@@ -1,21 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const HomePage = () => {
-  const navigate = useNavigate();
-
-  const handleButtonClick = () => {
-    navigate("/ppl");
-  };
-
   return (
-    <div className="flex flex-col justify-center items-center p-6 text-center">
+    <div className="flex flex-col justify-center align-middle p-6 max-w-xl space-y-4 mx-auto">
       <h1 className="text-3xl font-bold">Select an activity</h1>
-      <button
-        onClick={handleButtonClick}
-        className="mt-6 bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 max-w-lg w-full"
-      >
-        PPL
-      </button>
+      <NavLink to="/store">
+        <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
+          PPL
+        </button>
+      </NavLink>
     </div>
   );
 };

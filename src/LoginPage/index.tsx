@@ -5,6 +5,7 @@ import userService from "../Services/userService";
 const LoginPage = () => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [viewPassword, setViewPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -22,6 +23,11 @@ const LoginPage = () => {
       alert(error);
     }
   };
+
+  const handleViewPassword = () => {
+    setViewPassword(!viewPassword);
+  };
+
   return (
     <div className="h-screen flex flex-col items-center justify-center space-y-4">
       <h2 className="text-2xl font-semibold">Login</h2>
@@ -34,10 +40,13 @@ const LoginPage = () => {
       <input
         className="border px-3 py-2"
         placeholder="Password"
-        type="password"
+        type={viewPassword ? "text" : "password"}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <p className="cursor-pointer" onClick={handleViewPassword}>
+        {viewPassword ? "Hide Password" : "Show Passowrd"}
+      </p>
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700"
         onClick={handleLogin}

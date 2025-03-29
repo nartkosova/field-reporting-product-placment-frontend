@@ -2,6 +2,28 @@ import axios from "axios";
 
 const baseUrl = "http://localhost:3000/api/facings/podravka-facing";
 
+const getStoresByUserId = async (userId: number) => {
+  const token = localStorage.getItem("authToken");
+  const response = await axios.get(
+    `http://localhost:3000/api/stores/user/${userId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const getStoreById = async (store_id: number) => {
+  const token = localStorage.getItem("authToken");
+  const response = await axios.get(
+    `http://localhost:3000/api/stores/${store_id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const createPodravkaFacing = async (facingData: {
   user_id: number;
   store_id: number;
@@ -16,4 +38,20 @@ const createPodravkaFacing = async (facingData: {
   return response.data;
 };
 
-export default { createPodravkaFacing };
+const getProductsByStoreId = async (storeId: number) => {
+  const token = localStorage.getItem("authToken");
+  const response = await axios.get(
+    `http://localhost:3000/api/stores/${storeId}/products`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+export default {
+  createPodravkaFacing,
+  getStoresByUserId,
+  getStoreById,
+  getProductsByStoreId,
+};
