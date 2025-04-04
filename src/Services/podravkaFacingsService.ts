@@ -2,8 +2,10 @@ import axios from "axios";
 
 const baseUrl = "http://localhost:3000/api/facings/podravka-facing";
 
+const getToken = () => localStorage.getItem("authToken");
+
 const getStoresByUserId = async (userId: number) => {
-  const token = localStorage.getItem("authToken");
+  const token = getToken();
   const response = await axios.get(
     `http://localhost:3000/api/stores/user/${userId}`,
     {
@@ -14,7 +16,7 @@ const getStoresByUserId = async (userId: number) => {
 };
 
 const getStoreById = async (store_id: number) => {
-  const token = localStorage.getItem("authToken");
+  const token = getToken();
   const response = await axios.get(
     `http://localhost:3000/api/stores/${store_id}`,
     {
@@ -31,15 +33,33 @@ const createPodravkaFacing = async (facingData: {
   facings_count: number;
   report_date: string;
 }) => {
-  const token = localStorage.getItem("authToken");
+  const token = getToken();
   const response = await axios.post(baseUrl, facingData, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
+const createCategoryFacing = async (categoryData: {
+  user_id: number;
+  store_id: number;
+  category: string;
+  total_facings: number;
+  report_date: string;
+}) => {
+  const token = getToken();
+  const response = await axios.post(
+    `http://localhost:3000/api/facings/category-facing`,
+    categoryData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const getProductsByStoreId = async (storeId: number) => {
-  const token = localStorage.getItem("authToken");
+  const token = getToken();
   const response = await axios.get(
     `http://localhost:3000/api/stores/${storeId}/products`,
     {
@@ -53,5 +73,6 @@ export default {
   createPodravkaFacing,
   getStoresByUserId,
   getStoreById,
+  createCategoryFacing,
   getProductsByStoreId,
 };

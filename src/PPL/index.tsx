@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import podravkaFacingsService from "../Services/podravkaFacingsService";
 import { useParams } from "react-router-dom";
+
 interface Product {
   product_id: number;
   name: string;
@@ -10,7 +11,6 @@ interface Product {
 }
 
 const PodravkaFacingsFormPage = () => {
-  const [reportDate, setReportDate] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [facings, setFacings] = useState<{ [key: number]: number }>({});
@@ -25,7 +25,6 @@ const PodravkaFacingsFormPage = () => {
         const products = await podravkaFacingsService.getProductsByStoreId(
           storeId
         );
-        console.log(products);
         setProducts(products);
       } catch (err) {
         console.error("Error fetching products:", err);
@@ -45,23 +44,40 @@ const PodravkaFacingsFormPage = () => {
 
   const uniqueCategories = Array.from(new Set(products.map((p) => p.category)));
 
+  const totalFacingsForCategory = filteredProducts.reduce((sum, product) => {
+    const count = facings[product.product_id] || 0;
+    return sum + count;
+  }, 0);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const facingData = Object.entries(facings).map(([productId, count]) => ({
+      const today = new Date().toISOString().split("T")[0];
+
+      const facingData = filteredProducts.map((product) => ({
         user_id: userId,
         store_id: Number(storeId),
-        product_id: Number(productId),
-        facings_count: Number(count),
-        report_date: new Date().toISOString().split("T")[0],
+        product_id: product.product_id,
+        facings_count: facings[product.product_id] || 0,
+        report_date: today,
       }));
 
       for (const facing of facingData) {
         await podravkaFacingsService.createPodravkaFacing(facing);
       }
 
+      // Send total to category-facing table
+      await podravkaFacingsService.createCategoryFacing({
+        user_id: userId,
+        store_id: Number(storeId),
+        category: categoryFilter,
+        total_facings: totalFacingsForCategory,
+        report_date: today,
+      });
+
       alert("Facings submitted successfully!");
-      setReportDate("");
+
       setCategoryFilter("");
       setFacings({});
     } catch (err) {
@@ -103,6 +119,14 @@ const PodravkaFacingsFormPage = () => {
             />
           </div>
         ))}
+
+        {categoryFilter && (
+          <div className="text-left font-semibold">
+            Total facings for{" "}
+            <span className="text-blue-600">{categoryFilter}</span>:{" "}
+            {totalFacingsForCategory}
+          </div>
+        )}
 
         <button
           type="submit"
