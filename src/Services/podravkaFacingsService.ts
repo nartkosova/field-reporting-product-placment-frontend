@@ -1,42 +1,57 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:3000/api/facings/podravka-facing";
+const baseUrl = "http://localhost:3000/api";
 
 const getToken = () => localStorage.getItem("authToken");
-
-const getStoresByUserId = async (userId: number) => {
-  const token = getToken();
-  const response = await axios.get(
-    `http://localhost:3000/api/stores/user/${userId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
-const getStoreById = async (store_id: number) => {
-  const token = getToken();
-  const response = await axios.get(
-    `http://localhost:3000/api/stores/${store_id}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
 
 const createPodravkaFacing = async (facingData: {
   user_id: number;
   store_id: number;
+  category: string;
   product_id: number;
   facings_count: number;
-  report_date: string;
+  // report_date: string;
 }) => {
   const token = getToken();
-  const response = await axios.post(baseUrl, facingData, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axios.post(
+    `${baseUrl}/facings/podravka-facing`,
+    facingData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+const createCompetitorBrand = async (competitorBrandData: {
+  brand_name: string;
+}) => {
+  const token = getToken();
+  const response = await axios.post(
+    `${baseUrl}/products/competitor-brand`,
+    competitorBrandData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const createCompetitorFacing = async (competitorFacingData: {
+  user_id: number;
+  store_id: number;
+  competitor_id: number;
+  category: string;
+  facings_count: number;
+  // report_date: string;
+}) => {
+  const token = getToken();
+  const response = await axios.post(
+    `${baseUrl}/facings/competitor-facing`,
+    competitorFacingData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };
 
@@ -45,11 +60,12 @@ const createCategoryFacing = async (categoryData: {
   store_id: number;
   category: string;
   total_facings: number;
+  competitor_total_facings: number;
   report_date: string;
 }) => {
   const token = getToken();
   const response = await axios.post(
-    `http://localhost:3000/api/facings/category-facing`,
+    `${baseUrl}/facings/category-facing`,
     categoryData,
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -57,11 +73,26 @@ const createCategoryFacing = async (categoryData: {
   );
   return response.data;
 };
+const getPodravkaFacings = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/facings/podravka-facing`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
 
 const getProductsByStoreId = async (storeId: number) => {
   const token = getToken();
+  const response = await axios.get(`${baseUrl}/stores/${storeId}/products`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+const getCompetitorBrandByName = async (brandName: string) => {
+  const token = getToken();
   const response = await axios.get(
-    `http://localhost:3000/api/stores/${storeId}/products`,
+    `${baseUrl}/products/competitor-brand/${brandName}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -69,10 +100,29 @@ const getProductsByStoreId = async (storeId: number) => {
   return response.data;
 };
 
+const getAllCompetitorBrands = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/products/competitor-brand`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+const getPodravkaFacingsWithCompetitors = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/facings/with-competitors`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 export default {
   createPodravkaFacing,
-  getStoresByUserId,
-  getStoreById,
   createCategoryFacing,
+  createCompetitorFacing,
+  createCompetitorBrand,
+  getPodravkaFacings,
   getProductsByStoreId,
+  getCompetitorBrandByName,
+  getAllCompetitorBrands,
+  getPodravkaFacingsWithCompetitors,
 };

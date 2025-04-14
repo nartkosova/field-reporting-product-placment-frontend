@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import podravkaFacingsService from "../Services/podravkaFacingsService";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 interface Product {
   product_id: number;
@@ -11,10 +11,11 @@ interface Product {
 }
 
 const PodravkaFacingsFormPage = () => {
-  const [categoryFilter, setCategoryFilter] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [facings, setFacings] = useState<{ [key: number]: number }>({});
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = userInfo?.id;
@@ -25,26 +26,23 @@ const PodravkaFacingsFormPage = () => {
         const products = await podravkaFacingsService.getProductsByStoreId(
           storeId
         );
-        setProducts(products);
+        const filtered = products.filter(
+          (p: Product) => p.category === selectedCategory
+        );
+        setProducts(filtered);
       } catch (err) {
         console.error("Error fetching products:", err);
       }
     };
 
     fetchProducts();
-  }, [storeId]);
+  }, [storeId, selectedCategory]);
 
   const handleFacingChange = (productId: number, value: number) => {
     setFacings({ ...facings, [productId]: value });
   };
 
-  const filteredProducts = categoryFilter
-    ? products.filter((p) => p.category === categoryFilter)
-    : products;
-
-  const uniqueCategories = Array.from(new Set(products.map((p) => p.category)));
-
-  const totalFacingsForCategory = filteredProducts.reduce((sum, product) => {
+  const totalFacingsForCategory = products.reduce((sum, product) => {
     const count = facings[product.product_id] || 0;
     return sum + count;
   }, 0);
@@ -53,32 +51,19 @@ const PodravkaFacingsFormPage = () => {
     e.preventDefault();
 
     try {
-      const today = new Date().toISOString().split("T")[0];
-
-      const facingData = filteredProducts.map((product) => ({
+      const facingData = products.map((product) => ({
         user_id: userId,
         store_id: Number(storeId),
         product_id: product.product_id,
+        category: product.category,
         facings_count: facings[product.product_id] || 0,
-        report_date: today,
       }));
 
       for (const facing of facingData) {
         await podravkaFacingsService.createPodravkaFacing(facing);
       }
 
-      // Send total to category-facing table
-      await podravkaFacingsService.createCategoryFacing({
-        user_id: userId,
-        store_id: Number(storeId),
-        category: categoryFilter,
-        total_facings: totalFacingsForCategory,
-        report_date: today,
-      });
-
       alert("Facings submitted successfully!");
-
-      setCategoryFilter("");
       setFacings({});
     } catch (err) {
       alert("Error submitting facings");
@@ -90,20 +75,7 @@ const PodravkaFacingsFormPage = () => {
     <div className="flex flex-col p-6 max-w-xl mx-auto space-y-4">
       <h2 className="text-2xl font-semibold">Submit Podravka Facings</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <select
-          className="border p-2 w-full"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="">...</option>
-          {uniqueCategories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-
-        {filteredProducts.map((product) => (
+        {products.map((product) => (
           <div key={product.product_id} className="border p-2 rounded">
             <label>
               {product.name} ({product.category}) - {product.product_category}
@@ -120,13 +92,11 @@ const PodravkaFacingsFormPage = () => {
           </div>
         ))}
 
-        {categoryFilter && (
-          <div className="text-left font-semibold">
-            Total facings for{" "}
-            <span className="text-blue-600">{categoryFilter}</span>:{" "}
-            {totalFacingsForCategory}
-          </div>
-        )}
+        <div className="text-left font-semibold">
+          Total facings for{" "}
+          <span className="text-blue-600">{selectedCategory}</span>:{" "}
+          {totalFacingsForCategory}
+        </div>
 
         <button
           type="submit"

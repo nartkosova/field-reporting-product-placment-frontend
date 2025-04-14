@@ -7,8 +7,9 @@ let token = null;
 const setToken = (newToken: string) => {
   token = `${newToken}`;
 };
-
-const getAllUsers = async (token: string) => {
+const getToken = () => localStorage.getItem("authToken");
+const getAllUsers = async () => {
+  const token = getToken();
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };

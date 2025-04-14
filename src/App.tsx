@@ -2,11 +2,13 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
 import Header from "./Navigation/Header";
-import FacingsSelector from "./PPLFacingsSelector";
 import StoreList from "./PPLStores";
 import { useEffect, useState } from "react";
 import userService from "./Services/userService";
 import PodravkaFacingsFormPage from "./PPL";
+import FacingsSelector from "./PPLFacingsSelector";
+import CompetitorFacingsFormPage from "./PPLCompetitor";
+import ReportView from "./ReportView";
 const App = () => {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState<string | null>(null);
@@ -35,6 +37,11 @@ const App = () => {
               path="/ppl/store/:id/ppl-podravka"
               element={<PodravkaFacingsFormPage />}
             />
+            <Route
+              path="/ppl/store/:id/ppl-konkurrenca"
+              element={<CompetitorFacingsFormPage />}
+            />
+            <Route path="/reports" element={<ReportView />} />
           </>
         ) : (
           <Route path="/login" element={<LoginPage />} />

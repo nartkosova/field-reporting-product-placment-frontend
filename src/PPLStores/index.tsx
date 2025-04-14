@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import podravkaFacingsService from "../Services/podravkaFacingsService";
+import storeServices from "../Services/storeServices";
 import { NavLink } from "react-router-dom";
 import { Store } from "../types/storeInterface";
 const StoreList = () => {
@@ -21,9 +21,7 @@ const StoreList = () => {
       try {
         if (!userId) return;
 
-        const userStores = await podravkaFacingsService.getStoresByUserId(
-          userId
-        );
+        const userStores = await storeServices.getStoresByUserId(userId);
         setStores(userStores);
       } catch (error) {
         console.error("Failed to fetch stores:", error);
