@@ -107,11 +107,15 @@ const getAllCompetitorBrands = async () => {
   });
   return response.data;
 };
-const getPodravkaFacingsWithCompetitors = async () => {
+const getPodravkaFacingsWithCompetitors = async (params = {}) => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/facings/with-competitors`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const searchParams = new URLSearchParams(params).toString();
+  const response = await axios.get(
+    `${baseUrl}/facings/with-competitors?${searchParams}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };
 

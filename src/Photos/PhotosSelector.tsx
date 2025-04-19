@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { Store } from "../types/storeInterface";
-import podravkaFacingsService from "../Services/podravkaFacingsService";
-import storeServices from "../Services/storeServices";
 interface Product {
   category: string;
 }
 
-const FacingsSelector: React.FC = () => {
+const PhotosSelector: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const storeId = id ? parseInt(id) : NaN;
   const [store, setStore] = useState<Store | null>(null);
@@ -79,4 +76,4 @@ const FacingsSelector: React.FC = () => {
   );
 };
 
-export default FacingsSelector;
+export default PhotosSelector;

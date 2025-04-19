@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import podravkaFacingsService from "../Services/podravkaFacingsService";
+import podravkaFacingsService from "../../Services/podravkaFacingsService";
 import { useParams, useSearchParams } from "react-router-dom";
 
 interface Product {
@@ -84,6 +84,7 @@ const PodravkaFacingsFormPage = () => {
               type="number"
               className="border p-2 w-full mt-1"
               placeholder="Facings Count"
+              min={0}
               value={facings[product.product_id] || ""}
               onChange={(e) =>
                 handleFacingChange(product.product_id, Number(e.target.value))

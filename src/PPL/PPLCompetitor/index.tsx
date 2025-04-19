@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import podravkaFacingsService from "../Services/podravkaFacingsService";
+import podravkaFacingsService from "../../Services/podravkaFacingsService";
 
 interface CompetitorEntry {
   id?: number;
@@ -195,6 +195,7 @@ const CompetitorFacingsFormPage = () => {
             <input
               type="number"
               placeholder="Facings"
+              min={0}
               className="border p-2 w-1/2"
               value={comp.facings}
               onChange={(e) =>

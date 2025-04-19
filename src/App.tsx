@@ -2,12 +2,12 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
 import Header from "./Navigation/Header";
-import StoreList from "./PPLStores";
+import StoreList from "./PPL/PPLStores";
 import { useEffect, useState } from "react";
 import userService from "./Services/userService";
-import PodravkaFacingsFormPage from "./PPL";
-import FacingsSelector from "./PPLFacingsSelector";
-import CompetitorFacingsFormPage from "./PPLCompetitor";
+import PodravkaFacingsFormPage from "./PPL/PPLForm";
+import FacingsSelector from "./PPL/PPLFacingsSelector";
+import CompetitorFacingsFormPage from "./PPL/PPLCompetitor";
 import ReportView from "./ReportView";
 const App = () => {
   const navigate = useNavigate();

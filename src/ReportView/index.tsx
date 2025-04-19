@@ -15,6 +15,7 @@ const ReportView = () => {
     store_id: "",
     category: "",
     report_date: "",
+    date_range: "",
   });
 
   useEffect(() => {
@@ -43,6 +44,7 @@ const ReportView = () => {
 
     fetchInitialData();
   }, []);
+
   const formatDateISO = (date: string | Date) => {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -51,15 +53,42 @@ const ReportView = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const getDateRangeFilter = () => {
+    const today = new Date();
+    if (filters.date_range === "today") {
+      return [formatDateISO(today), formatDateISO(today)];
+    }
+    if (filters.date_range === "week") {
+      const pastWeek = new Date(today);
+      pastWeek.setDate(today.getDate() - 7);
+      return [formatDateISO(pastWeek), formatDateISO(today)];
+    }
+    if (filters.date_range === "month") {
+      const pastMonth = new Date(today);
+      pastMonth.setMonth(today.getMonth() - 1);
+      return [formatDateISO(pastMonth), formatDateISO(today)];
+    }
+    if (filters.date_range === "3 months") {
+      const past3Months = new Date(today);
+      past3Months.setMonth(today.getMonth() - 3);
+      return [formatDateISO(past3Months), formatDateISO(today)];
+    }
+  };
+
+  const [startDate, endDate] = getDateRangeFilter() || ["", ""];
+
   const filteredFacings = facings.filter((f: any) => {
     const reportDate = formatDateISO(f.report_date);
     return (
       (!filters.user_id || String(f.user_id) === filters.user_id) &&
       (!filters.store_id || String(f.store_id) === filters.store_id) &&
       (!filters.category || f.category === filters.category) &&
-      (!filters.report_date || reportDate === filters.report_date)
+      (!filters.report_date || reportDate === filters.report_date) &&
+      (!filters.date_range ||
+        (reportDate >= startDate && reportDate <= endDate))
     );
   });
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Facings Overview</h2>
@@ -112,6 +141,20 @@ const ReportView = () => {
             setFilters({ ...filters, report_date: e.target.value })
           }
         />
+
+        <select
+          className="border p-2"
+          value={filters.date_range}
+          onChange={(e) =>
+            setFilters({ ...filters, date_range: e.target.value })
+          }
+        >
+          <option value="">All time</option>
+          <option value="today">Today</option>
+          <option value="week">Past week</option>
+          <option value="month">Past month</option>
+          <option value="3 months">Past 3 months</option>
+        </select>
       </div>
 
       <table className="w-full border text-sm">

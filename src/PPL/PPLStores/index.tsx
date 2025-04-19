@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import storeServices from "../Services/storeServices";
+import storeServices from "../../Services/storeServices";
 import { NavLink } from "react-router-dom";
-import { Store } from "../types/storeInterface";
+import { Store } from "../../types/storeInterface";
 const StoreList = () => {
   const [stores, setStores] = useState([]);
   const [userId, setUserId] = useState<number | null>(null);
