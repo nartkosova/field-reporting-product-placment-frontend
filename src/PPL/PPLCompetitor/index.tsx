@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import podravkaFacingsService from "../../Services/podravkaFacingsService";
-
 interface CompetitorEntry {
   id?: number;
   name: string;
