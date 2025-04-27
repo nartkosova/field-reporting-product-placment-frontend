@@ -6,6 +6,7 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userInfo");
+    localStorage.removeItem("selectedCategory");
     navigate("/login");
   };
   return (

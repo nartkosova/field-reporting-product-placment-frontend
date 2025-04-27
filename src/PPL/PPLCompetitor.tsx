@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import podravkaFacingsService from "../../Services/podravkaFacingsService";
+import podravkaFacingsService from "../Services/podravkaFacingsService";
 interface CompetitorEntry {
   id?: number;
   name: string;
@@ -74,63 +74,26 @@ const CompetitorFacingsFormPage = () => {
     console.log("Submitting competitors:", competitors);
 
     try {
-      for (const competitor of competitors) {
-        if (competitor.name && competitor.facings > 0) {
-          let brandId: number | undefined;
+      const facingData = competitors.map((competitor) => {
+        const existingBrand = allCompetitorBrands.find(
+          (b) =>
+            b.brand_name.trim().toLowerCase() ===
+            competitor.name.trim().toLowerCase()
+        );
 
-          if (competitor.id) {
-            brandId = competitor.id;
-            console.log(
-              `Using existing brand ID for ${competitor.name}: ${brandId}`
-            );
-          } else {
-            const existing = allCompetitorBrands.find(
-              (b) =>
-                b.brand_name.trim().toLowerCase() ===
-                competitor.name.trim().toLowerCase()
-            );
+        return {
+          user_id: userId,
+          store_id: Number(storeId),
+          category: selectedCategory,
+          facings_count: competitor.facings,
+          competitor_id: existingBrand
+            ? existingBrand.competitor_id
+            : undefined,
+          name: !existingBrand ? competitor.name : undefined,
+        };
+      });
 
-            if (!existing) {
-              console.log(`Creating new brand: ${competitor.name}`);
-              const createdBrand =
-                await podravkaFacingsService.createCompetitorBrand({
-                  brand_name: competitor.name,
-                });
-              brandId = createdBrand.id;
-              console.log("Created brand with ID:", brandId);
-            } else {
-              brandId = existing.competitor_id;
-              console.log(
-                `Found existing brand ID for ${competitor.name}: ${brandId}`
-              );
-            }
-          }
-
-          if (!brandId) {
-            console.error(
-              `No brand ID found or created for ${competitor.name}`
-            );
-            continue;
-          }
-
-          const payload = {
-            user_id: userId,
-            store_id: Number(storeId),
-            competitor_id: brandId,
-            category: selectedCategory,
-            facings_count: competitor.facings,
-          };
-
-          console.log("Sending payload:", payload);
-
-          await podravkaFacingsService.createCompetitorFacing(payload);
-        } else {
-          console.warn(
-            "Skipping competitor due to missing name or facings:",
-            competitor
-          );
-        }
-      }
+      await podravkaFacingsService.batchCreateCompetitorFacings(facingData);
 
       alert("Competitor facings submitted!");
       setCompetitors([{ name: "", facings: 0 }]);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import podravkaFacingsService from "../../Services/podravkaFacingsService";
+import podravkaFacingsService from "../Services/podravkaFacingsService";
 import { useParams, useSearchParams } from "react-router-dom";
 
 interface Product {
@@ -13,6 +13,8 @@ interface Product {
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [facings, setFacings] = useState<{ [key: number]: number }>({});
+  const [loading, setLoading] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(true);
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
@@ -22,6 +24,7 @@ const PodravkaFacingsFormPage = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setProductsLoading(true);
       try {
         const products = await podravkaFacingsService.getProductsByStoreId(
           storeId
@@ -32,6 +35,8 @@ const PodravkaFacingsFormPage = () => {
         setProducts(filtered);
       } catch (err) {
         console.error("Error fetching products:", err);
+      } finally {
+        setProductsLoading(false);
       }
     };
 
@@ -49,7 +54,7 @@ const PodravkaFacingsFormPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const facingData = products.map((product) => ({
         user_id: userId,
@@ -59,53 +64,58 @@ const PodravkaFacingsFormPage = () => {
         facings_count: facings[product.product_id] || 0,
       }));
 
-      for (const facing of facingData) {
-        await podravkaFacingsService.createPodravkaFacing(facing);
-      }
+      await podravkaFacingsService.batchCreatePodravkaFacings(facingData);
 
       alert("Facings submitted successfully!");
       setFacings({});
     } catch (err) {
       alert("Error submitting facings");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col p-6 max-w-xl mx-auto space-y-4">
       <h2 className="text-2xl font-semibold">Submit Podravka Facings</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {products.map((product) => (
-          <div key={product.product_id} className="border p-2 rounded">
-            <label>
-              {product.name} ({product.category}) - {product.product_category}
-            </label>
-            <input
-              type="number"
-              className="border p-2 w-full mt-1"
-              placeholder="Facings Count"
-              min={0}
-              value={facings[product.product_id] || ""}
-              onChange={(e) =>
-                handleFacingChange(product.product_id, Number(e.target.value))
-              }
-            />
+      {productsLoading ? (
+        <p>Loading products...</p>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {products.map((product) => (
+            <div key={product.product_id} className="border p-2 rounded">
+              <label>
+                {product.name} ({product.category}) - {product.product_category}
+              </label>
+              <input
+                type="number"
+                className="border p-2 w-full mt-1"
+                placeholder="Facings Count"
+                min={0}
+                value={facings[product.product_id] || ""}
+                onChange={(e) =>
+                  handleFacingChange(product.product_id, Number(e.target.value))
+                }
+              />
+            </div>
+          ))}
+
+          <div className="text-left font-semibold">
+            Total facings for{" "}
+            <span className="text-blue-600">{selectedCategory}</span>:{" "}
+            {totalFacingsForCategory}
           </div>
-        ))}
 
-        <div className="text-left font-semibold">
-          Total facings for{" "}
-          <span className="text-blue-600">{selectedCategory}</span>:{" "}
-          {totalFacingsForCategory}
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
-        >
-          Submit
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+        </form>
+      )}
     </div>
   );
 };

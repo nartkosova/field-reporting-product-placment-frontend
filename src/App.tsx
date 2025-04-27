@@ -4,12 +4,13 @@ import LoginPage from "./LoginPage";
 import Header from "./Navigation/Header";
 import { useEffect, useState } from "react";
 import userService from "./Services/userService";
-import PodravkaFacingsFormPage from "./PPL/PPLForm";
+import PodravkaFacingsFormPage from "./PPL/PPLPodravka";
 import FacingsSelector from "./PPL/PPLFacingsSelector";
 import CompetitorFacingsFormPage from "./PPL/PPLCompetitor";
 import ReportView from "./ReportView/ReportHeader";
 import StoreSelector from "./Components/StoreList/StoreSelector";
 import PhotoSelector from "./Photos/PhotosSelector";
+import PriceCheckPodravka from "./PriceCheck/PriceCheckPodravka";
 const App = () => {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState<string | null>(null);
@@ -32,10 +33,10 @@ const App = () => {
           <>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<HomePage />} />
-            <Route path="/store" element={<StoreSelector />} />
-            <Route path="/store/:id" element={<FacingsSelector />} />
+            <Route path="/ppl-store" element={<StoreSelector />} />
+            <Route path="/ppl-store/:id" element={<FacingsSelector />} />
             <Route
-              path="/ppl/store/:id/ppl-podravka"
+              path="/ppl-store/:id/ppl-podravka"
               element={<PodravkaFacingsFormPage />}
             />
             <Route
@@ -45,6 +46,8 @@ const App = () => {
             <Route path="/reports" element={<ReportView />} />
             <Route path="/photos" element={<StoreSelector />} />
             <Route path="/photos/:id" element={<PhotoSelector />} />
+            <Route path="/price-check" element={<StoreSelector />} />
+            <Route path="/price-check/:id" element={<PriceCheckPodravka />} />
           </>
         ) : (
           <Route path="/login" element={<LoginPage />} />

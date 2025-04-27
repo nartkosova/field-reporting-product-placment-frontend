@@ -1,5 +1,8 @@
 import axios from "axios";
-
+import {
+  PodravkaFacingInput,
+  CompetitorFacingInput,
+} from "../types/podravkaFacingInterface";
 const baseUrl = "http://localhost:3000/api";
 
 const getToken = () => localStorage.getItem("authToken");
@@ -118,6 +121,33 @@ const getPodravkaFacingsWithCompetitors = async (params = {}) => {
   );
   return response.data;
 };
+const batchCreatePodravkaFacings = async (
+  facingDataArray: PodravkaFacingInput[]
+) => {
+  const token = getToken();
+  const response = await axios.post(
+    `${baseUrl}/facings/podravka-facing/batch`,
+    facingDataArray,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const batchCreateCompetitorFacings = async (
+  facingDataArray: CompetitorFacingInput[]
+) => {
+  const token = getToken();
+  const response = await axios.post(
+    `${baseUrl}/facings/competitor-facing/batch`,
+    facingDataArray,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
 
 export default {
   createPodravkaFacing,
@@ -129,4 +159,6 @@ export default {
   getCompetitorBrandByName,
   getAllCompetitorBrands,
   getPodravkaFacingsWithCompetitors,
+  batchCreatePodravkaFacings,
+  batchCreateCompetitorFacings,
 };
