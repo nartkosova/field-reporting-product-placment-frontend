@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { Store } from "../../types/storeInterface";
-import podravkaFacingsService from "../../Services/podravkaFacingsService";
-import storeServices from "../../Services/storeServices";
+import { Store } from "../types/storeInterface";
+import podravkaFacingsService from "../Services/podravkaFacingsService";
+import storeServices from "../Services/storeServices";
 import Select from "react-select";
 interface Product {
   category: string;
@@ -58,7 +58,18 @@ const PhotoSelector: React.FC = () => {
       />
 
       <NavLink
-        to={`/ppl/store/${store?.store_id}/ppl-podravka?category=${selectedCategory}`}
+        to={`/photos/${store?.store_id}/primaty?category=${selectedCategory}`}
+      >
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 max-w-xl w-full"
+          disabled={!selectedCategory}
+        >
+          Primare
+        </button>
+      </NavLink>
+
+      <NavLink
+        to={`/photos/${store?.store_id}/secondary?category=${selectedCategory}`}
       >
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 max-w-xl w-full"
@@ -69,7 +80,7 @@ const PhotoSelector: React.FC = () => {
       </NavLink>
 
       <NavLink
-        to={`/ppl/store/${store?.store_id}/ppl-konkurrenca?category=${selectedCategory}`}
+        to={`/photos/${store?.store_id}/terciary?category=${selectedCategory}`}
       >
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 max-w-xl w-full"

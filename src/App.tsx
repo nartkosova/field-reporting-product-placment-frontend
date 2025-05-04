@@ -10,6 +10,7 @@ import CompetitorFacingsFormPage from "./PPL/PPLCompetitor";
 import ReportView from "./ReportView/ReportHeader";
 import StoreSelector from "./Components/StoreList/StoreSelector";
 import PhotoSelector from "./Photos/PhotosSelector";
+import PriceCheckSelector from "./PriceCheck/PriceCheckSelector";
 import PriceCheckPodravka from "./PriceCheck/PriceCheckPodravka";
 const App = () => {
   const navigate = useNavigate();
@@ -40,14 +41,18 @@ const App = () => {
               element={<PodravkaFacingsFormPage />}
             />
             <Route
-              path="/ppl/store/:id/ppl-konkurrenca"
+              path="/ppl-store/:id/ppl-konkurrenca"
               element={<CompetitorFacingsFormPage />}
             />
             <Route path="/reports" element={<ReportView />} />
             <Route path="/photos" element={<StoreSelector />} />
             <Route path="/photos/:id" element={<PhotoSelector />} />
             <Route path="/price-check" element={<StoreSelector />} />
-            <Route path="/price-check/:id" element={<PriceCheckPodravka />} />
+            <Route path="/price-check/:id" element={<PriceCheckSelector />} />
+            <Route
+              path="/price-check/:id/podravka"
+              element={<PriceCheckPodravka />}
+            />
           </>
         ) : (
           <Route path="/login" element={<LoginPage />} />

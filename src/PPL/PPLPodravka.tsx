@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
 import podravkaFacingsService from "../Services/podravkaFacingsService";
 import { useParams, useSearchParams } from "react-router-dom";
-
-interface Product {
-  product_id: number;
-  name: string;
-  category: string;
-  business_unit: string;
-  product_category: string;
-}
+import { Product } from "../types/productInterface";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
