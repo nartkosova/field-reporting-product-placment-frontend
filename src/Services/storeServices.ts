@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:3000/api";
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const getToken = () => localStorage.getItem("authToken");
 
 const getStoresByUserId = async (userId: number) => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/stores/user/${userId}`, {
+  const response = await axios.get(`${baseUrl}/api/stores/user/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -14,7 +14,7 @@ const getStoresByUserId = async (userId: number) => {
 
 const getStoreById = async (store_id: number) => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/stores/${store_id}`, {
+  const response = await axios.get(`${baseUrl}/api/stores/${store_id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -22,7 +22,7 @@ const getStoreById = async (store_id: number) => {
 
 const getAllStores = async () => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/stores`, {
+  const response = await axios.get(`${baseUrl}/api/stores`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;

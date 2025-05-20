@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import podravkaFacingsService from "../Services/podravkaFacingsService";
+import competitorServices from "../Services/competitorServices";
+import Select from "react-select";
 interface CompetitorEntry {
   id?: number;
   name: string;
@@ -27,7 +28,7 @@ const CompetitorFacingsFormPage = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const brands = await podravkaFacingsService.getAllCompetitorBrands();
+        const brands = await competitorServices.getAllCompetitorBrands();
         setAllCompetitorBrands(brands);
         console.log("Fetched competitor brands:", brands);
       } catch (err) {
@@ -93,7 +94,7 @@ const CompetitorFacingsFormPage = () => {
         };
       });
 
-      await podravkaFacingsService.batchCreateCompetitorFacings(facingData);
+      await competitorServices.batchCreateCompetitorFacings(facingData);
 
       alert("Competitor facings submitted!");
       setCompetitors([{ name: "", facings: 0 }]);
@@ -114,34 +115,44 @@ const CompetitorFacingsFormPage = () => {
         {competitors.map((comp, index) => (
           <div key={index} className="flex space-x-2">
             {!comp.isNew ? (
-              <select
-                className="border p-2 w-1/2"
-                value={comp.name || ""}
-                onChange={(e) => {
-                  const selectedName = e.target.value;
-                  const selectedBrand = allCompetitorBrands.find(
-                    (b) => b.brand_name === selectedName
-                  );
-                  handleCompetitorChange(index, "name", selectedName);
-                  if (selectedBrand) {
-                    handleCompetitorChange(
-                      index,
-                      "id",
-                      selectedBrand.competitor_id
+              <Select
+                className="w-1/2"
+                value={
+                  comp.isNew
+                    ? { label: "+ Add new competitor", value: "__new__" }
+                    : comp.name
+                    ? { label: comp.name, value: comp.name }
+                    : null
+                }
+                onChange={(selected) => {
+                  if (!selected) return;
+                  if (selected.value === "__new__") {
+                    handleCompetitorChange(index, "name", "__new__");
+                  } else {
+                    handleCompetitorChange(index, "name", selected.value);
+                    const selectedBrand = allCompetitorBrands.find(
+                      (b) => b.brand_name === selected.value
                     );
-                    console.log("Selected existing brand:", selectedBrand);
+                    if (selectedBrand) {
+                      handleCompetitorChange(
+                        index,
+                        "id",
+                        selectedBrand.competitor_id
+                      );
+                      console.log("Selected existing brand:", selectedBrand);
+                    }
                   }
                 }}
-                required
-              >
-                <option value="">Select competitor</option>
-                {allCompetitorBrands.map((brand) => (
-                  <option key={brand.competitor_id} value={brand.brand_name}>
-                    {brand.brand_name}
-                  </option>
-                ))}
-                <option value="__new__">+ Add new competitor</option>
-              </select>
+                options={[
+                  ...allCompetitorBrands.map((brand) => ({
+                    label: brand.brand_name,
+                    value: brand.brand_name,
+                  })),
+                  { label: "+ Add new competitor", value: "__new__" },
+                ]}
+                placeholder="Select competitor"
+                isClearable
+              />
             ) : (
               <input
                 type="text"

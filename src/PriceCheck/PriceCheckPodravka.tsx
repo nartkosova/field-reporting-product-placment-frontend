@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import priceCheckServices from "../Services/priceCheckServices";
 import podravkaFacingsService from "../Services/podravkaFacingsService";
-import { PriceCheckInput } from "../types/priceCheckInterface";
+import {
+  PriceCheckInput,
+  PodravkaPriceCheckInput,
+} from "../types/priceCheckInterface";
 import { Product } from "../types/productInterface";
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -55,7 +58,7 @@ const PriceCheckPodravka = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const payload = products.map((product) => ({
+      const payload: PodravkaPriceCheckInput[] = products.map((product) => ({
         user_id: userId,
         store_id: storeId,
         product_type: "podravka",
@@ -70,11 +73,10 @@ const PriceCheckPodravka = () => {
           prices[product.product_id]?.discount_description ?? undefined,
       }));
 
-      //   await priceCheckServices.batchCreatePriceCheck(payload);
+      await priceCheckServices.batchCreatePriceCheck(payload);
 
-      //   alert("Prices submitted successfully!");
-      //   setPrices({});
-      console.log("Prices submitted successfully!", payload);
+      alert("Prices submitted successfully!");
+      setPrices({});
     } catch (err) {
       alert("Error submitting prices");
       console.error("Submit error:", err);

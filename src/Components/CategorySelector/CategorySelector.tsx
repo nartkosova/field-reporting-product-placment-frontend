@@ -9,7 +9,7 @@ interface CategorySelectorProps {
   routeBase: string;
   buttonLinks: {
     label: string;
-    path: string; // e.g. '/ppl-podravka'
+    path: string;
   }[];
 }
 
@@ -92,7 +92,11 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           to={`${routeBase}/${store?.store_id}${path}?category=${selectedCategory}`}
         >
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 max-w-xl w-full"
+            className={`px-4 py-2 rounded cursor-pointer max-w-xl w-full ${
+              selectedCategory
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-blue-600 opacity-70 text-gray-200 !cursor-not-allowed"
+            }`}
             disabled={!selectedCategory}
           >
             {label}

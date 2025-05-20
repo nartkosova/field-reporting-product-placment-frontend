@@ -1,11 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Store } from "../../types/storeInterface";
-
-interface StoreListProps {
-  stores: Store[];
-  user: string | null;
-  showLocation?: boolean;
-}
+import { StoreListProps } from "../../types/storeInterface";
 
 const StoreList = ({ stores, user, showLocation = true }: StoreListProps) => {
   return (

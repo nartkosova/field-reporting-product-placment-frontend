@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userService from "../Services/userService";
-
+import { setToken } from "../Services/authService";
 const LoginPage = () => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -11,16 +11,23 @@ const LoginPage = () => {
   const handleLogin = async () => {
     try {
       const response = await userService.loginUser({ user, password });
-
       window.localStorage.setItem("authToken", response.token);
       window.localStorage.setItem("userInfo", JSON.stringify(response.user));
-      userService.setToken(response.token);
+      setToken(response.token);
       setUser("");
       setPassword("");
       navigate("/");
-    } catch (error) {
-      userService.setToken("");
-      alert(error);
+    } catch (error: unknown) {
+      setToken("");
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { data?: { error?: string } };
+        };
+        const message = axiosError.response?.data?.error || "Login failed";
+        alert(message);
+      } else {
+        alert("Unexpected error occurred");
+      }
     }
   };
 

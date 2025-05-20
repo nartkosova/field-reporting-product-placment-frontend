@@ -5,3 +5,8 @@ export interface Store {
   store_category: string;
   location: string;
 }
+export interface StoreListProps {
+  stores: Store[];
+  user: string | null;
+  showLocation?: boolean;
+}

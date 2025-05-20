@@ -1,12 +1,12 @@
 import axios from "axios";
 import { PriceCheckInput } from "../types/priceCheckInterface";
-const baseUrl = "http://localhost:5000";
+const baseUrl = import.meta.env.VITE_BASE_URL;
 const getToken = () => localStorage.getItem("authToken");
 
 const batchCreatePriceCheck = async (priceDataArray: PriceCheckInput[]) => {
   const token = getToken();
   const response = await axios.post(
-    `${baseUrl}/price-checker/batch`,
+    `${baseUrl}/api/price-checks/batch`,
     priceDataArray,
     {
       headers: {
@@ -14,6 +14,22 @@ const batchCreatePriceCheck = async (priceDataArray: PriceCheckInput[]) => {
       },
     }
   );
+  return response.data;
+};
+
+export const getPriceCheck = async (params: {
+  store_id?: number;
+  category?: string;
+  product_type?: "podravka" | "competitor";
+}): Promise<PriceCheckInput[]> => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/api/price-checks`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params,
+  });
+
   return response.data;
 };
 

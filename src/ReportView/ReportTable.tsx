@@ -58,7 +58,7 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
           0
         ),
       {
-        header: "Total",
+        header: "Konkurrenca Total",
         id: "total_competitor_facings",
         enableSorting: true,
       }

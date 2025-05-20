@@ -1,34 +1,28 @@
 import axios from "axios";
+import { getToken } from "./authService";
 
-const baseUrl = "http://127.0.0.1:3000/api/users";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let token = null;
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
-const setToken = (newToken: string) => {
-  token = `${newToken}`;
-};
-const getToken = () => localStorage.getItem("authToken");
 const getAllUsers = async () => {
   const token = getToken();
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  const response = await axios.get(baseUrl, config);
+  const response = await axios.get(`${baseUrl}/api/users`, config);
   return response.data;
 };
 
 const createUser = async (userData: { user: string; password: string }) => {
-  const response = await axios.post(baseUrl, userData);
+  const response = await axios.post(`${baseUrl}/api/users`, userData);
   return response.data;
 };
 
 const loginUser = async (credentials: { user: string; password: string }) => {
-  const response = await axios.post(`${baseUrl}/login`, credentials);
+  const response = await axios.post(`${baseUrl}/api/users/login`, credentials);
   return response.data;
 };
 
 export default {
-  setToken,
   getAllUsers,
   createUser,
   loginUser,

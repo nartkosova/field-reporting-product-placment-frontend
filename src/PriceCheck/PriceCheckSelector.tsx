@@ -5,7 +5,7 @@ const PriceCheckSelector = () => {
       routeBase="/price-check"
       buttonLinks={[
         { label: "Shiko Qmimet Per Podravken", path: "/podravka" },
-        { label: "Shiko Qmimet Per Konkurrencen", path: "/competitors" },
+        { label: "Shiko Qmimet Per Konkurrencen", path: "/konkurrenca" },
       ]}
     />
   );

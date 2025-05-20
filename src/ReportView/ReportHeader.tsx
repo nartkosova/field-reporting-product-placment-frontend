@@ -17,9 +17,9 @@ interface Store {
 
 interface Facing {
   user: string;
-  user_id: string | number;
+  user_id: number;
   store_name: string;
-  store_id: string | number;
+  store_id: number;
   category: string;
   total_facings: number;
   report_date: string;
@@ -166,6 +166,7 @@ const ReportHeader = () => {
         />
 
         <Select
+          className="md:w-1/2 w-full"
           isMulti
           options={storeOptions}
           placeholder="Select store(s)"
