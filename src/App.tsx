@@ -22,14 +22,21 @@ const App = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userRole = userInfo?.role;
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("authToken");
-    setLoggedIn(loggedUserJSON);
-    if (loggedUserJSON) {
-      setToken(loggedUserJSON);
-    } else {
-      setToken("");
-      navigate("/login");
+    const loggedUserJSON = localStorage.getItem("authToken");
+    const userInfoJSON = localStorage.getItem("userInfo");
+
+    if (loggedUserJSON && userInfoJSON) {
+      const parsedUser = JSON.parse(userInfoJSON);
+      if (parsedUser?.id || parsedUser?.role) {
+        setLoggedIn(loggedUserJSON);
+        setToken(loggedUserJSON);
+        return;
+      }
     }
+
+    setLoggedIn(null);
+    setToken("");
+    navigate("/login");
   }, [navigate]);
 
   return (
@@ -40,40 +47,47 @@ const App = () => {
           <>
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<HomePage />} />
-            <Route path="/ppl-store" element={<StoreSelector />} />
-            <Route path="/ppl-store/:id" element={<FacingsSelector />} />
-            <Route
-              path="/ppl-store/:id/ppl-podravka"
-              element={<PodravkaFacingsFormPage />}
-            />
-            <Route
-              path="/ppl-store/:id/ppl-konkurrenca"
-              element={<CompetitorFacingsFormPage />}
-            />
-            <Route path="/photos" element={<StoreSelector />} />
-            <Route path="/photos/:id" element={<PhotoSelector />} />
-            <Route
-              path="/photos/:storeId/primare"
-              element={<PhotoUploadPage photoType="regular_shelf" />}
-            />
-            <Route
-              path="/photos/:storeId/sekondare"
-              element={<PhotoUploadPage photoType="secondary_position" />}
-            />
-            <Route
-              path="/photos/:storeId/terciare"
-              element={<PhotoUploadPage photoType="other_position" />}
-            />
-            <Route path="/price-check" element={<StoreSelector />} />
-            <Route path="/price-check/:id" element={<PriceCheckSelector />} />
-            <Route
-              path="/price-check/:id/podravka"
-              element={<PriceCheckPodravka />}
-            />
-            <Route
-              path="/price-check/:id/konkurrenca"
-              element={<PriceCheckCompetitor />}
-            />
+            {userRole !== "admin" && (
+              <>
+                <Route path="/ppl-store" element={<StoreSelector />} />
+                <Route path="/ppl-store/:id" element={<FacingsSelector />} />
+                <Route
+                  path="/ppl-store/:id/ppl-podravka"
+                  element={<PodravkaFacingsFormPage />}
+                />
+                <Route
+                  path="/ppl-store/:id/ppl-konkurrenca"
+                  element={<CompetitorFacingsFormPage />}
+                />
+                <Route path="/photos" element={<StoreSelector />} />
+                <Route path="/photos/:id" element={<PhotoSelector />} />
+                <Route
+                  path="/photos/:storeId/primare"
+                  element={<PhotoUploadPage photoType="regular_shelf" />}
+                />
+                <Route
+                  path="/photos/:storeId/sekondare"
+                  element={<PhotoUploadPage photoType="secondary_position" />}
+                />
+                <Route
+                  path="/photos/:storeId/terciare"
+                  element={<PhotoUploadPage photoType="other_position" />}
+                />
+                <Route path="/price-check" element={<StoreSelector />} />
+                <Route
+                  path="/price-check/:id"
+                  element={<PriceCheckSelector />}
+                />
+                <Route
+                  path="/price-check/:id/podravka"
+                  element={<PriceCheckPodravka />}
+                />
+                <Route
+                  path="/price-check/:id/konkurrenca"
+                  element={<PriceCheckCompetitor />}
+                />
+              </>
+            )}
             {userRole === "admin" && (
               <>
                 <Route path="/photos/report" element={<PhotoReportHeader />} />

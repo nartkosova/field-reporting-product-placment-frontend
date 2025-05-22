@@ -43,6 +43,18 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
     columnHelper.accessor("total_facings", {
       header: "Podravka Facings",
       enableSorting: true,
+      cell: (info) => {
+        const row = info.row.original;
+        const podravka = Number(row.total_facings);
+        const competitor = Object.values(row.competitors || {}).reduce(
+          (sum, val) => sum + Number(val),
+          0
+        );
+        const total = podravka + competitor;
+        const percentage = total === 0 ? 0 : (podravka / total) * 100;
+
+        return `${podravka} (${percentage.toFixed(1)}%)`;
+      },
     }),
     ...competitorColumns.map((comp) =>
       columnHelper.accessor((row) => row.competitors?.[comp] ?? 0, {
@@ -51,18 +63,22 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         enableSorting: true,
       })
     ),
-    columnHelper.accessor(
-      (row) =>
-        Object.values(row.competitors || {}).reduce(
+    columnHelper.display({
+      id: "total_competitor_facings",
+      header: "Konkurrenca Total",
+      cell: ({ row }) => {
+        const competitor = Object.values(row.original.competitors || {}).reduce(
           (sum, val) => sum + Number(val),
           0
-        ),
-      {
-        header: "Konkurrenca Total",
-        id: "total_competitor_facings",
-        enableSorting: true,
-      }
-    ),
+        );
+        const podravka = Number(row.original.total_facings);
+        const total = competitor + podravka;
+        const percent = total === 0 ? 0 : (competitor / total) * 100;
+        return `${competitor} (${percent.toFixed(1)}%)`;
+      },
+      enableSorting: false, // optional: no sorting here unless you re-implement
+    }),
+
     columnHelper.accessor("report_date", {
       header: "Date",
       enableSorting: true,
@@ -160,14 +176,14 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
             </span>
 
             <button
-              className="px-2 py-1 border rounded disabled:opacity-50"
+              className="px-2 py-1 border rounded disabled:opacity-50 cursor-pointer"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
               Prev
             </button>
             <button
-              className="px-2 py-1 border rounded disabled:opacity-50"
+              className="px-2 py-1 border rounded disabled:opacity-50 cursor-pointer"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >

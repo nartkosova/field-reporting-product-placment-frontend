@@ -15,4 +15,6 @@ export interface PhotoSchema {
   user: string;
   store_name: string;
   uploaded_at: string;
+  photo_description?: string;
+  photo_stage?: "before" | "after";
 }

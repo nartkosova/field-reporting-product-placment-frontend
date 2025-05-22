@@ -84,7 +84,7 @@ const PodravkaFacingsFormPage = () => {
               <input
                 type="number"
                 className="border p-2 w-full mt-1"
-                placeholder="Facings Count"
+                placeholder="Numri i facings"
                 min={0}
                 value={facings[product.product_id] || ""}
                 onChange={(e) =>
