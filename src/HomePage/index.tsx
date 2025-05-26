@@ -13,6 +13,11 @@ const HomePage = () => {
               PPL
             </button>
           </NavLink>
+          <NavLink to="/ppl-podravka">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
+              Edito PPL
+            </button>
+          </NavLink>
           <NavLink to="/photos">
             <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
               Krijo Foto

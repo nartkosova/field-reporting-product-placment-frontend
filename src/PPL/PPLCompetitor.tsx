@@ -13,7 +13,7 @@ const CompetitorFacingsFormPage = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const storeId = id ? parseInt(id) : NaN;
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = userInfo?.id;
@@ -72,7 +72,7 @@ const CompetitorFacingsFormPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting competitors:", competitors);
+    setIsSubmitting(true);
 
     try {
       const facingData = competitors.map((competitor) => {
@@ -101,12 +101,14 @@ const CompetitorFacingsFormPage = () => {
     } catch (err) {
       alert("Error submitting facings");
       console.error("Submission error:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex flex-col p-6 max-w-xl mx-auto space-y-4">
-      <h2 className="text-2xl font-semibold">Submit Competitor Facings</h2>
+      <h2 className="text-2xl font-semibold">Facings Konkurrenca</h2>
       <p>
         Kategoria e zgjedhur:{" "}
         <span className="text-blue-600">{selectedCategory}</span>
@@ -174,7 +176,6 @@ const CompetitorFacingsFormPage = () => {
               onChange={(e) =>
                 handleCompetitorChange(index, "facings", e.target.value)
               }
-              required
             />
           </div>
         ))}
@@ -184,16 +185,17 @@ const CompetitorFacingsFormPage = () => {
           onClick={addCompetitor}
           className="bg-gray-200 px-4 py-1 rounded hover:bg-gray-300"
         >
-          + Add Competitor
+          + Shto konkurent
         </button>
 
         <div className="text-left font-semibold">
-          Total facings for competitors:{" "}
+          Total facings:{" "}
           <span className="text-red-600">{totalCompetitorFacings}</span>
         </div>
 
         <button
           type="submit"
+          disabled={isSubmitting}
           className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
         >
           Submit

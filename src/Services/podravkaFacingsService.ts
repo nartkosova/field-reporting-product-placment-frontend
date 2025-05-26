@@ -66,10 +66,53 @@ const batchCreatePodravkaFacings = async (
   return response.data;
 };
 
+export const updatePodravkaBatch = async ({
+  batchId,
+  facings,
+}: {
+  batchId: string;
+  facings: PodravkaFacingInput[];
+}) => {
+  const token = getToken();
+  const response = await axios.put(
+    `${baseUrl}/api/facings/podravka-facing/batch`,
+    { batchId, facings },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const getPodravkaFacingsByBatchId = async (batchId: string) => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/batch/${batchId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const getUserPPLBatches = async () => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/user-batches`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 export default {
   createPodravkaFacing,
   getPodravkaFacings,
   getProductsByStoreId,
   getPodravkaFacingsWithCompetitors,
   batchCreatePodravkaFacings,
+  updatePodravkaBatch,
+  getPodravkaFacingsByBatchId,
+  getUserPPLBatches,
 };

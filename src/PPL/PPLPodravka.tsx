@@ -71,9 +71,9 @@ const PodravkaFacingsFormPage = () => {
 
   return (
     <div className="flex flex-col p-6 max-w-xl mx-auto space-y-4">
-      <h2 className="text-2xl font-semibold">Submit Podravka Facings</h2>
+      <h2 className="text-2xl font-semibold">Podravka Facings</h2>
       {productsLoading ? (
-        <p>Loading products...</p>
+        <p>Duke i shfaqur produktet...</p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           {products.map((product) => (
@@ -95,7 +95,7 @@ const PodravkaFacingsFormPage = () => {
           ))}
 
           <div className="text-left font-semibold">
-            Total facings for{" "}
+            Total i facings per kategorin{" "}
             <span className="text-blue-600">{selectedCategory}</span>:{" "}
             {totalFacingsForCategory}
           </div>

@@ -15,6 +15,8 @@ import PriceCheckCompetitor from "./PriceCheck/PriceCheckCompetitor/PriceCheckCo
 import { setToken } from "./Services/authService";
 import PhotoUploadPage from "./Photos/PhotoUploadPage";
 import PhotoReportHeader from "./PhotoReports/PhotoReportHeader";
+import PodravkaPPLEditor from "./PPL/UpdatePPLPodravkaSelector";
+import UpdatePodravkaFacingsPage from "./PPL/UpdatePodravkaFacings";
 
 const App = () => {
   const navigate = useNavigate();
@@ -58,6 +60,11 @@ const App = () => {
                 <Route
                   path="/ppl-store/:id/ppl-konkurrenca"
                   element={<CompetitorFacingsFormPage />}
+                />
+                <Route path="/ppl-podravka" element={<PodravkaPPLEditor />} />
+                <Route
+                  path="/ppl-podravka/edit/:batchId"
+                  element={<UpdatePodravkaFacingsPage />}
                 />
                 <Route path="/photos" element={<StoreSelector />} />
                 <Route path="/photos/:id" element={<PhotoSelector />} />
