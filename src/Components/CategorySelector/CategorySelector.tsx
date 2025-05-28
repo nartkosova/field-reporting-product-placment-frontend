@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, NavLink } from "react-router-dom";
 import Select from "react-select";
-import storeServices from "../../Services/storeServices";
-import podravkaFacingsService from "../../Services/podravkaFacingsService";
+import storeServices from "../../services/storeServices";
+import podravkaFacingsService from "../../services/podravkaFacingsService";
 import { Store } from "../../types/storeInterface";
 
 interface CategorySelectorProps {
@@ -11,11 +11,13 @@ interface CategorySelectorProps {
     label: string;
     path: string;
   }[];
+  categoryRequired?: boolean;
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
   routeBase,
   buttonLinks,
+  categoryRequired = true,
 }) => {
   const { id } = useParams<{ id: string }>();
   const storeId = id ? parseInt(id) : NaN;
@@ -70,39 +72,50 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   return (
     <div className="flex flex-col justify-center align-middle p-6 max-w-xl space-y-4 mx-auto">
       <p className="text-2xl font-semibold">
-        Jeni në shitoren {store?.store_name}, zgjidhni kategorinë dhe opsionin.
+        Jeni në shitoren {store?.store_name}
+        {categoryRequired && ", zgjidhni kategorinë dhe opsionin."}
       </p>
 
-      <Select
-        className="w-full"
-        options={categories.map((cat) => ({ value: cat, label: cat }))}
-        value={
-          selectedCategory
-            ? { value: selectedCategory, label: selectedCategory }
-            : null
-        }
-        onChange={handleCategoryChange}
-        placeholder="Zgjidh kategorinë..."
-        isClearable
-      />
+      {categoryRequired && (
+        <Select
+          className="w-full"
+          options={categories.map((cat) => ({ value: cat, label: cat }))}
+          value={
+            selectedCategory
+              ? { value: selectedCategory, label: selectedCategory }
+              : null
+          }
+          onChange={handleCategoryChange}
+          placeholder="Zgjidh kategorinë..."
+          isClearable
+        />
+      )}
 
-      {buttonLinks.map(({ label, path }) => (
-        <NavLink
-          key={label}
-          to={`${routeBase}/${store?.store_id}${path}?category=${selectedCategory}`}
-        >
-          <button
-            className={`px-4 py-2 rounded cursor-pointer max-w-xl w-full ${
-              selectedCategory
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-blue-600 opacity-70 text-gray-200 !cursor-not-allowed"
-            }`}
-            disabled={!selectedCategory}
-          >
-            {label}
-          </button>
-        </NavLink>
-      ))}
+      {buttonLinks.map(({ label, path }) => {
+        const isKorporative = label.toLowerCase() === "korporative";
+        const fullPath = isKorporative
+          ? `${routeBase}/${store?.store_id}${path}`
+          : `${routeBase}/${store?.store_id}${path}?category=${selectedCategory}`;
+
+        const isDisabled = isKorporative
+          ? !!selectedCategory
+          : categoryRequired && !selectedCategory;
+
+        return (
+          <NavLink key={label} to={fullPath}>
+            <button
+              className={`px-4 py-2 rounded cursor-pointer max-w-xl w-full ${
+                isDisabled
+                  ? "bg-blue-600 opacity-70 text-gray-200 !cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+              disabled={isDisabled}
+            >
+              {label}
+            </button>
+          </NavLink>
+        );
+      })}
     </div>
   );
 };

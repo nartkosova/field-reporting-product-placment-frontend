@@ -1,22 +1,28 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
-import HomePage from "./HomePage";
-import LoginPage from "./LoginPage";
-import Header from "./Navigation/Header";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import Header from "./pages/Navigation/Header";
 import { useEffect, useState } from "react";
-import PodravkaFacingsFormPage from "./PPL/PPLPodravka";
-import FacingsSelector from "./PPL/PPLFacingsSelector";
-import CompetitorFacingsFormPage from "./PPL/PPLCompetitor";
-import ReportView from "./ReportView/ReportHeader";
-import StoreSelector from "./Components/StoreList/StoreSelector";
-import PhotoSelector from "./Photos/PhotosSelector";
-import PriceCheckSelector from "./PriceCheck/PriceCheckSelector";
-import PriceCheckPodravka from "./PriceCheck/PriceCheckPodravka";
-import PriceCheckCompetitor from "./PriceCheck/PriceCheckCompetitor/PriceCheckCompetitor";
-import { setToken } from "./Services/authService";
-import PhotoUploadPage from "./Photos/PhotoUploadPage";
-import PhotoReportHeader from "./PhotoReports/PhotoReportHeader";
-import PodravkaPPLEditor from "./PPL/UpdatePPLPodravkaSelector";
-import UpdatePodravkaFacingsPage from "./PPL/UpdatePodravkaFacings";
+import PodravkaFacingsFormPage from "./pages/PPL/PPLPodravka";
+import FacingsSelector from "./pages/PPL/PPLFacingsSelector";
+import CompetitorFacingsFormPage from "./pages/PPL/PPLCompetitor";
+import ReportView from "./pages/ReportView/ReportHeader";
+import StoreSelector from "./components/StoreList/StoreSelector";
+import PhotoSelector from "./pages/Photos/PhotosSelector";
+import PriceCheckSelector from "./pages/PriceCheck/PriceCheckSelector";
+import PriceCheckPodravka from "./pages/PriceCheck/PriceCheckPodravka";
+import PriceCheckCompetitor from "./pages/PriceCheck/PriceCheckCompetitor/PriceCheckCompetitor";
+import { setToken } from "./services/authService";
+import PhotoUploadPage from "./pages/Photos/PhotoUploadPage";
+import PhotoReportHeader from "./pages/PhotoReports/PhotoReportHeader";
+import PodravkaPPLEditor from "./pages/PPL/UpdatePPLPodravkaSelector";
+import UpdatePodravkaFacingsPage from "./pages/PPL/UpdatePodravkaFacings";
+import CreateCompetitorBrand from "./pages/Features/Competitor/CreateCompetitorBrand";
+import SelectCreateEdit from "./pages/SelectCreateUpdate/SelectCreateUpdate";
+import CreateCompetitorProduct from "./pages/Features/Products/CreateCompetitorProduct";
+import CreateUser from "./pages/Features/Users/CreateUser";
+import CompetitorList from "./pages/Features/Competitor/CompetitorList";
+import UpdateCompetitorBrand from "./pages/Features/Competitor/UpdateCompetitorBrand";
 
 const App = () => {
   const navigate = useNavigate();
@@ -42,7 +48,7 @@ const App = () => {
   }, [navigate]);
 
   return (
-    <div className="h-screen">
+    <div>
       {loggedIn ? <Header /> : null}
       <Routes>
         {loggedIn ? (
@@ -77,7 +83,7 @@ const App = () => {
                   element={<PhotoUploadPage photoType="secondary_position" />}
                 />
                 <Route
-                  path="/photos/:storeId/terciare"
+                  path="/photos/:storeId/korporative"
                   element={<PhotoUploadPage photoType="other_position" />}
                 />
                 <Route path="/price-check" element={<StoreSelector />} />
@@ -99,6 +105,24 @@ const App = () => {
               <>
                 <Route path="/photos/report" element={<PhotoReportHeader />} />
                 <Route path="/reports" element={<ReportView />} />
+                <Route path="/settings" element={<SelectCreateEdit />} />
+                <Route
+                  path="/settings/create/competitor-brand"
+                  element={<CreateCompetitorBrand />}
+                />
+                <Route
+                  path="/settings/create/competitor-product"
+                  element={<CreateCompetitorProduct />}
+                />
+                <Route path="/settings/create/user" element={<CreateUser />} />
+                <Route
+                  path="/settings/edit/competitor-brands"
+                  element={<CompetitorList />}
+                />
+                <Route
+                  path="/settings/edit/competitor-brands/:id"
+                  element={<UpdateCompetitorBrand />}
+                />
               </>
             )}
           </>

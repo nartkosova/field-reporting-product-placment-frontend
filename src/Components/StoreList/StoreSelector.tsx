@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import storeServices from "../../Services/storeServices";
-import StoreList from "../../Components/StoreList/StoreList";
+import storeServices from "../../services/storeServices";
+import StoreList from "./StoreList";
 const StoreSelector = () => {
   const [stores, setStores] = useState([]);
   const [userId, setUserId] = useState<number | null>(null);

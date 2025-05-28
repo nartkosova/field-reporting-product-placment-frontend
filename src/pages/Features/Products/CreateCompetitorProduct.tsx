@@ -1,0 +1,58 @@
+import { useEffect, useState } from "react";
+import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
+import competitorServices from "../../../services/competitorServices";
+
+const CreateCompetitorProductPage = () => {
+  const [competitorOptions, setCompetitorOptions] = useState<
+    { label: string; value: number }[]
+  >([]);
+
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      const brands = await competitorServices.getAllCompetitorBrands();
+      const formatted = brands.map(
+        (b: { brand_name: string; competitor_id: number }) => ({
+          label: b.brand_name,
+          value: b.competitor_id,
+        })
+      );
+      setCompetitorOptions(formatted);
+    };
+    fetchBrands();
+  }, []);
+
+  const handleSubmit = async (formData: Record<string, string | number>) => {
+    const payload = {
+      name: formData.name as string,
+      category: formData.category as string,
+      weight: formData.weight ? Number(formData.weight) : undefined,
+      competitor_id: Number(formData.competitor_id),
+      created_by: userInfo?.id,
+    };
+
+    await competitorServices.createCompetitorProduct(payload);
+  };
+
+  return (
+    <CreateUpdateForm
+      title="Create Competitor Product"
+      submitText="Create Product"
+      fields={[
+        { name: "name", label: "Product Name" },
+        { name: "category", label: "Category" },
+        { name: "weight", label: "Weight (g)", type: "number" },
+        {
+          name: "competitor_id",
+          label: "Competitor Brand",
+          type: "select",
+          options: competitorOptions,
+        },
+      ]}
+      onSubmit={handleSubmit}
+    />
+  );
+};
+
+export default CreateCompetitorProductPage;

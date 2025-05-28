@@ -69,6 +69,18 @@ const getAllCompetitorBrands = async () => {
   });
   return response.data;
 };
+
+const getCompetitorBrandById = async (competitorId: number) => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/products/competitor-brand/${competitorId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const createCompetitorBrand = async (competitorBrandData: {
   brand_name: string;
 }) => {
@@ -76,6 +88,32 @@ const createCompetitorBrand = async (competitorBrandData: {
   const response = await axios.post(
     `${baseUrl}/api/products/competitor-brand`,
     competitorBrandData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const updateCompetitorBrand = async (
+  competitorId: number,
+  competitorBrandData: { brand_name: string }
+) => {
+  const token = getToken();
+  const response = await axios.put(
+    `${baseUrl}/api/products/competitor-brand/${competitorId}`,
+    competitorBrandData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const deleteCompetitorBrand = async (competitorId: number) => {
+  const token = getToken();
+  const response = await axios.delete(
+    `${baseUrl}/api/products/competitor-brand/${competitorId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -105,7 +143,10 @@ export default {
   createCompetitorProduct,
   createCompetitorFacing,
   createCompetitorBrand,
+  updateCompetitorBrand,
+  deleteCompetitorBrand,
   getCompetitorBrandByName,
   getAllCompetitorBrands,
+  getCompetitorBrandById,
   batchCreateCompetitorFacings,
 };

@@ -84,6 +84,19 @@ export const updatePodravkaBatch = async ({
   return response.data;
 };
 
+const deletePodravkaFacingBatch = async (batchId: number | string) => {
+  const token = getToken();
+  const response = await axios.delete(
+    `${baseUrl}/api/facings/podravka-facing/batch/${batchId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 const getPodravkaFacingsByBatchId = async (batchId: string) => {
   const token = getToken();
   const response = await axios.get(
@@ -113,6 +126,7 @@ export default {
   getPodravkaFacingsWithCompetitors,
   batchCreatePodravkaFacings,
   updatePodravkaBatch,
+  deletePodravkaFacingBatch,
   getPodravkaFacingsByBatchId,
   getUserPPLBatches,
 };
