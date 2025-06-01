@@ -12,6 +12,11 @@ const SelectCreateEdit = () => {
         },
         { label: "Krijo User Te Ri", path: "/create/user" },
         { label: "Edito Konkurrencen", path: "/edit/competitor-brands" },
+        {
+          label: "Edito Produktet e Konkurrences",
+          path: "/edit/competitor-products",
+        },
+        { label: "Edito Userat", path: "/edit/users" },
       ]}
       categoryRequired={false}
     />

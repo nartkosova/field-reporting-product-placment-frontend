@@ -5,6 +5,7 @@ import {
   PodravkaFacingInput,
   PodravkaFacingWithMeta,
 } from "../../types/podravkaFacingInterface";
+import { AxiosError } from "axios";
 
 const UpdatePodravkaFacingsPage = () => {
   const { batchId } = useParams<{ batchId: string }>();
@@ -33,7 +34,10 @@ const UpdatePodravkaFacingsPage = () => {
         setFacings(initial);
       } catch (err) {
         console.error("Error loading batch:", err);
-        alert(err instanceof Error ? err.message : "Error, provo perseri.");
+        const axiosError = err as AxiosError<{ error: string }>;
+        const backendMessage =
+          axiosError.response?.data?.error || "Error, provo persëri.";
+        alert(backendMessage);
       } finally {
         setLoading(false);
       }
@@ -65,11 +69,10 @@ const UpdatePodravkaFacingsPage = () => {
 
       alert("Facings përditësuan me sukses!");
     } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : "Error gjatë përditësimit të facings"
-      );
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error || "Gabim gjatë ngarkimit të facings.";
+      alert(backendMessage);
     } finally {
       setSubmitting(false);
     }
@@ -96,17 +99,15 @@ const UpdatePodravkaFacingsPage = () => {
                   handleFacingChange(product.product_id, Number(e.target.value))
                 }
               />
-              Total facings:{" "}
-              <span className="text-red-600">{totalFacings}</span>
             </div>
           ))}
-
+          Total facings: <span className="text-red-600">{totalFacings}</span>
           <button
             type="submit"
             disabled={submitting}
-            className="bg-green-600 text-white px-4 py-2 w-full rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 w-full rounded hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? "Updating..." : "Update"}
+            {submitting ? "Duke u përditsuar..." : "Perditëso Facings"}
           </button>
         </form>
       )}

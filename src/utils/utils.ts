@@ -7,3 +7,14 @@ export function sanitizeFilename(input: string): string {
     .replace(/^-|-$/g, "")
     .toLowerCase();
 }
+
+export function formattedDate(date: string): string {
+  return new Date(date).toLocaleString("sq-AL", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: false,
+  });
+}

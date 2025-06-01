@@ -3,25 +3,6 @@ import { PodravkaFacingInput } from "../types/podravkaFacingInterface";
 const baseUrl = import.meta.env.VITE_BASE_URL;
 const getToken = () => localStorage.getItem("authToken");
 
-const createPodravkaFacing = async (facingData: {
-  user_id: number;
-  store_id: number;
-  category: string;
-  product_id: number;
-  facings_count: number;
-  // report_date: string;
-}) => {
-  const token = getToken();
-  const response = await axios.post(
-    `${baseUrl}/api/facings/podravka-facing`,
-    facingData,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
 const getPodravkaFacings = async () => {
   const token = getToken();
   const response = await axios.get(`${baseUrl}/api/facings/podravka-facing`, {
@@ -120,7 +101,6 @@ const getUserPPLBatches = async () => {
 };
 
 export default {
-  createPodravkaFacing,
   getPodravkaFacings,
   getProductsByStoreId,
   getPodravkaFacingsWithCompetitors,

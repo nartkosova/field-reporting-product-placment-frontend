@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import competitorServices from "../../services/competitorServices";
 import Select from "react-select";
+import { AxiosError } from "axios";
 
 interface CompetitorEntry {
   id?: number;
@@ -11,6 +12,7 @@ interface CompetitorEntry {
 
 const CompetitorFacingsFormPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,9 +93,12 @@ const CompetitorFacingsFormPage = () => {
 
       alert("Facings te konkurencës janë dërguar me sukses.");
       setCompetitors([{ name: "", facings: 0 }]);
+      navigate(-1);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Error, provo perseri.");
-      console.error("Submission error:", err);
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error || "Error, provo persëri.";
+      alert(backendMessage);
     } finally {
       setIsSubmitting(false);
     }

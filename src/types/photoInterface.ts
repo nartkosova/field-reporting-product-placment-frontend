@@ -1,5 +1,9 @@
 export interface PhotoInput {
-  photo_type: "regular_shelf" | "secondary_position" | "other_position";
+  photo_type:
+    | "regular_shelf"
+    | "secondary_position"
+    | "fletushka"
+    | "korporative";
   photo_url: string;
   category: string;
   user_id: number;
@@ -7,7 +11,11 @@ export interface PhotoInput {
 }
 
 export interface PhotoSchema {
-  photo_type: "regular_shelf" | "secondary_position" | "other_position";
+  photo_type:
+    | "regular_shelf"
+    | "secondary_position"
+    | "fletushka"
+    | "korporative";
   photo_url: string;
   category: string;
   user_id: number;
@@ -16,5 +24,4 @@ export interface PhotoSchema {
   store_name: string;
   uploaded_at: string;
   photo_description?: string;
-  photo_stage?: "before" | "after";
 }

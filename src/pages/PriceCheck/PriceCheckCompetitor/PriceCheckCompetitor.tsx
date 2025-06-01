@@ -8,6 +8,7 @@ import AddProductForm from "./AddProductForm";
 import ProductList from "./ProductList";
 import { CompetitorPriceCheckInput } from "../../../types/priceCheckInterface";
 import { CompetitorProduct } from "../../../types/productInterface";
+import { AxiosError } from "axios";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,9 +72,10 @@ const PriceCheckCompetitor = () => {
       alert("Qmimet u ngarkuan me sukses!");
       setPrices({});
     } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Gabim gjatë ngarkimit të qmimit."
-      );
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error || "Gabim gjatë ngarkimit të qmimit.";
+      alert(backendMessage);
       console.error(err);
     } finally {
       setLoading(false);

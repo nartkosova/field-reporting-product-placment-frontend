@@ -15,7 +15,7 @@ import PriceCheckCompetitor from "./pages/PriceCheck/PriceCheckCompetitor/PriceC
 import { setToken } from "./services/authService";
 import PhotoUploadPage from "./pages/Photos/PhotoUploadPage";
 import PhotoReportHeader from "./pages/PhotoReports/PhotoReportHeader";
-import PodravkaPPLEditor from "./pages/PPL/UpdatePPLPodravkaSelector";
+import PodravkaPPLEditor from "./pages/PPL/PodravkaPPLList";
 import UpdatePodravkaFacingsPage from "./pages/PPL/UpdatePodravkaFacings";
 import CreateCompetitorBrand from "./pages/Features/Competitor/CreateCompetitorBrand";
 import SelectCreateEdit from "./pages/SelectCreateUpdate/SelectCreateUpdate";
@@ -23,6 +23,10 @@ import CreateCompetitorProduct from "./pages/Features/Products/CreateCompetitorP
 import CreateUser from "./pages/Features/Users/CreateUser";
 import CompetitorList from "./pages/Features/Competitor/CompetitorList";
 import UpdateCompetitorBrand from "./pages/Features/Competitor/UpdateCompetitorBrand";
+import UserList from "./pages/Features/Users/UserList";
+import UpdateUser from "./pages/Features/Users/UpdateUser";
+import CompetitorProductList from "./pages/Features/Products/ProductList";
+import UpdateCompetitorProduct from "./pages/Features/Products/UpdateCompetitorProducts";
 
 const App = () => {
   const navigate = useNavigate();
@@ -83,8 +87,12 @@ const App = () => {
                   element={<PhotoUploadPage photoType="secondary_position" />}
                 />
                 <Route
+                  path="/photos/:storeId/fletushka"
+                  element={<PhotoUploadPage photoType="fletushka" />}
+                />
+                <Route
                   path="/photos/:storeId/korporative"
-                  element={<PhotoUploadPage photoType="other_position" />}
+                  element={<PhotoUploadPage photoType="korporative" />}
                 />
                 <Route path="/price-check" element={<StoreSelector />} />
                 <Route
@@ -122,6 +130,19 @@ const App = () => {
                 <Route
                   path="/settings/edit/competitor-brands/:id"
                   element={<UpdateCompetitorBrand />}
+                />
+                <Route path="/settings/edit/users" element={<UserList />} />
+                <Route
+                  path="/settings/edit/users/:id"
+                  element={<UpdateUser />}
+                />
+                <Route
+                  path="/settings/edit/competitor-products"
+                  element={<CompetitorProductList />}
+                />
+                <Route
+                  path="/settings/edit/competitor-products/:id"
+                  element={<UpdateCompetitorProduct />}
                 />
               </>
             )}

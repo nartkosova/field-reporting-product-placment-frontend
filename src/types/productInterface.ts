@@ -13,4 +13,5 @@ export interface CompetitorProduct {
   weight?: number;
   competitor_id: number;
   created_at: string;
+  created_by?: string;
 }

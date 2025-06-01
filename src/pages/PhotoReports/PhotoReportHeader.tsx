@@ -9,7 +9,8 @@ import PhotoTable from "./PhotoReportTable";
 const photoTypeOptions = [
   { value: "regular_shelf", label: "Regular Shelf" },
   { value: "secondary_position", label: "Secondary Position" },
-  { value: "other_position", label: "Other Position" },
+  { value: "fletushka", label: "Fletushka" },
+  { value: "korporative", label: "Korporative" },
 ];
 
 const PhotoReportHeader = () => {

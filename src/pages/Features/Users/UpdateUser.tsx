@@ -1,47 +1,53 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import competitorServices from "../../../services/competitorServices";
+import { useParams, useNavigate } from "react-router-dom";
+import userService from "../../../services/userService";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { AxiosError } from "axios";
-
-const UpdateCompetitorBrand = () => {
+import { updateUserFields } from "./userFields";
+const UpdateUser = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState<Record<string, string>>(
     {}
   );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBrand = async () => {
+    const fetchUser = async () => {
       try {
-        const brand = await competitorServices.getCompetitorBrandById(
-          Number(id)
-        );
-        setInitialValues({ brand_name: brand.brand_name });
+        const user = await userService.getUserById(Number(id));
+        setInitialValues({
+          user: user.user,
+          role: user.role,
+          password: "", // password cannot be prefilled for security
+        });
       } catch (err) {
-        console.error("Failed to load brand", err);
+        console.error("Failed to load user", err);
         const axiosError = err as AxiosError<{ error: string }>;
         const backendMessage =
           axiosError.response?.data?.error ||
-          "Gabim gjatë ngarkimit të dhenave.";
+          "Gabim gjatë ngarkimit të të dhënave.";
         alert(backendMessage);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) fetchBrand();
+    if (id) fetchUser();
   }, [id]);
 
   const handleUpdate = async (data: Record<string, string | number>) => {
     if (!id) return;
     try {
-      await competitorServices.updateCompetitorBrand(Number(id), {
-        brand_name: data.brand_name as string,
+      await userService.updateUser(Number(id), {
+        user: data.user as string,
+        password: data.password as string,
+        role: data.role as string,
       });
-      alert("Konkurrenca u përditësua me sukses.");
+      alert("Përdoruesi u përditësua me sukses.");
+      navigate(`/settings/edit/users`);
     } catch (err) {
-      console.error("Error updating brand", err);
+      console.error("Error updating user", err);
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Gabim gjatë përditësimit.";
@@ -55,8 +61,8 @@ const UpdateCompetitorBrand = () => {
         <p>Duke u ngarkuar...</p>
       ) : (
         <CreateUpdateForm
-          title="Përditëso Konkurrencën"
-          fields={[{ name: "brand_name", label: "Emri i konkurrencës" }]}
+          title="Përditëso Përdoruesin"
+          fields={updateUserFields}
           initialValues={initialValues}
           onSubmit={handleUpdate}
           submitText="Vazhdo"
@@ -66,4 +72,4 @@ const UpdateCompetitorBrand = () => {
   );
 };
 
-export default UpdateCompetitorBrand;
+export default UpdateUser;

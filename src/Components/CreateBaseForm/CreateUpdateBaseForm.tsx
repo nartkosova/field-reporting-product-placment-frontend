@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
+import { useNavigate } from "react-router-dom";
 
 interface Field {
   name: string;
@@ -26,6 +27,7 @@ export function CreateUpdateForm({
   const [formState, setFormState] =
     useState<Record<string, string | number>>(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setFormState(initialValues);
@@ -42,10 +44,11 @@ export function CreateUpdateForm({
 
     try {
       await onSubmit(formState);
-      alert(`${submitText} successful.`);
       if (!initialValues || Object.keys(initialValues).length === 0) {
         setFormState({});
       }
+      alert("Veprimi u krye me sukses!");
+      navigate(-1);
     } catch (err: unknown) {
       console.error("Submit error:", err);
       if (typeof err === "object" && err && "response" in err) {
@@ -94,7 +97,7 @@ export function CreateUpdateForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Submitting..." : submitText}
         </button>

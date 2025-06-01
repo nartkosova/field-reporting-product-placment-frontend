@@ -77,11 +77,6 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         header: "Photo Type",
         enableSorting: true,
       }),
-      columnHelper.accessor("photo_stage", {
-        header: "Stage",
-        enableSorting: true,
-        cell: (info) => (info.getValue() === "after" ? "After" : "Before"),
-      }),
       columnHelper.accessor("photo_description", {
         header: "Description",
         enableSorting: false,

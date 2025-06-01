@@ -3,17 +3,6 @@ import { getToken } from "./authService";
 import { PhotoSchema } from "../types/photoInterface";
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
-const getPhotos = async (params: { category?: string; store_id?: number }) => {
-  const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/photos`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params,
-  });
-  return response.data;
-};
-
 const createPhoto = async (formData: FormData) => {
   const token = getToken();
   const response = await axios.post(
@@ -54,7 +43,6 @@ const bulkDeletePhotos = async (photoUrls: string[]) => {
 };
 
 export default {
-  getPhotos,
   createPhoto,
   getAllReportPhotos,
   bulkDeletePhotos,

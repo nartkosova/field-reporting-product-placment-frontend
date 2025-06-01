@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import podravkaFacingsService from "../../services/podravkaFacingsService";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { Product } from "../../types/productInterface";
+import { AxiosError } from "axios";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -9,6 +10,7 @@ const PodravkaFacingsFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [productsLoading, setProductsLoading] = useState(true);
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
@@ -61,10 +63,12 @@ const PodravkaFacingsFormPage = () => {
 
       alert("Facings u ngarkuan me sukses!");
       setFacings({});
+      navigate(-1);
     } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Gabim gjatë ngarkimit të facings."
-      );
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error || "Gabim gjatë ngarkimit të facings.";
+      alert(backendMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -109,7 +113,7 @@ const PodravkaFacingsFormPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Submitting..." : "Submit"}
           </button>

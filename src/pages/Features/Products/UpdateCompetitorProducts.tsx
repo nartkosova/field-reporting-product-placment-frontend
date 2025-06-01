@@ -1,0 +1,107 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import competitorServices from "../../../services/competitorServices";
+import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
+import { AxiosError } from "axios";
+import { CompetitorProduct } from "../../../types/productInterface";
+
+const UpdateCompetitorProduct = () => {
+  const { id } = useParams<{ id: string }>();
+  const [initialValues, setInitialValues] = useState<
+    Record<string, string | number>
+  >({});
+  const [loading, setLoading] = useState(true);
+  const [competitorOptions, setCompetitorOptions] = useState<
+    { label: string; value: number }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const brands = await competitorServices.getAllCompetitorBrands();
+        const formattedBrands = brands.map(
+          (b: { brand_name: string; competitor_id: number }) => ({
+            label: b.brand_name,
+            value: b.competitor_id,
+          })
+        );
+        setCompetitorOptions(formattedBrands);
+
+        const products = await competitorServices.getCompetitorProducts({});
+        const product = products.find(
+          (p: CompetitorProduct) => p.competitor_product_id === Number(id)
+        );
+
+        if (!product) {
+          alert("Produkti nuk u gjet.");
+          return;
+        }
+
+        setInitialValues({
+          name: product.name,
+          category: product.category,
+          weight: product.weight ?? "",
+          competitor_id: product.competitor_id,
+        });
+      } catch (err) {
+        console.error("Failed to load data", err);
+        const axiosError = err as AxiosError<{ error: string }>;
+        const backendMessage =
+          axiosError.response?.data?.error ||
+          "Gabim gjatë ngarkimit të të dhënave.";
+        alert(backendMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchData();
+  }, [id]);
+
+  const handleUpdate = async (data: Record<string, string | number>) => {
+    if (!id) return;
+    try {
+      await competitorServices.updateCompetitorProduct(Number(id), {
+        name: data.name as string,
+        category: data.category as string,
+        weight: data.weight ? Number(data.weight) : undefined,
+        competitor_id: Number(data.competitor_id),
+      });
+      alert("Produkti u përditësua me sukses.");
+    } catch (err) {
+      console.error("Gabim gjatë përditësimit", err);
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error || "Gabim gjatë përditësimit.";
+      alert(backendMessage);
+    }
+  };
+
+  return (
+    <div className="max-w-xl mx-auto p-6 space-y-4">
+      {loading ? (
+        <p>Duke u ngarkuar...</p>
+      ) : (
+        <CreateUpdateForm
+          title="Përditëso Produktin"
+          fields={[
+            { name: "name", label: "Emri i produktit" },
+            { name: "category", label: "Kategoria" },
+            { name: "weight", label: "Pesha (g)", type: "number" },
+            {
+              name: "competitor_id",
+              label: "Brandi Konkurrent",
+              type: "select",
+              options: competitorOptions,
+            },
+          ]}
+          initialValues={initialValues}
+          onSubmit={handleUpdate}
+          submitText="Përditëso"
+        />
+      )}
+    </div>
+  );
+};
+
+export default UpdateCompetitorProduct;

@@ -7,6 +7,7 @@ import {
   PodravkaPriceCheckInput,
 } from "../../types/priceCheckInterface";
 import { Product } from "../../types/productInterface";
+import { AxiosError } from "axios";
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [prices, setPrices] = useState<{ [key: number]: PriceCheckInput }>({});
@@ -78,9 +79,10 @@ const PriceCheckPodravka = () => {
       alert("Qmimet u ngarkuan me sukses!");
       setPrices({});
     } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Gabim gjatë ngarkimit të qmimit."
-      );
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error || "Gabim gjatë ngarkimit të qmimit.";
+      alert(backendMessage);
       console.error("Submit error:", err);
     } finally {
       setLoading(false);

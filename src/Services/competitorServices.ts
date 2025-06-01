@@ -37,6 +37,42 @@ const createCompetitorProduct = async (data: {
   );
   return response.data;
 };
+
+const updateCompetitorProduct = async (
+  productId: number,
+  data: {
+    name: string;
+    category: string;
+    weight?: number;
+    competitor_id: number;
+  }
+) => {
+  const token = getToken();
+  const response = await axios.put(
+    `${baseUrl}/api/products/competitor/${productId}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+const deleteCompetitorProduct = async (productId: number) => {
+  const token = getToken();
+  const response = await axios.delete(
+    `${baseUrl}/api/products/competitor/${productId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 const batchCreateCompetitorFacings = async (
   facingDataArray: CompetitorFacingInput[]
 ) => {
@@ -73,7 +109,7 @@ const getAllCompetitorBrands = async () => {
 const getCompetitorBrandById = async (competitorId: number) => {
   const token = getToken();
   const response = await axios.get(
-    `${baseUrl}/api/products/competitor-brand/${competitorId}`,
+    `${baseUrl}/api/products/competitor-brand/id/${competitorId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -121,27 +157,11 @@ const deleteCompetitorBrand = async (competitorId: number) => {
   return response.data;
 };
 
-const createCompetitorFacing = async (competitorFacingData: {
-  user_id: number;
-  store_id: number;
-  competitor_id: number;
-  category: string;
-  facings_count: number;
-}) => {
-  const token = getToken();
-  const response = await axios.post(
-    `${baseUrl}/api/facings/competitor-facing`,
-    competitorFacingData,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
 export default {
   getCompetitorProducts,
   createCompetitorProduct,
-  createCompetitorFacing,
+  updateCompetitorProduct,
+  deleteCompetitorProduct,
   createCompetitorBrand,
   updateCompetitorBrand,
   deleteCompetitorBrand,

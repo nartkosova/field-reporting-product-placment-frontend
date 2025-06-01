@@ -44,7 +44,7 @@ const HomePage = () => {
           </NavLink>
           <NavLink to="/settings">
             <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Krijo
+              Krijo/Edito
             </button>
           </NavLink>
         </>
