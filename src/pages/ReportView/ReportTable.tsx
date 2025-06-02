@@ -76,18 +76,24 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         const percent = total === 0 ? 0 : (competitor / total) * 100;
         return `${competitor} (${percent.toFixed(1)}%)`;
       },
-      enableSorting: false, // optional: no sorting here unless you re-implement
+      enableSorting: true,
     }),
 
     columnHelper.accessor("report_date", {
       header: "Date",
       enableSorting: true,
-      cell: (info) =>
-        new Date(info.getValue()).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }),
+      cell: (info) => {
+        const date = new Date(info.getValue());
+        return isNaN(date.getTime())
+          ? "—"
+          : date.toLocaleString([], {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            });
+      },
     }),
   ];
 

@@ -4,7 +4,7 @@ import competitorServices from "../../../services/competitorServices";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { AxiosError } from "axios";
 import { CompetitorProduct } from "../../../types/productInterface";
-
+import { useProductCategories } from "../../../hooks/useProductCategories";
 const UpdateCompetitorProduct = () => {
   const { id } = useParams<{ id: string }>();
   const [initialValues, setInitialValues] = useState<
@@ -14,6 +14,7 @@ const UpdateCompetitorProduct = () => {
   const [competitorOptions, setCompetitorOptions] = useState<
     { label: string; value: number }[]
   >([]);
+  const { categories } = useProductCategories();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,8 +87,19 @@ const UpdateCompetitorProduct = () => {
           title="Përditëso Produktin"
           fields={[
             { name: "name", label: "Emri i produktit" },
-            { name: "category", label: "Kategoria" },
-            { name: "weight", label: "Pesha (g)", type: "number" },
+            {
+              name: "category",
+              label: "Kategoria",
+              type: "select",
+              options: categories.map((category) => ({
+                label: category,
+                value: category,
+              })),
+            },
+            {
+              name: "weight",
+              label: "Pesha (kg)",
+            },
             {
               name: "competitor_id",
               label: "Brandi Konkurrent",

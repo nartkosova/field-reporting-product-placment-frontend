@@ -85,7 +85,18 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
       columnHelper.accessor("uploaded_at", {
         header: "Uploaded At",
         enableSorting: true,
-        cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+        cell: (info) => {
+          const date = new Date(info.getValue());
+          return isNaN(date.getTime())
+            ? "—"
+            : date.toLocaleString([], {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              });
+        },
       }),
       columnHelper.accessor("photo_url", {
         header: "Photo",

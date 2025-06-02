@@ -10,7 +10,13 @@ const getPodravkaFacings = async () => {
   });
   return response.data;
 };
-
+const getProducts = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/api/products`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
 const getProductsByStoreId = async (storeId: number) => {
   const token = getToken();
   const response = await axios.get(
@@ -102,6 +108,7 @@ const getUserPPLBatches = async () => {
 
 export default {
   getPodravkaFacings,
+  getProducts,
   getProductsByStoreId,
   getPodravkaFacingsWithCompetitors,
   batchCreatePodravkaFacings,

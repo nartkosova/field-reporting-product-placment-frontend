@@ -33,12 +33,14 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
       return alert("Ju lutem plotësoni të gjitha fushat.");
     const safeName = sanitizeFilename(String(storeName));
     const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
-    const customName = `${safeName}-${category}-${timestamp}`.toLowerCase();
+    const customName = `${safeName}-${
+      category || photoType
+    }-${timestamp}`.toLowerCase();
 
     const formData = new FormData();
     formData.append("photo", file, customName);
     formData.append("photo_type", photoType);
-    formData.append("category", category ?? "corporate");
+    formData.append("category", category || photoType);
     formData.append("user_id", userId);
     formData.append("store_id", storeId);
     formData.append("photo_description", photoDescription);

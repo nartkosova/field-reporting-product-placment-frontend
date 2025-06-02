@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import competitorServices from "../../../services/competitorServices";
+import { useProductCategories } from "../../../hooks/useProductCategories";
 
 const CreateCompetitorProductPage = () => {
   const [competitorOptions, setCompetitorOptions] = useState<
     { label: string; value: number }[]
   >([]);
-
+  const { categories } = useProductCategories();
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
   useEffect(() => {
@@ -40,9 +41,14 @@ const CreateCompetitorProductPage = () => {
       title="Create Competitor Product"
       submitText="Create Product"
       fields={[
-        { name: "name", label: "Product Name" },
-        { name: "category", label: "Category" },
-        { name: "weight", label: "Weight (g)", type: "number" },
+        { name: "name", label: "Emri i produktit" },
+        {
+          name: "category",
+          label: "Kategoria",
+          type: "select",
+          options: categories.map((cat) => ({ label: cat, value: cat })),
+        },
+        { name: "weight", label: "Pesha (kg)", type: "number" },
         {
           name: "competitor_id",
           label: "Competitor Brand",

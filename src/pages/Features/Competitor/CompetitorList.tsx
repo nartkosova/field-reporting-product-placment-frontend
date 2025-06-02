@@ -10,7 +10,7 @@ interface CompetitorBrand {
 const CompetitorList = () => {
   return (
     <EntityList
-      title="Competitor Brands"
+      title="Konkurrnca"
       fetchAll={async () => {
         const brands = await competitorServices.getAllCompetitorBrands();
         return brands.map((b: CompetitorBrand) => ({

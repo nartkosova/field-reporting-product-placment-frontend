@@ -92,15 +92,17 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
       )}
 
       {buttonLinks.map(({ label, path }) => {
-        const isKorporative = label.toLowerCase() === "korporative";
+        const categoryNotRequired =
+          label.toLowerCase() === "fletushka" ||
+          label.toLowerCase() === "korporative";
         const storeSegment = store?.store_id ? `/${store.store_id}` : "";
-        const fullPath = isKorporative
+        const fullPath = categoryNotRequired
           ? `${routeBase}${storeSegment}${path}`
           : categoryRequired
           ? `${routeBase}${storeSegment}${path}?category=${selectedCategory}`
           : `${routeBase}${storeSegment}${path}`;
 
-        const isDisabled = isKorporative
+        const isDisabled = categoryNotRequired
           ? !!selectedCategory
           : categoryRequired && !selectedCategory;
 
