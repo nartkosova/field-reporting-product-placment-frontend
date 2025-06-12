@@ -11,6 +11,7 @@ export interface PhotoInput {
 }
 
 export interface PhotoSchema {
+  photo_id: number;
   photo_type:
     | "regular_shelf"
     | "secondary_position"

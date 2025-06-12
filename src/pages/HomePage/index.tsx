@@ -23,9 +23,14 @@ const HomePage = () => {
               Krijo Foto
             </button>
           </NavLink>
-          <NavLink to="/price-check">
+          <NavLink to="/photos/edit">
             <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Krijo Qmimin
+              Edito Fotot
+            </button>
+          </NavLink>
+          <NavLink to="/reports">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
+              Raporte
             </button>
           </NavLink>
         </>

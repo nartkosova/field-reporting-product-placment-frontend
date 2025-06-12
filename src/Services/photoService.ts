@@ -42,8 +42,68 @@ const bulkDeletePhotos = async (photoUrls: string[]) => {
   return res.data;
 };
 
+const getReportPhotosByUserId = async (): Promise<PhotoSchema[]> => {
+  const token = getToken();
+  const res = await axios.get(`${baseUrl}/api/photos/report-photos/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+const getReportPhotosByPhotoId = async (
+  photoId: string
+): Promise<PhotoSchema> => {
+  const token = getToken();
+  const res = await axios.get(
+    `${baseUrl}/api/photos/report-photos/${photoId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
+const updateReportPhoto = async (
+  photoId: string,
+  formData: FormData
+): Promise<PhotoSchema> => {
+  const token = getToken();
+  const res = await axios.put(
+    `${baseUrl}/api/photos/report-photos/${photoId}`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return res.data;
+};
+
+const deleteReportPhoto = async (photoId: string) => {
+  const token = getToken();
+  const res = await axios.delete(
+    `${baseUrl}/api/photos/report-photos/${photoId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
 export default {
   createPhoto,
   getAllReportPhotos,
   bulkDeletePhotos,
+  getReportPhotosByUserId,
+  getReportPhotosByPhotoId,
+  updateReportPhoto,
+  deleteReportPhoto,
 };

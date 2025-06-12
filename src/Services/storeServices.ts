@@ -1,4 +1,5 @@
 import axios from "axios";
+import { StoreInput } from "../types/storeInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -20,6 +21,34 @@ const getStoreById = async (store_id: number) => {
   return response.data;
 };
 
+const createStore = async (storeData: StoreInput) => {
+  const token = getToken();
+  const response = await axios.post(`${baseUrl}/api/stores`, storeData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+const updateStore = async (store_id: number, storeData: StoreInput) => {
+  const token = getToken();
+  const response = await axios.put(
+    `${baseUrl}/api/stores/${store_id}`,
+    storeData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const deleteStore = async (store_id: number) => {
+  const token = getToken();
+  const response = await axios.delete(`${baseUrl}/api/stores/${store_id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 const getAllStores = async () => {
   const token = getToken();
   const response = await axios.get(`${baseUrl}/api/stores`, {
@@ -28,8 +57,20 @@ const getAllStores = async () => {
   return response.data;
 };
 
+const getStoresWithUserId = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/api/stores/user`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 export default {
   getStoresByUserId,
   getStoreById,
+  createStore,
+  updateStore,
+  deleteStore,
   getAllStores,
+  getStoresWithUserId,
 };

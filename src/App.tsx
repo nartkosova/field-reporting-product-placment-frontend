@@ -27,6 +27,11 @@ import UserList from "./pages/Features/Users/UserList";
 import UpdateUser from "./pages/Features/Users/UpdateUser";
 import CompetitorProductList from "./pages/Features/Products/ProductList";
 import UpdateCompetitorProduct from "./pages/Features/Products/UpdateCompetitorProducts";
+import PhotoList from "./pages/Photos/PhotoList";
+import UpdatePhotoPage from "./pages/Photos/UpdateProdravkaPhotos";
+import Stores from "./pages/Features/Stores/Stores";
+import CreateStorePage from "./pages/Features/Stores/CreateStore";
+import UpdateStore from "./pages/Features/Stores/UpdateStore";
 
 const App = () => {
   const navigate = useNavigate();
@@ -77,6 +82,8 @@ const App = () => {
                   element={<UpdatePodravkaFacingsPage />}
                 />
                 <Route path="/photos" element={<StoreSelector />} />
+                <Route path="/photos/edit" element={<PhotoList />} />
+                <Route path="/photos/edit/:id" element={<UpdatePhotoPage />} />
                 <Route path="/photos/:id" element={<PhotoSelector />} />
                 <Route
                   path="/photos/:storeId/primare"
@@ -107,6 +114,7 @@ const App = () => {
                   path="/price-check/:id/konkurrenca"
                   element={<PriceCheckCompetitor />}
                 />
+                <Route path="/reports" element={<ReportView />} />
               </>
             )}
             {userRole === "admin" && (
@@ -114,6 +122,10 @@ const App = () => {
                 <Route path="/photos/report" element={<PhotoReportHeader />} />
                 <Route path="/reports" element={<ReportView />} />
                 <Route path="/settings" element={<SelectCreateEdit />} />
+                <Route
+                  path="/settings/create/store"
+                  element={<CreateStorePage />}
+                />
                 <Route
                   path="/settings/create/competitor-brand"
                   element={<CreateCompetitorBrand />}
@@ -123,6 +135,11 @@ const App = () => {
                   element={<CreateCompetitorProduct />}
                 />
                 <Route path="/settings/create/user" element={<CreateUser />} />
+                <Route path="/settings/edit/store" element={<Stores />} />
+                <Route
+                  path="/settings/edit/store/:id"
+                  element={<UpdateStore />}
+                />
                 <Route
                   path="/settings/edit/competitor-brands"
                   element={<CompetitorList />}

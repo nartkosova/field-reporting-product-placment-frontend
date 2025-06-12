@@ -9,26 +9,27 @@ export interface Entity {
   role?: string;
   created_at?: string;
   created_by?: string;
+  category?: string;
 }
 
-interface EntityListProps {
+interface EntityListProps<T extends Entity> {
   title: string;
-  fetchAll: () => Promise<Entity[]>;
-  onDelete: (id: number) => Promise<void>;
+  fetchAll: () => Promise<T[]>;
+  onDelete?: (id: number) => Promise<void>;
   editPath: string;
   itemLabel?: string;
-  renderDetails?: (item: Entity) => React.ReactNode;
+  renderDetails?: (item: T) => React.ReactNode;
 }
 
-export const EntityList = ({
+export const EntityList = <T extends Entity>({
   title,
   fetchAll,
   onDelete,
   editPath,
   itemLabel = "elementin",
   renderDetails,
-}: EntityListProps) => {
-  const [items, setItems] = useState<Entity[]>([]);
+}: EntityListProps<T>) => {
+  const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -57,6 +58,7 @@ export const EntityList = ({
   };
 
   const handleDelete = async (id: number) => {
+    if (!onDelete) return;
     const confirm = window.confirm(
       `A jeni të sigurt që dëshironi të fshini këtë ${itemLabel}?`
     );
@@ -90,7 +92,7 @@ export const EntityList = ({
           {items.map((item) => (
             <li
               key={item.id}
-              className="border p-4 rounded flex justify-between items-center hover:bg-gray-50 "
+              className="border p-4 rounded flex justify-between items-center hover:bg-gray-50"
             >
               <div
                 onClick={() => handleEdit(item.id)}
@@ -116,16 +118,23 @@ export const EntityList = ({
                         Krijuar nga: {item.created_by}
                       </div>
                     )}
+                    {item.category && (
+                      <div className="text-sm text-gray-600">
+                        Kategoria: {item.category}
+                      </div>
+                    )}
                   </>
                 )}
               </div>
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="text-red-600 hover:text-red-800 text-xl ml-4 cursor-pointer"
-                title="Delete"
-              >
-                🗑️
-              </button>
+              {onDelete && (
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="text-red-600 hover:text-red-800 text-xl ml-4 cursor-pointer"
+                  title="Delete"
+                >
+                  🗑️
+                </button>
+              )}
             </li>
           ))}
         </ul>

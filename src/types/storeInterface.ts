@@ -10,3 +10,9 @@ export interface StoreListProps {
   user: string | null;
   showLocation?: boolean;
 }
+
+export interface StoreInput extends Omit<Store, "store_id"> {
+  store_channel: string;
+  user_id: number;
+  sales_rep: string;
+}

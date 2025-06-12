@@ -41,7 +41,7 @@ const PhotoReportHeader = () => {
     const fetchData = async () => {
       const [userList, storeList, photoList] = await Promise.all([
         userService.getAllUsers(),
-        storeService.getAllStores(),
+        storeService.getStoresWithUserId(),
         photoService.getAllReportPhotos(),
       ]);
 

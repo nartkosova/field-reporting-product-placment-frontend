@@ -66,7 +66,7 @@ const ReportHeader = () => {
     const fetchInitialData = async () => {
       const [userList, storeList, allFacings] = await Promise.all([
         userService.getAllUsers(),
-        storeServices.getAllStores(),
+        storeServices.getStoresWithUserId(),
         podravkaFacingsService.getPodravkaFacingsWithCompetitors(),
       ]);
 
