@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import podravkaFacingsService from "../services/podravkaFacingsService";
+import productServices from "../services/productServices";
 
 export const useProductCategories = () => {
   const [categories, setCategories] = useState<string[]>([]);
@@ -9,7 +9,7 @@ export const useProductCategories = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const products = (await podravkaFacingsService.getProducts()) as {
+        const products = (await productServices.getProducts()) as {
           category: string;
         }[];
         const uniqueCategories = Array.from(

@@ -12,6 +12,15 @@ const getAllUsers = async () => {
   return response.data;
 };
 
+const getUserById = async (id: number) => {
+  const token = getToken();
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  const response = await axios.get(`${baseUrl}/api/users/${id}`, config);
+  return response.data;
+};
+
 const createUser = async (userData: {
   user: string;
   password: string;
@@ -38,15 +47,6 @@ const deleteUser = async (id: number) => {
   await axios.delete(`${baseUrl}/api/users/${id}`, config);
 };
 
-const getUserById = async (id: number) => {
-  const token = getToken();
-  const config = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
-  const response = await axios.get(`${baseUrl}/api/users/${id}`, config);
-  return response.data;
-};
-
 const updateUser = async (
   id: number,
   data: { user: string; password: string; role: string }
@@ -57,11 +57,12 @@ const updateUser = async (
   };
   await axios.put(`${baseUrl}/api/users/${id}`, data, config);
 };
+
 export default {
   getAllUsers,
+  getUserById,
   createUser,
   loginUser,
   deleteUser,
-  getUserById,
   updateUser,
 };

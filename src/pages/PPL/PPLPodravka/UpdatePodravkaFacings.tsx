@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import podravkaFacingsService from "../../services/podravkaFacingsService";
+import podravkaFacingsService from "../../../services/podravkaFacingsService";
 import {
   PodravkaFacingInput,
   PodravkaFacingWithMeta,
-} from "../../types/podravkaFacingInterface";
+} from "../../../types/podravkaFacingInterface";
 import { AxiosError } from "axios";
 
 const UpdatePodravkaFacingsPage = () => {

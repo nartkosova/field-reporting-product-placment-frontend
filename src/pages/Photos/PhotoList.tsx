@@ -34,7 +34,7 @@ const PhotoList = () => {
         await photoService.deleteReportPhoto(photoId.toString());
       }}
       editPath="/photos/edit"
-      itemLabel="fotografinë"
+      itemLabel="fotografi"
       renderDetails={(item) => (
         <div className="text-sm text-gray-600 space-y-1">
           <div>Tipi: {item.photo_type}</div>

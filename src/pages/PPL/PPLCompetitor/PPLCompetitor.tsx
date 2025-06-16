@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import competitorServices from "../../services/competitorServices";
+import competitorServices from "../../../services/competitorServices";
 import Select from "react-select";
 import { AxiosError } from "axios";
+import competitorFacingsService from "../../../services/competitorFacingsService";
 
 interface CompetitorEntry {
   id?: number;
@@ -30,7 +31,9 @@ const CompetitorFacingsFormPage = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const brands = await competitorServices.getAllCompetitorBrands();
+        const brands = await competitorServices.getCompetitorByCategory(
+          selectedCategory
+        );
         setAllCompetitorBrands(brands);
       } catch (err) {
         console.error("Error fetching brands:", err);
@@ -38,7 +41,7 @@ const CompetitorFacingsFormPage = () => {
     };
 
     fetchBrands();
-  }, []);
+  }, [selectedCategory]);
 
   const handleCompetitorChange = (
     index: number,
@@ -89,7 +92,7 @@ const CompetitorFacingsFormPage = () => {
           };
         });
 
-      await competitorServices.batchCreateCompetitorFacings(facingData);
+      await competitorFacingsService.batchCreateCompetitorFacings(facingData);
 
       alert("Facings te konkurencës janë dërguar me sukses.");
       setCompetitors([{ name: "", facings: 0 }]);

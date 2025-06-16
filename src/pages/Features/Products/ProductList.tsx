@@ -1,5 +1,5 @@
 import { EntityList } from "../../../components/EntityList/EntityList";
-import competitorServices from "../../../services/competitorServices";
+import productServices from "../../../services/productServices";
 import { CompetitorProduct } from "../../../types/productInterface";
 
 const CompetitorProductList = () => {
@@ -7,7 +7,7 @@ const CompetitorProductList = () => {
     <EntityList
       title="Produktet e Konkurrencës"
       fetchAll={async () => {
-        const products = await competitorServices.getCompetitorProducts({});
+        const products = await productServices.getCompetitorProducts({});
         return products.map((p: CompetitorProduct) => ({
           id: p.competitor_product_id,
           name: p.name,
@@ -15,7 +15,7 @@ const CompetitorProductList = () => {
           created_by: p.created_by,
         }));
       }}
-      onDelete={competitorServices.deleteCompetitorProduct}
+      onDelete={productServices.deleteCompetitorProduct}
       editPath="/settings/edit/competitor-products"
       itemLabel="produktin"
     />

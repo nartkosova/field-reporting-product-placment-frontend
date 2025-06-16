@@ -1,27 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EntityList } from "../../components/EntityList/EntityList";
-import podravkaFacingsService from "../../services/podravkaFacingsService";
-import { formattedDate } from "../../utils/utils";
-
-interface Batch {
-  batch_id: number;
-  store_name: string;
-  report_date: string;
-  report_time: string;
-  category: string;
-  product_count: number;
-}
+import { EntityList } from "../../../components/EntityList/EntityList";
+import podravkaFacingsService from "../../../services/podravkaFacingsService";
+import { formattedDate } from "../../../utils/utils";
+import { Batch } from "../../../types/podravkaFacingInterface";
 
 const PodravkaPPLEditor = () => {
   return (
     <EntityList
-      title="PPL Reports"
+      title="Raportet PPL"
       fetchAll={async () => {
         const data = await podravkaFacingsService.getUserPPLBatches();
         return data.map((batch: Batch) => ({
           id: batch.batch_id,
           name: batch.store_name,
-          created_at: { date: batch.report_date, time: batch.report_time },
+          created_at: batch.report_date,
           category: batch.category,
           product_count: batch.product_count,
         }));
@@ -32,7 +24,7 @@ const PodravkaPPLEditor = () => {
         );
       }}
       editPath="/ppl-podravka/edit"
-      itemLabel="raportin PPL"
+      itemLabel="raport PPL"
       renderDetails={(item) => (
         <div className="text-sm text-gray-600">
           Kategoria: {(item as any).category} | Produkte:{" "}

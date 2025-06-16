@@ -1,14 +1,13 @@
-// pages/PriceCheckCompetitor.tsx
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import priceCheckServices from "../../../services/priceCheckServices";
-import competitorServices from "../../../services/competitorServices";
 import BrandSelector from "./BrandSelector";
 import AddProductForm from "./AddProductForm";
 import ProductList from "./ProductList";
 import { CompetitorPriceCheckInput } from "../../../types/priceCheckInterface";
 import { CompetitorProduct } from "../../../types/productInterface";
 import { AxiosError } from "axios";
+import productServices from "../../../services/productServices";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,7 +26,7 @@ const PriceCheckCompetitor = () => {
 
   const fetchProducts = async () => {
     if (!selectedBrandId) return;
-    const res = await competitorServices.getCompetitorProducts({
+    const res = await productServices.getCompetitorProducts({
       category: selectedCategory,
       competitor_id: selectedBrandId,
     });

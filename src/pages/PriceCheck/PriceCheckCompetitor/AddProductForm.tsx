@@ -1,5 +1,5 @@
 import { useState } from "react";
-import competitorServices from "../../../services/competitorServices";
+import productServices from "../../../services/productServices";
 
 interface Props {
   competitor_id: number;
@@ -19,7 +19,7 @@ const AddProductForm = ({
 
   const handleSubmit = async () => {
     if (!name) return;
-    await competitorServices.createCompetitorProduct({
+    await productServices.createCompetitorProduct({
       name,
       weight,
       category,

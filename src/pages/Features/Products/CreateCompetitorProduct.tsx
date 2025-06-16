@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import competitorServices from "../../../services/competitorServices";
 import { useProductCategories } from "../../../hooks/useProductCategories";
+import productServices from "../../../services/productServices";
 
 const CreateCompetitorProductPage = () => {
   const [competitorOptions, setCompetitorOptions] = useState<
@@ -33,7 +34,7 @@ const CreateCompetitorProductPage = () => {
       created_by: userInfo?.id,
     };
 
-    await competitorServices.createCompetitorProduct(payload);
+    await productServices.createCompetitorProduct(payload);
   };
 
   return (

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import podravkaFacingsService from "../../services/podravkaFacingsService";
+import podravkaFacingsService from "../../../services/podravkaFacingsService";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { Product } from "../../types/productInterface";
+import { Product } from "../../../types/productInterface";
 import { AxiosError } from "axios";
+import productServices from "../../../services/productServices";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,9 +22,7 @@ const PodravkaFacingsFormPage = () => {
     const fetchProducts = async () => {
       setProductsLoading(true);
       try {
-        const products = await podravkaFacingsService.getProductsByStoreId(
-          storeId
-        );
+        const products = await productServices.getProductsByStoreId(storeId);
         const filtered = products.filter(
           (p: Product) => p.category === selectedCategory
         );

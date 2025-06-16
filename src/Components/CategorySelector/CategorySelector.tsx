@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useLocation, NavLink } from "react-router-dom";
 import Select from "react-select";
 import storeServices from "../../services/storeServices";
-import podravkaFacingsService from "../../services/podravkaFacingsService";
 import { Store } from "../../types/storeInterface";
+import productServices from "../../services/productServices";
 
 interface CategorySelectorProps {
   routeBase: string;
@@ -33,9 +33,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         const store = await storeServices.getStoreById(storeId);
         setStore(store);
 
-        const products = await podravkaFacingsService.getProductsByStoreId(
-          storeId
-        );
+        const products = await productServices.getProductsByStoreId(storeId);
         const uniqueCategories: string[] = Array.from(
           new Set(products.map((p: { category: string }) => p.category))
         );

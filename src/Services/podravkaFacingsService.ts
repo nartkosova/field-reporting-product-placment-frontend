@@ -10,23 +10,6 @@ const getPodravkaFacings = async () => {
   });
   return response.data;
 };
-const getProducts = async () => {
-  const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/products`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
-};
-const getProductsByStoreId = async (storeId: number) => {
-  const token = getToken();
-  const response = await axios.get(
-    `${baseUrl}/api/stores/${storeId}/products`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
 
 const getPodravkaFacingsWithCompetitors = async (params = {}) => {
   const token = getToken();
@@ -39,6 +22,29 @@ const getPodravkaFacingsWithCompetitors = async (params = {}) => {
   );
   return response.data;
 };
+
+const getPodravkaFacingsByBatchId = async (batchId: string) => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/batch/${batchId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const getUserPPLBatches = async () => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/user-batches`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const batchCreatePodravkaFacings = async (
   facingDataArray: PodravkaFacingInput[]
 ) => {
@@ -53,7 +59,7 @@ const batchCreatePodravkaFacings = async (
   return response.data;
 };
 
-export const updatePodravkaBatch = async ({
+const updatePodravkaBatch = async ({
   batchId,
   facings,
 }: {
@@ -84,36 +90,12 @@ const deletePodravkaFacingBatch = async (batchId: number | string) => {
   return response.data;
 };
 
-const getPodravkaFacingsByBatchId = async (batchId: string) => {
-  const token = getToken();
-  const response = await axios.get(
-    `${baseUrl}/api/facings/podravka-facing/batch/${batchId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
-const getUserPPLBatches = async () => {
-  const token = getToken();
-  const response = await axios.get(
-    `${baseUrl}/api/facings/podravka-facing/user-batches`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
 export default {
   getPodravkaFacings,
-  getProducts,
-  getProductsByStoreId,
   getPodravkaFacingsWithCompetitors,
+  getPodravkaFacingsByBatchId,
+  getUserPPLBatches,
   batchCreatePodravkaFacings,
   updatePodravkaBatch,
   deletePodravkaFacingBatch,
-  getPodravkaFacingsByBatchId,
-  getUserPPLBatches,
 };

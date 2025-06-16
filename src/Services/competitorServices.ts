@@ -1,106 +1,11 @@
 import axios from "axios";
 import { getToken } from "./authService";
-import { CompetitorFacingInput } from "../types/podravkaFacingInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
-const getCompetitorProducts = async (params: {
-  category?: string;
-  competitor_id?: number;
-}) => {
-  const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/products/competitor`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params,
-  });
-  return response.data;
-};
-
-const createCompetitorProduct = async (data: {
-  name: string;
-  category: string;
-  weight?: number;
-  competitor_id: number;
-  created_by: number;
-}) => {
-  const token = getToken();
-  const response = await axios.post(
-    `${baseUrl}/api/products/competitor`,
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
-};
-
-const updateCompetitorProduct = async (
-  productId: number,
-  data: {
-    name: string;
-    category: string;
-    weight?: number;
-    competitor_id: number;
-  }
-) => {
-  const token = getToken();
-  const response = await axios.put(
-    `${baseUrl}/api/products/competitor/${productId}`,
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
-};
-
-const deleteCompetitorProduct = async (productId: number) => {
-  const token = getToken();
-  const response = await axios.delete(
-    `${baseUrl}/api/products/competitor/${productId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
-};
-
-const batchCreateCompetitorFacings = async (
-  facingDataArray: CompetitorFacingInput[]
-) => {
-  const token = getToken();
-  const response = await axios.post(
-    `${baseUrl}/api/facings/competitor-facing/batch`,
-    facingDataArray,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
-const getCompetitorBrandByName = async (brandName: string) => {
-  const token = getToken();
-  const response = await axios.get(
-    `${baseUrl}/api/products/competitor-brand/${brandName}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
 const getAllCompetitorBrands = async () => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/products/competitor-brand`, {
+  const response = await axios.get(`${baseUrl}/api/competitor-brands`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -109,7 +14,18 @@ const getAllCompetitorBrands = async () => {
 const getCompetitorBrandById = async (competitorId: number) => {
   const token = getToken();
   const response = await axios.get(
-    `${baseUrl}/api/products/competitor-brand/id/${competitorId}`,
+    `${baseUrl}/api/competitor-brands/id/${competitorId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const getCompetitorByCategory = async (category: string) => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/competitor-brands/category/${category}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -122,7 +38,7 @@ const createCompetitorBrand = async (competitorBrandData: {
 }) => {
   const token = getToken();
   const response = await axios.post(
-    `${baseUrl}/api/products/competitor-brand`,
+    `${baseUrl}/api/competitor-brands`,
     competitorBrandData,
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -137,7 +53,7 @@ const updateCompetitorBrand = async (
 ) => {
   const token = getToken();
   const response = await axios.put(
-    `${baseUrl}/api/products/competitor-brand/${competitorId}`,
+    `${baseUrl}/api/competitor-brands/${competitorId}`,
     competitorBrandData,
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -149,7 +65,7 @@ const updateCompetitorBrand = async (
 const deleteCompetitorBrand = async (competitorId: number) => {
   const token = getToken();
   const response = await axios.delete(
-    `${baseUrl}/api/products/competitor-brand/${competitorId}`,
+    `${baseUrl}/api/competitor-brands/${competitorId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -158,15 +74,10 @@ const deleteCompetitorBrand = async (competitorId: number) => {
 };
 
 export default {
-  getCompetitorProducts,
-  createCompetitorProduct,
-  updateCompetitorProduct,
-  deleteCompetitorProduct,
   createCompetitorBrand,
   updateCompetitorBrand,
   deleteCompetitorBrand,
-  getCompetitorBrandByName,
   getAllCompetitorBrands,
+  getCompetitorByCategory,
   getCompetitorBrandById,
-  batchCreateCompetitorFacings,
 };

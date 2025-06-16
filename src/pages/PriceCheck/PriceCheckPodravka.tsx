@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import priceCheckServices from "../../services/priceCheckServices";
-import podravkaFacingsService from "../../services/podravkaFacingsService";
 import {
   PriceCheckInput,
   PodravkaPriceCheckInput,
 } from "../../types/priceCheckInterface";
 import { Product } from "../../types/productInterface";
 import { AxiosError } from "axios";
+import productServices from "../../services/productServices";
+
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [prices, setPrices] = useState<{ [key: number]: PriceCheckInput }>({});
@@ -25,7 +26,7 @@ const PriceCheckPodravka = () => {
     const fetchProducts = async () => {
       setProductsLoading(true);
       try {
-        const all = await podravkaFacingsService.getProductsByStoreId(storeId);
+        const all = await productServices.getProductsByStoreId(storeId);
         const filtered = all.filter(
           (p: Product) => p.category === selectedCategory
         );

@@ -15,7 +15,12 @@ const HomePage = () => {
           </NavLink>
           <NavLink to="/ppl-podravka">
             <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Edito PPL
+              Edito PPL Podravka
+            </button>
+          </NavLink>
+          <NavLink to="/ppl-konkurrenca">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
+              Edito PPL Konkurrenca
             </button>
           </NavLink>
           <NavLink to="/photos">

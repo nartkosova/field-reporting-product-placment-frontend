@@ -5,6 +5,8 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import { AxiosError } from "axios";
 import { CompetitorProduct } from "../../../types/productInterface";
 import { useProductCategories } from "../../../hooks/useProductCategories";
+import productServices from "../../../services/productServices";
+
 const UpdateCompetitorProduct = () => {
   const { id } = useParams<{ id: string }>();
   const [initialValues, setInitialValues] = useState<
@@ -28,7 +30,7 @@ const UpdateCompetitorProduct = () => {
         );
         setCompetitorOptions(formattedBrands);
 
-        const products = await competitorServices.getCompetitorProducts({});
+        const products = await productServices.getCompetitorProducts({});
         const product = products.find(
           (p: CompetitorProduct) => p.competitor_product_id === Number(id)
         );
@@ -62,7 +64,7 @@ const UpdateCompetitorProduct = () => {
   const handleUpdate = async (data: Record<string, string | number>) => {
     if (!id) return;
     try {
-      await competitorServices.updateCompetitorProduct(Number(id), {
+      await productServices.updateCompetitorProduct(Number(id), {
         name: data.name as string,
         category: data.category as string,
         weight: data.weight ? Number(data.weight) : undefined,
