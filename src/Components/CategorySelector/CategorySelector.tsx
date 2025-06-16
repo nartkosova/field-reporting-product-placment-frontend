@@ -22,6 +22,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   const { id } = useParams<{ id: string }>();
   const storeId = id ? parseInt(id) : NaN;
   const location = useLocation();
+  const company = useParams<{ company: string }>().company;
 
   const [store, setStore] = useState<Store | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
@@ -94,11 +95,13 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           label.toLowerCase() === "fletushka" ||
           label.toLowerCase() === "korporative";
         const storeSegment = store?.store_id ? `/${store.store_id}` : "";
+        const companySegment = company ? `/${company}` : "";
+
         const fullPath = categoryNotRequired
-          ? `${routeBase}${storeSegment}${path}`
+          ? `${routeBase}${storeSegment}${companySegment}${path}`
           : categoryRequired
-          ? `${routeBase}${storeSegment}${path}?category=${selectedCategory}`
-          : `${routeBase}${storeSegment}${path}`;
+          ? `${routeBase}${storeSegment}${companySegment}${path}?category=${selectedCategory}`
+          : `${routeBase}${storeSegment}${companySegment}${path}`;
 
         const isDisabled = categoryNotRequired
           ? !!selectedCategory

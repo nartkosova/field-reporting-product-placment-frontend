@@ -17,6 +17,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const category = new URLSearchParams(location.search).get("category");
+  const { company } = useParams<{ company: string }>();
   const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = user.id;
   const [storeName, setStoreName] = useState<string | null>(null);
@@ -35,12 +36,13 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
     const customName = `${safeName}-${
       category || photoType
-    }-${timestamp}`.toLowerCase();
+    }-${company}-${timestamp}`.toLowerCase();
 
     const formData = new FormData();
     formData.append("photo", file, customName);
     formData.append("photo_type", photoType);
     formData.append("category", category || photoType);
+    formData.append("company", company || "podravka");
     formData.append("user_id", userId);
     formData.append("store_id", storeId);
     formData.append("photo_description", photoDescription);

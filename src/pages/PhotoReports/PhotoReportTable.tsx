@@ -66,24 +66,29 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
       }),
       columnHelper.accessor("user", { header: "User", enableSorting: true }),
       columnHelper.accessor("store_name", {
-        header: "Store",
+        header: "Shitorja",
         enableSorting: true,
       }),
       columnHelper.accessor("category", {
-        header: "Category",
+        header: "Kategroria",
         enableSorting: true,
       }),
       columnHelper.accessor("photo_type", {
-        header: "Photo Type",
+        header: "Lloji i Fotos",
         enableSorting: true,
       }),
       columnHelper.accessor("photo_description", {
-        header: "Description",
+        header: "Përshkrimi i Fotos",
         enableSorting: false,
         cell: (info) => info.getValue() || "-",
       }),
+      columnHelper.accessor("company", {
+        header: "Kompania",
+        enableSorting: true,
+        cell: (info) => info.getValue() || "-",
+      }),
       columnHelper.accessor("uploaded_at", {
-        header: "Uploaded At",
+        header: "Ngarkuar më",
         enableSorting: true,
         cell: (info) => {
           const date = new Date(info.getValue());
@@ -99,7 +104,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         },
       }),
       columnHelper.accessor("photo_url", {
-        header: "Photo",
+        header: "Fotot",
         cell: (info) => (
           <img
             src={info.getValue()}

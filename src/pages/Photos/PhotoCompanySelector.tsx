@@ -7,8 +7,8 @@ const PhotoCompanySelector = () => {
     <CategorySelector
       routeBase="/photos"
       buttonLinks={[
-        { label: "Foto Podravka", path: `/${storeId}/photo-podravka` },
-        { label: "Foto Konkurrenca", path: `/${storeId}/photo-competitor` },
+        { label: "Foto Podravka", path: `/${storeId}/podravka` },
+        { label: "Foto Konkurrenca", path: `/${storeId}/competitor` },
       ]}
       categoryRequired={false}
     />

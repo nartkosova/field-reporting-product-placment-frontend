@@ -19,6 +19,7 @@ export interface PhotoSchema {
     | "korporative";
   photo_url: string;
   category: string;
+  company: "podravka" | "competitor";
   user_id: number;
   store_id: number;
   user: string;

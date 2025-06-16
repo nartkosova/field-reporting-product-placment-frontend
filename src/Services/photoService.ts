@@ -76,16 +76,13 @@ const deleteReportPhoto = async (photoId: string) => {
 
 const bulkDeletePhotos = async (photoUrls: string[]) => {
   const token = getToken();
-  const res = await axios.post(
-    `${baseUrl}/api/photos/bulk-delete`,
-    { photoUrls },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const res = await axios.delete(`${baseUrl}/api/photos/bulk-delete`, {
+    data: { photoUrls },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return res.data;
 };
 
