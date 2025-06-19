@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import competitorServices from "../../../services/competitorServices";
 import Select from "react-select";
 import { AxiosError } from "axios";
 import competitorFacingsService from "../../../services/competitorFacingsService";
+import { userInfo } from "../../../utils/parseLocalStorage";
+import { useSelectedStore } from "../../../hooks/useSelectStore";
 
 interface CompetitorEntry {
   id?: number;
@@ -12,13 +14,13 @@ interface CompetitorEntry {
 }
 
 const CompetitorFacingsFormPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const storeInfo = useSelectedStore();
+  const id = storeInfo?.store_id || 0;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const storeId = id ? parseInt(id) : NaN;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const storeId = id ? parseInt(id.toString()) : NaN;
   const userId = userInfo?.id;
 
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([
@@ -144,7 +146,7 @@ const CompetitorFacingsFormPage = () => {
                   label: brand.brand_name,
                   value: brand.brand_name,
                 }))}
-                placeholder="Zgjedh markën"
+                placeholder="Zgjedh konkurrentin"
                 isClearable
               />
             </div>

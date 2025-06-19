@@ -39,11 +39,11 @@ export const EntityList = <T extends Entity>({
       setItems(data);
     } catch (err) {
       console.error(`Failed to fetch ${title.toLowerCase()}:`, err);
-      // const axiosError = err as AxiosError<{ error: string }>;
-      // const backendMessage =
-      //   axiosError.response?.data?.error ||
-      //   `Gabim gjatë ngarkimit të ${title.toLowerCase()}.`;
-      // alert(backendMessage);
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error ||
+        `Gabim gjatë ngarkimit të ${title.toLowerCase()}.`;
+      alert(backendMessage);
     } finally {
       setLoading(false);
     }

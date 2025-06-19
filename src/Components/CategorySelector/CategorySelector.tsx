@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, NavLink } from "react-router-dom";
 import Select from "react-select";
-import storeServices from "../../services/storeServices";
-import { Store } from "../../types/storeInterface";
+// import storeServices from "../../services/storeServices";
+// import { Store } from "../../types/storeInterface";
 import productServices from "../../services/productServices";
-
+import { useSelectedStore } from "../../hooks/useSelectStore";
 interface CategorySelectorProps {
   routeBase: string;
   buttonLinks: {
@@ -19,20 +19,20 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   buttonLinks,
   categoryRequired = true,
 }) => {
-  const { id } = useParams<{ id: string }>();
-  const storeId = id ? parseInt(id) : NaN;
+  const selectedStore = useSelectedStore();
+  const storeId = selectedStore?.store_id || 0;
   const location = useLocation();
   const company = useParams<{ company: string }>().company;
 
-  const [store, setStore] = useState<Store | null>(null);
+  // const [store, setStore] = useState<Store | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const store = await storeServices.getStoreById(storeId);
-        setStore(store);
+        // const store = await storeServices.getStoreById(storeId);
+        // setStore(store);
 
         const products = await productServices.getProductsByStoreId(storeId);
         const uniqueCategories: string[] = Array.from(
@@ -71,7 +71,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   return (
     <div className="flex flex-col justify-center align-middle p-6 max-w-xl space-y-4 mx-auto">
       <p className="text-2xl font-semibold">
-        Jeni në shitoren {store?.store_name}
+        Jeni në shitoren {selectedStore?.store_name}
         {categoryRequired && ", zgjidhni kategorinë dhe opsionin."}
       </p>
 
@@ -94,7 +94,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         const categoryNotRequired =
           label.toLowerCase() === "fletushka" ||
           label.toLowerCase() === "korporative";
-        const storeSegment = store?.store_id ? `/${store.store_id}` : "";
+        const storeSegment = storeId ? `/${storeId}` : "";
         const companySegment = company ? `/${company}` : "";
 
         const fullPath = categoryNotRequired

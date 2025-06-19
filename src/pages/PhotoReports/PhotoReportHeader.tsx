@@ -20,6 +20,9 @@ const PhotoReportHeader = () => {
   >([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [photos, setPhotos] = useState<PhotoSchema[]>([]);
+  const [totalPhotos, setTotalPhotos] = useState(0);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const [filters, setFilters] = useState({
     user_ids: [] as string[],
@@ -39,22 +42,25 @@ const PhotoReportHeader = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [userList, storeList, photoList] = await Promise.all([
+      const [userList, storeList, photoResponse] = await Promise.all([
         userService.getAllUsers(),
         storeService.getStoresWithUserId(),
-        photoService.getAllReportPhotos(),
+        photoService.getAllReportPhotos(pageSize, page * pageSize),
       ]);
 
       setUsers(userList);
       setStores(storeList);
-      setPhotos(photoList);
+      setPhotos(photoResponse.data);
+      setTotalPhotos(photoResponse.total);
 
-      const cats = Array.from(new Set(photoList.map((p) => p.category)));
+      const cats = Array.from(
+        new Set(photoResponse.data.map((p) => p.category))
+      );
       setCategories(cats);
     };
 
     fetchData();
-  }, []);
+  }, [page, pageSize]);
 
   const userOptions = users.map((u) => ({
     value: String(u.user_id),
@@ -144,6 +150,47 @@ const PhotoReportHeader = () => {
             }))
           }
         />
+      </div>
+      <div className="flex justify-between items-center mt-4 text-sm mb-4">
+        <div className="flex items-center gap-2">
+          <span>
+            Page {page + 1} of {Math.ceil(totalPhotos / pageSize)}
+          </span>
+          <button
+            className="px-2 py-1 border rounded disabled:opacity-50 cursor-pointer"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Prev
+          </button>
+          <button
+            className="px-2 py-1 border rounded disabled:opacity-50 cursor-pointer"
+            onClick={() =>
+              setPage((p) => ((p + 1) * pageSize < totalPhotos ? p + 1 : p))
+            }
+            disabled={(page + 1) * pageSize >= totalPhotos}
+          >
+            Next
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label>Rows per page:</label>
+          <select
+            className="border rounded p-1"
+            value={pageSize}
+            onChange={(e) => {
+              setPage(0);
+              setPageSize(Number(e.target.value));
+            }}
+          >
+            {[10, 25, 50, 100].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <PhotoTable data={filteredPhotos} />

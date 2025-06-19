@@ -8,13 +8,13 @@ import { CompetitorPriceCheckInput } from "../../../types/priceCheckInterface";
 import { CompetitorProduct } from "../../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
+import { userInfo } from "../../../utils/parseLocalStorage";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = userInfo?.id;
 
   const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);

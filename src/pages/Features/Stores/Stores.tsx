@@ -15,6 +15,7 @@ const Stores = () => {
         }));
       }}
       editPath="/settings/edit/store"
+      onDelete={storeServices.deleteStore}
       itemLabel="dyqanin"
     />
   );

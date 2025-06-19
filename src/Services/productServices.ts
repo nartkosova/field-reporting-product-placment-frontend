@@ -1,5 +1,10 @@
 import axios from "axios";
 import { getToken } from "./authService";
+import {
+  cacheStoreProducts,
+  getCachedStoreProducts,
+  isOnline,
+} from "../utils/cacheManager";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -80,15 +85,26 @@ const getProducts = async () => {
   return response.data;
 };
 
-const getProductsByStoreId = async (storeId: number) => {
+export const getProductsByStoreId = async (storeId: number) => {
   const token = getToken();
-  const response = await axios.get(
-    `${baseUrl}/api/stores/${storeId}/products`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
+
+  if (!isOnline()) {
+    const cached = getCachedStoreProducts(storeId);
+    if (cached) {
+      console.log("Using cached products for offline mode");
+      return cached;
     }
-  );
-  return response.data;
+    throw new Error("No cached data available for offline mode");
+  }
+  const response = await axios.get(`${baseUrl}/api/products`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const products = response.data;
+
+  cacheStoreProducts(storeId, products);
+
+  return products;
 };
 
 export default {

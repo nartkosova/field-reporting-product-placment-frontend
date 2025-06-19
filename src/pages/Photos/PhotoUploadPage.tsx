@@ -4,13 +4,14 @@ import photoService from "../../services/photoService";
 import { PhotoInput } from "../../types/photoInterface";
 import storeServices from "../../services/storeServices";
 import { sanitizeFilename } from "../../utils/utils";
-
+import { useSelectedStore } from "../../hooks/useSelectStore";
 interface Props {
   photoType: PhotoInput["photo_type"];
 }
 
 const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
-  const { storeId } = useParams<{ storeId: string }>();
+  const storeInfo = useSelectedStore();
+  const storeId = storeInfo?.store_id || 0;
   const location = useLocation();
   const [file, setFile] = useState<File | null>(null);
   const [photoDescription, setPhotoDescription] = useState("");
@@ -44,7 +45,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     formData.append("category", category || photoType);
     formData.append("company", company || "podravka");
     formData.append("user_id", userId);
-    formData.append("store_id", storeId);
+    formData.append("store_id", storeId.toString());
     formData.append("photo_description", photoDescription);
 
     try {

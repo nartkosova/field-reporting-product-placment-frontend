@@ -9,6 +9,7 @@ export interface PodravkaFacingWithMeta extends PodravkaFacingInput {
   batch_id: string;
   name: string;
   store_name: string;
+  label: string;
 }
 
 export interface CompetitorFacingInput {

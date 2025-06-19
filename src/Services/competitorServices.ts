@@ -35,6 +35,7 @@ const getCompetitorByCategory = async (category: string) => {
 
 const createCompetitorBrand = async (competitorBrandData: {
   brand_name: string;
+  categories?: string[];
 }) => {
   const token = getToken();
   const response = await axios.post(
@@ -49,7 +50,7 @@ const createCompetitorBrand = async (competitorBrandData: {
 
 const updateCompetitorBrand = async (
   competitorId: number,
-  competitorBrandData: { brand_name: string }
+  competitorBrandData: { brand_name: string; categories?: string[] }
 ) => {
   const token = getToken();
   const response = await axios.put(

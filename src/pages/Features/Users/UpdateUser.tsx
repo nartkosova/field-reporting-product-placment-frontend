@@ -36,7 +36,9 @@ const UpdateUser = () => {
     if (id) fetchUser();
   }, [id]);
 
-  const handleUpdate = async (data: Record<string, string | number>) => {
+  const handleUpdate = async (
+    data: Record<string, string | number | (string | number)[]>
+  ) => {
     if (!id) return;
     try {
       await userService.updateUser(Number(id), {

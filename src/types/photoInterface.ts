@@ -27,3 +27,8 @@ export interface PhotoSchema {
   uploaded_at: string;
   photo_description?: string;
 }
+
+export interface PaginatedPhotoResponse {
+  data: PhotoSchema[];
+  total: number;
+}

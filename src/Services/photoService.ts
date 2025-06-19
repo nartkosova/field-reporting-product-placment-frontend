@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getToken } from "./authService";
-import { PhotoSchema } from "../types/photoInterface";
+import { PaginatedPhotoResponse, PhotoSchema } from "../types/photoInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -14,28 +14,31 @@ const getReportPhotosByUserId = async (): Promise<PhotoSchema[]> => {
   return res.data;
 };
 
-const getReportPhotosByPhotoId = async (
+export const getReportPhotosByPhotoId = async (
   photoId: string
 ): Promise<PhotoSchema> => {
   const token = getToken();
+
   const res = await axios.get(`${baseUrl}/api/photos/${photoId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
+
   return res.data;
 };
 
-const getAllReportPhotos = async (): Promise<PhotoSchema[]> => {
+export const getAllReportPhotos = async (
+  limit: number,
+  offset: number
+): Promise<PaginatedPhotoResponse> => {
   const token = getToken();
-  const res = await axios.get(`${baseUrl}/api/photos/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+
+  const res = await axios.get(`${baseUrl}/api/photos`, {
+    params: { limit, offset },
+    headers: { Authorization: `Bearer ${token}` },
   });
+
   return res.data;
 };
-
 const createPhoto = async (formData: FormData) => {
   const token = getToken();
   const response = await axios.post(

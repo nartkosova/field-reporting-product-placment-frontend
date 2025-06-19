@@ -1,62 +1,56 @@
 import { NavLink } from "react-router-dom";
+import { StoreDropdown } from "../../components/StoreDropdown/StoreDropdown";
+import { userInfo } from "../../utils/parseLocalStorage";
+import { userNavItems, adminNavItems } from "./HomePageFields";
+import { useSelectedStore } from "../../hooks/useSelectStore";
 
-const HomePage = () => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+interface NavButtonProps {
+  to: string;
+  children: React.ReactNode;
+  disabled?: boolean;
+}
+
+const NavButton: React.FC<NavButtonProps> = ({
+  to,
+  children,
+  disabled = false,
+}) => (
+  <NavLink to={to}>
+    <button
+      disabled={disabled}
+      className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {children}
+    </button>
+  </NavLink>
+);
+
+const HomePage: React.FC = () => {
   const userRole = userInfo?.role;
+  const isAdmin = userRole === "admin";
+  const selectedStore = useSelectedStore();
   return (
     <div className="flex flex-col justify-center align-middle p-6 max-w-xl space-y-4 mx-auto">
       <h1 className="text-3xl font-bold">Zgjedhe nje aktivitet</h1>
-      {userRole !== "admin" && (
+
+      {!isAdmin && (
         <>
-          <NavLink to="/ppl-store">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              PPL
-            </button>
-          </NavLink>
-          <NavLink to="/ppl-podravka">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Edito PPL Podravka
-            </button>
-          </NavLink>
-          <NavLink to="/ppl-konkurrenca">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Edito PPL Konkurrenca
-            </button>
-          </NavLink>
-          <NavLink to="/photos">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Krijo Foto
-            </button>
-          </NavLink>
-          <NavLink to="/photos/edit">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Edito Fotot
-            </button>
-          </NavLink>
-          <NavLink to="/reports">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Raporte
-            </button>
-          </NavLink>
+          <StoreDropdown />
+          {userNavItems(selectedStore).map((item) => (
+            <NavButton key={item.to} to={item.to} disabled={item.disabled}>
+              {item.label}
+            </NavButton>
+          ))}
         </>
       )}
-      {userRole === "admin" && (
+
+      {isAdmin && (
         <>
-          <NavLink to="/reports">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Raporte
-            </button>
-          </NavLink>
-          <NavLink to="/photos/report">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Raportet e Fotove
-            </button>
-          </NavLink>
-          <NavLink to="/settings">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700">
-              Krijo/Edito
-            </button>
-          </NavLink>
+          {adminNavItems.map((item) => (
+            <NavButton key={item.to} to={item.to}>
+              {item.label}
+            </NavButton>
+          ))}
         </>
       )}
     </div>

@@ -15,8 +15,6 @@ const columnHelper = createColumnHelper<PhotoSchema>();
 
 const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [pageSize, setPageSize] = useState(10);
-  const [showAll, setShowAll] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
 
@@ -166,60 +164,6 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         </table>
       </div>
 
-      <div className="flex items-center justify-between text-sm">
-        {!showAll ? (
-          <div className="flex items-center gap-2">
-            <span>
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-            </span>
-            <button
-              className="px-2 py-1 border rounded disabled:opacity-50"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Prev
-            </button>
-            <button
-              className="px-2 py-1 border rounded disabled:opacity-50"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </button>
-          </div>
-        ) : (
-          <p>Showing all rows</p>
-        )}
-
-        <div className="flex items-center gap-2">
-          <span>Rows per page:</span>
-          <select
-            className="border rounded p-1"
-            value={showAll ? "all" : pageSize}
-            onChange={(e) => {
-              if (e.target.value === "all") {
-                setShowAll(true);
-                setPageSize(data.length);
-                table.setPageSize(data.length);
-              } else {
-                const size = Number(e.target.value);
-                setShowAll(false);
-                setPageSize(size);
-                table.setPageSize(size);
-              }
-            }}
-          >
-            {[10, 50, 100].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-            <option value="all">All</option>
-          </select>
-        </div>
-      </div>
-
       {selectedPhotos.size > 0 && (
         <div className="pt-2 flex gap-2">
           <button
@@ -252,11 +196,17 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
           <button
             className="px-4 py-2 bg-red-600 text-white rounded cursor-pointer"
             onClick={async () => {
+              if (
+                !window.confirm(
+                  "A je i sigurt që dëshiron të fshish këto foto?"
+                )
+              ) {
+                return;
+              }
               const photoUrls = Array.from(selectedPhotos);
               await photoService.bulkDeletePhotos(photoUrls);
               alert("Selected photos deleted successfully");
               setSelectedPhotos(new Set());
-              // optionally trigger refetch or update table
             }}
           >
             Delete Selected ({selectedPhotos.size})

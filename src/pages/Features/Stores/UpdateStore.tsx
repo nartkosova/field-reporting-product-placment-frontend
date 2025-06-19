@@ -58,7 +58,9 @@ const UpdateStore = () => {
     fetchStore();
   }, [id]);
 
-  const handleUpdate = async (data: Record<string, string | number>) => {
+  const handleUpdate = async (
+    data: Record<string, string | number | (string | number)[]>
+  ) => {
     if (!id) return;
 
     const payload: StoreInput = {

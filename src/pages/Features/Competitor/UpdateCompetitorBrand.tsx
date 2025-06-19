@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import competitorServices from "../../../services/competitorServices";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { AxiosError } from "axios";
+import { competitorFields } from "./CompetitorFields";
+import { useProductCategories } from "../../../hooks/useProductCategories";
 
 const UpdateCompetitorBrand = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,14 +12,17 @@ const UpdateCompetitorBrand = () => {
     {}
   );
   const [loading, setLoading] = useState(true);
-
+  const { categories } = useProductCategories();
   useEffect(() => {
     const fetchBrand = async () => {
       try {
         const brand = await competitorServices.getCompetitorBrandById(
           Number(id)
         );
-        setInitialValues({ brand_name: brand.brand_name });
+        setInitialValues({
+          brand_name: brand.brand_name,
+          categories: brand.categories,
+        });
       } catch (err) {
         console.error("Failed to load brand", err);
         const axiosError = err as AxiosError<{ error: string }>;
@@ -33,11 +38,14 @@ const UpdateCompetitorBrand = () => {
     if (id) fetchBrand();
   }, [id]);
 
-  const handleUpdate = async (data: Record<string, string | number>) => {
+  const handleUpdate = async (
+    data: Record<string, string | number | (string | number)[]>
+  ) => {
     if (!id) return;
     try {
       await competitorServices.updateCompetitorBrand(Number(id), {
         brand_name: data.brand_name as string,
+        categories: data.categories as string[],
       });
       alert("Konkurrenca u përditësua me sukses.");
     } catch (err) {
@@ -56,7 +64,12 @@ const UpdateCompetitorBrand = () => {
       ) : (
         <CreateUpdateForm
           title="Përditëso Konkurrencën"
-          fields={[{ name: "brand_name", label: "Emri i konkurrencës" }]}
+          fields={competitorFields({
+            categoryOptions: categories.map((cat) => ({
+              label: cat,
+              value: cat,
+            })),
+          })}
           initialValues={initialValues}
           onSubmit={handleUpdate}
           submitText="Vazhdo"

@@ -4,7 +4,9 @@ import userService from "../../../services/userService";
 import { AxiosError } from "axios";
 
 const CreateUser = () => {
-  const handleSubmit = async (data: Record<string, string | number>) => {
+  const handleSubmit = async (
+    data: Record<string, string | number | (string | number)[]>
+  ) => {
     const { user, password, role } = data as {
       user: string;
       password: string;

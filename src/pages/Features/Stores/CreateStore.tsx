@@ -26,7 +26,9 @@ const CreateStorePage = () => {
     fetchUsers();
   }, []);
 
-  const handleCreate = async (data: Record<string, string | number>) => {
+  const handleCreate = async (
+    data: Record<string, string | number | (string | number)[]>
+  ) => {
     const payload: StoreInput = {
       store_name: data.store_name as string,
       location: data.location as string,
@@ -36,6 +38,13 @@ const CreateStorePage = () => {
       user_id: data.user_id as number,
       store_code: data.store_code as number,
     };
+
+    Object.keys(payload).forEach((key) => {
+      if (Array.isArray(data[key])) {
+        console.warn(`Unexpected array value for key: ${key}`);
+      }
+    });
+
     await storeServices.createStore(payload);
   };
 

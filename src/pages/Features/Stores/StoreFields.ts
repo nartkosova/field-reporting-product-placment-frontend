@@ -37,7 +37,7 @@ export const userFields = ({
   },
   {
     name: "user_id",
-    label: "Përdoresi",
+    label: "Përdoruesi",
     type: "select",
     options: userOptions,
   },

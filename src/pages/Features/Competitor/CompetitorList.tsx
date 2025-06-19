@@ -21,7 +21,7 @@ const CompetitorList = () => {
       }}
       onDelete={competitorServices.deleteCompetitorBrand}
       editPath="/settings/edit/competitor-brands"
-      itemLabel="brandin"
+      itemLabel="Konkurrenca"
     />
   );
 };

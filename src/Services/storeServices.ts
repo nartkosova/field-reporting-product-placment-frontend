@@ -1,6 +1,7 @@
 import axios from "axios";
 import { StoreInput } from "../types/storeInterface";
 import { getToken } from "./authService";
+import { isOnline } from "../utils/cacheManager";
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const getStoresByUserId = async (userId: number) => {
@@ -13,9 +14,21 @@ const getStoresByUserId = async (userId: number) => {
 
 const getStoreById = async (store_id: number) => {
   const token = getToken();
+
+  if (!isOnline()) {
+    const local = localStorage.getItem("selectedStore");
+    const storeInfo = local ? JSON.parse(local) : null;
+    if (storeInfo?.store_id === store_id) {
+      console.log("Using cached storeInfo for offline mode");
+      return storeInfo;
+    }
+    throw new Error("Offline and no cached data available for this store");
+  }
+
   const response = await axios.get(`${baseUrl}/api/stores/${store_id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return response.data;
 };
 

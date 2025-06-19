@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import podravkaFacingsService from "../../../services/podravkaFacingsService";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Product } from "../../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
+import { userInfo } from "../../../utils/parseLocalStorage";
+import { useSelectedStore } from "../../../hooks/useSelectStore";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [facings, setFacings] = useState<{ [key: number]: number }>({});
   const [loading, setLoading] = useState(false);
   const [productsLoading, setProductsLoading] = useState(true);
-  const { id } = useParams<{ id: string }>();
+  const storeInfo = useSelectedStore();
+  const id = storeInfo?.store_id || 0;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
-  const storeId = id ? parseInt(id) : NaN;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const storeId = id ? parseInt(id.toString()) : NaN;
   const userId = userInfo?.id;
 
   useEffect(() => {

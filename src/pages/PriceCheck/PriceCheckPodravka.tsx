@@ -8,6 +8,7 @@ import {
 import { Product } from "../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../services/productServices";
+import { userInfo } from "../../utils/parseLocalStorage";
 
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -19,7 +20,6 @@ const PriceCheckPodravka = () => {
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = userInfo?.id;
 
   useEffect(() => {

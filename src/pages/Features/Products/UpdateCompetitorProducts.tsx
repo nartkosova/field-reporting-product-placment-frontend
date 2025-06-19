@@ -61,7 +61,9 @@ const UpdateCompetitorProduct = () => {
     if (id) fetchData();
   }, [id]);
 
-  const handleUpdate = async (data: Record<string, string | number>) => {
+  const handleUpdate = async (
+    data: Record<string, string | number | (string | number)[]>
+  ) => {
     if (!id) return;
     try {
       await productServices.updateCompetitorProduct(Number(id), {

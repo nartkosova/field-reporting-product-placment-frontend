@@ -1,59 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import podravkaFacingsService from "../../services/podravkaFacingsService";
 import userService from "../../services/userService";
 import storeServices from "../../services/storeServices";
 import Select from "react-select";
 import ReportTable from "./ReportTable";
-
-interface User {
-  user_id: string | number;
-  user: string;
-}
-
-interface Store {
-  store_id: string | number;
-  store_name: string;
-}
-
-interface Facing {
-  user: string;
-  user_id: number;
-  store_name: string;
-  store_id: number;
-  category: string;
-  total_facings: number;
-  report_date: string;
-  competitors: Record<string, number>;
-}
-
-interface FilterState {
-  user_ids: string[];
-  store_ids: string[];
-  categories: string[];
-  report_month: string[];
-}
-
-const monthOptions = [
-  { value: "01", label: "January" },
-  { value: "02", label: "February" },
-  { value: "03", label: "March" },
-  { value: "04", label: "April" },
-  { value: "05", label: "May" },
-  { value: "06", label: "June" },
-  { value: "07", label: "July" },
-  { value: "08", label: "August" },
-  { value: "09", label: "September" },
-  { value: "10", label: "October" },
-  { value: "11", label: "November" },
-  { value: "12", label: "December" },
-];
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { User, Store, Facing, FilterState } from "../../types/reportInterface";
+import { monthOptions } from "../../utils/monthOptions";
+import ReportChart from "./ReportChart";
 
 const ReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [facings, setFacings] = useState<Facing[]>([]);
-  const [competitorColumns, setCompetitorColumns] = useState<string[]>([]);
 
   const [filters, setFilters] = useState<FilterState>({
     user_ids: [],
@@ -78,15 +39,6 @@ const ReportHeader = () => {
         new Set<string>(allFacings.map((f: Facing) => f.category))
       );
       setCategories(cats);
-
-      const allCompetitorNames = new Set<string>();
-      allFacings.forEach((f: Facing) => {
-        const competitors = f.competitors || {};
-        Object.keys(competitors).forEach((name) =>
-          allCompetitorNames.add(name)
-        );
-      });
-      setCompetitorColumns(Array.from(allCompetitorNames));
     };
 
     fetchInitialData();
@@ -146,6 +98,58 @@ const ReportHeader = () => {
         filters.categories.includes(f.category))
     );
   });
+
+  const competitorColumns = useMemo(() => {
+    const names = new Set<string>();
+    filteredFacings.forEach((f) => {
+      Object.entries(f.competitors || {}).forEach(([brand, count]) => {
+        if (Number(count) > 0) names.add(brand);
+      });
+    });
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }, [filteredFacings]);
+
+  const handleExportExcel = () => {
+    const dataToExport = filteredFacings.map((row) => {
+      const competitors = competitorColumns.reduce((acc, brand) => {
+        acc[brand] = row.competitors[brand] ?? 0;
+        return acc;
+      }, {} as Record<string, number>);
+
+      return {
+        User: row.user,
+        Store: row.store_name,
+        Category: row.category,
+        "Podravka Facings": row.total_facings,
+        ...competitors,
+        "Total Competitor Facings": Object.values(row.competitors).reduce(
+          (sum, val) => sum + Number(val),
+          0
+        ),
+        Date: new Date(row.report_date).toLocaleDateString(),
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Facings Report");
+
+    const blob = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "binary",
+    });
+
+    const buf = new ArrayBuffer(blob.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < blob.length; i++) {
+      view[i] = blob.charCodeAt(i) & 0xff;
+    }
+
+    saveAs(
+      new Blob([buf], { type: "application/octet-stream" }),
+      `facings_report_${Date.now()}.xlsx`
+    );
+  };
 
   return (
     <div className="p-6">
@@ -211,6 +215,16 @@ const ReportHeader = () => {
         data={filteredFacings}
         competitorColumns={competitorColumns}
       />
+
+      <div className="pt-6 flex gap-2">
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer"
+          onClick={handleExportExcel}
+        >
+          Exporto ne Excel
+        </button>
+      </div>
+      <ReportChart data={filteredFacings} />
     </div>
   );
 };

@@ -8,22 +8,25 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useState } from "react";
+import { getFacingTotals } from "../../utils/getFacingTotals";
 
-interface Facing {
+interface FacingTable {
   user: string;
   store_name: string;
   category: string;
   total_facings: number;
   report_date: string;
   competitors: Record<string, number>;
+  user_id: number;
+  store_id: number;
 }
 
 interface Props {
-  data: Facing[];
+  data: FacingTable[];
   competitorColumns: string[];
 }
 
-const columnHelper = createColumnHelper<Facing>();
+const columnHelper = createColumnHelper<FacingTable>();
 
 const FacingsTable = ({ data, competitorColumns }: Props) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -147,7 +150,6 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
                     <td
                       key={cell.id}
                       className={`border px-2 py-1 align-top whitespace-normal break-words ${
-                        // compact width for numeric cells
                         [
                           "total_facings",
                           "total_competitor_facings",
@@ -173,20 +175,11 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
                   const id = header.id;
 
                   const rows = table.getRowModel().rows;
-                  const totalPodravka = rows.reduce(
-                    (sum, row) => sum + Number(row.original.total_facings),
-                    0
-                  );
-                  const totalCompetitor = rows.reduce((sum, row) => {
-                    return (
-                      sum +
-                      Object.values(row.original.competitors || {}).reduce(
-                        (s, v) => s + Number(v),
-                        0
-                      )
-                    );
-                  }, 0);
-                  const grandTotal = totalPodravka + totalCompetitor;
+                  const {
+                    podravka: totalPodravka,
+                    competitor: totalCompetitor,
+                    total: grandTotal,
+                  } = getFacingTotals(rows.map((r) => r.original));
 
                   if (id === "total_facings") {
                     const percent =

@@ -3,13 +3,12 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import competitorServices from "../../../services/competitorServices";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
-
+import { userInfo } from "../../../utils/parseLocalStorage";
 const CreateCompetitorProductPage = () => {
   const [competitorOptions, setCompetitorOptions] = useState<
     { label: string; value: number }[]
   >([]);
   const { categories } = useProductCategories();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -25,7 +24,9 @@ const CreateCompetitorProductPage = () => {
     fetchBrands();
   }, []);
 
-  const handleSubmit = async (formData: Record<string, string | number>) => {
+  const handleSubmit = async (
+    formData: Record<string, string | number | (string | number)[]>
+  ) => {
     const payload = {
       name: formData.name as string,
       category: formData.category as string,
