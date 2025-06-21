@@ -29,9 +29,19 @@ export interface CompetitorFacingWithMeta extends CompetitorFacingInput {
 }
 
 export interface Batch {
-  batch_id: number;
+  batch_id: number | string;
   store_name: string;
   report_date: string;
   category: string;
   product_count: number;
+}
+
+export interface QueuedPodravkaBatch {
+  meta: {
+    store_name: string;
+    report_date: string;
+    category: string;
+    product_count: number;
+  };
+  facings: PodravkaFacingInput[];
 }

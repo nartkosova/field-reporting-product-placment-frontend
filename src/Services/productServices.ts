@@ -96,9 +96,12 @@ export const getProductsByStoreId = async (storeId: number) => {
     }
     throw new Error("No cached data available for offline mode");
   }
-  const response = await axios.get(`${baseUrl}/api/products`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axios.get(
+    `${baseUrl}/api/stores/${storeId}/products`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
   const products = response.data;
 

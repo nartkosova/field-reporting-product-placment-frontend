@@ -1,7 +1,12 @@
 import { Store } from "../../types/storeInterface";
 
 export const userNavItems = (storeInfo: Store | null) => [
-  { to: `/ppl-store/${storeInfo?.store_id || ""}`, label: "PPL" },
+  {
+    to: `/ppl-store/${storeInfo?.store_id || ""}`,
+    label: "PPL",
+    disabled: !storeInfo,
+    ariaLabel: "PPL Store",
+  },
   { to: "/ppl-podravka", label: "Edito PPL Podravka" },
   { to: "/ppl-konkurrenca", label: "Edito PPL Konkurrenca" },
   {

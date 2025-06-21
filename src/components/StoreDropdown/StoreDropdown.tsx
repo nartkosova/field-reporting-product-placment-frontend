@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import Select, { SingleValue } from "react-select";
 import storeServices from "../../services/storeServices";
@@ -17,13 +16,11 @@ interface StoreOption {
 export const StoreDropdown = () => {
   const [stores, setStores] = useState<Store[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
-  const [user, setUser] = useState<string | null>(null);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const storeInfo = useSelectedStore();
 
   useEffect(() => {
     setUserId(userInfo?.id ?? null);
-    setUser(userInfo?.user ?? null);
   }, []);
 
   useEffect(() => {
@@ -53,7 +50,7 @@ export const StoreDropdown = () => {
     if (!selected) {
       setSelectedStore(null);
       localStorage.removeItem("selectedStore");
-      window.dispatchEvent(new Event("selectedStoreChanged")); // notify same-tab listeners
+      window.dispatchEvent(new Event("selectedStoreChanged"));
       return;
     }
 

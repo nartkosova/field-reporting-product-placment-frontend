@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import podravkaFacingsService from "../../../services/podravkaFacingsService";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Product } from "../../../types/productInterface";
-import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
 import { userInfo } from "../../../utils/parseLocalStorage";
 import { useSelectedStore } from "../../../hooks/useSelectStore";
+import { queueFacings } from "../../../db/db";
+import { isOnline } from "../../../utils/cacheManager";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -25,9 +26,11 @@ const PodravkaFacingsFormPage = () => {
       setProductsLoading(true);
       try {
         const products = await productServices.getProductsByStoreId(storeId);
-        const filtered = products.filter(
-          (p: Product) => p.category === selectedCategory
-        );
+        const filtered = products
+          .filter((p: Product) => p.category === selectedCategory)
+          .sort((a: Product, b: Product) =>
+            b.product_category.localeCompare(a.product_category)
+          );
         setProducts(filtered);
       } catch (err) {
         console.error("Error fetching products:", err);
@@ -51,26 +54,29 @@ const PodravkaFacingsFormPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const facingData = products.map((product) => ({
+      user_id: userId,
+      store_id: Number(storeId),
+      product_id: product.product_id,
+      category: product.category,
+      facings_count: facings[product.product_id] || 0,
+    }));
+
     try {
-      const facingData = products.map((product) => ({
-        user_id: userId,
-        store_id: Number(storeId),
-        product_id: product.product_id,
-        category: product.category,
-        facings_count: facings[product.product_id] || 0,
-      }));
+      if (!isOnline()) {
+        await queueFacings(facingData);
+        alert("Offline – facings u ruajtën për t'u dërguar më vonë.");
+      } else {
+        await podravkaFacingsService.batchCreatePodravkaFacings(facingData);
+        alert("Facings u ngarkuan me sukses!");
+      }
 
-      await podravkaFacingsService.batchCreatePodravkaFacings(facingData);
-
-      alert("Facings u ngarkuan me sukses!");
       setFacings({});
       navigate(-1);
     } catch (err) {
-      const axiosError = err as AxiosError<{ error: string }>;
-      const backendMessage =
-        axiosError.response?.data?.error || "Gabim gjatë ngarkimit të facings.";
-      alert(backendMessage);
-      console.error(err);
+      console.error("Gabim gjatë submit:", err);
+      alert("Gabim gjatë ngarkimit të facings.");
     } finally {
       setLoading(false);
     }
@@ -90,7 +96,7 @@ const PodravkaFacingsFormPage = () => {
               className="p-4 border border-gray-300 rounded-md "
             >
               <label className="block mb-2 font-medium text-gray-700">
-                {product.name} ({product.category}) - {product.product_category}
+                {product.name} - {product.product_category}
               </label>
               <input
                 type="number"
