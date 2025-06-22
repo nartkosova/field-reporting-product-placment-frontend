@@ -7,8 +7,7 @@ export const userNavItems = (storeInfo: Store | null) => [
     disabled: !storeInfo,
     ariaLabel: "PPL Store",
   },
-  { to: "/ppl-podravka", label: "Edito PPL Podravka" },
-  { to: "/ppl-konkurrenca", label: "Edito PPL Konkurrenca" },
+  { to: "/edit-ppl", label: "Edito PPL" },
   {
     to: `/photos/${storeInfo?.store_id || ""}`,
     label: "Krijo Foto",

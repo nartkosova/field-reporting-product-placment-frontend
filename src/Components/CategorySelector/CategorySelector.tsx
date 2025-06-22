@@ -12,12 +12,14 @@ interface CategorySelectorProps {
     path: string;
   }[];
   categoryRequired?: boolean;
+  textRendered?: boolean;
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
   routeBase,
   buttonLinks,
   categoryRequired = true,
+  textRendered = true,
 }) => {
   const selectedStore = useSelectedStore();
   const storeId = selectedStore?.store_id || 0;
@@ -70,11 +72,12 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   return (
     <div className="flex flex-col justify-center align-middle p-6 max-w-xl space-y-4 mx-auto">
-      <p className="text-2xl font-semibold">
-        Jeni në shitoren {selectedStore?.store_name}
-        {categoryRequired && ", zgjidhni kategorinë dhe opsionin."}
-      </p>
-
+      {textRendered && (
+        <p className="text-2xl font-semibold">
+          Jeni në shitoren {selectedStore?.store_name}
+          {categoryRequired && ", zgjidhni kategorinë dhe opsionin."}
+        </p>
+      )}
       {categoryRequired && (
         <Select
           className="w-full"

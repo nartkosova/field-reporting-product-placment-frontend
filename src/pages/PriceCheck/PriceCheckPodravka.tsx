@@ -8,14 +8,13 @@ import {
 import { Product } from "../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../services/productServices";
-import { userInfo } from "../../utils/parseLocalStorage";
 
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [prices, setPrices] = useState<{ [key: number]: PriceCheckInput }>({});
   const [loading, setLoading] = useState(false);
   const [productsLoading, setProductsLoading] = useState(true);
-
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";

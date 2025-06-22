@@ -3,8 +3,8 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import competitorServices from "../../../services/competitorServices";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
-import { userInfo } from "../../../utils/parseLocalStorage";
 const CreateCompetitorProductPage = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const [competitorOptions, setCompetitorOptions] = useState<
     { label: string; value: number }[]
   >([]);

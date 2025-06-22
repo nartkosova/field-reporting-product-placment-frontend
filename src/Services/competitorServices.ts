@@ -33,6 +33,17 @@ const getCompetitorByCategory = async (category: string) => {
   return response.data;
 };
 
+const getAllCompetitorsWithCategories = async () => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/competitor-brands/categories`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const createCompetitorBrand = async (competitorBrandData: {
   brand_name: string;
   categories?: string[];
@@ -78,6 +89,7 @@ export default {
   createCompetitorBrand,
   updateCompetitorBrand,
   deleteCompetitorBrand,
+  getAllCompetitorsWithCategories,
   getAllCompetitorBrands,
   getCompetitorByCategory,
   getCompetitorBrandById,

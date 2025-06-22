@@ -88,10 +88,9 @@ const getProducts = async () => {
 export const getProductsByStoreId = async (storeId: number) => {
   const token = getToken();
 
-  if (!isOnline()) {
+  if (!isOnline() || localStorage.getItem(`store_${storeId}_products`)) {
     const cached = getCachedStoreProducts(storeId);
     if (cached) {
-      console.log("Using cached products for offline mode");
       return cached;
     }
     throw new Error("No cached data available for offline mode");

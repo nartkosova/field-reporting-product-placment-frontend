@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import priceCheckServices from "../../../services/priceCheckServices";
 import BrandSelector from "./BrandSelector";
@@ -8,15 +8,14 @@ import { CompetitorPriceCheckInput } from "../../../types/priceCheckInterface";
 import { CompetitorProduct } from "../../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
-import { userInfo } from "../../../utils/parseLocalStorage";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = userInfo?.id;
-
   const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
   const [products, setProducts] = useState<CompetitorProduct[]>([]);
   const [prices, setPrices] = useState<{
@@ -24,18 +23,18 @@ const PriceCheckCompetitor = () => {
   }>({});
   const [loading, setLoading] = useState(false);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!selectedBrandId) return;
     const res = await productServices.getCompetitorProducts({
       category: selectedCategory,
       competitor_id: selectedBrandId,
     });
     setProducts(res);
-  };
+  }, [selectedBrandId, selectedCategory]);
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedBrandId, selectedCategory]);
+  }, [fetchProducts]);
 
   const handlePriceChange = (
     id: number,

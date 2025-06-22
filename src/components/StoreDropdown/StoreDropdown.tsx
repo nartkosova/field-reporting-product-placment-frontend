@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Select, { SingleValue } from "react-select";
 import storeServices from "../../services/storeServices";
 import { Store } from "../../types/storeInterface";
-import { userInfo } from "../../utils/parseLocalStorage";
 import productServices from "../../services/productServices";
 import { clearApiCache } from "../../utils/cacheManager";
 import { useSelectedStore } from "../../hooks/useSelectStore";
@@ -18,10 +17,10 @@ export const StoreDropdown = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const storeInfo = useSelectedStore();
-
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   useEffect(() => {
     setUserId(userInfo?.id ?? null);
-  }, []);
+  }, [userInfo]);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -50,6 +49,7 @@ export const StoreDropdown = () => {
     if (!selected) {
       setSelectedStore(null);
       localStorage.removeItem("selectedStore");
+      localStorage.removeItem(`store_${storeInfo?.store_id}_products`);
       window.dispatchEvent(new Event("selectedStoreChanged"));
       return;
     }

@@ -1,31 +1,10 @@
-import { NavLink } from "react-router-dom";
 import { StoreDropdown } from "../../components/StoreDropdown/StoreDropdown";
-import { userInfo } from "../../utils/parseLocalStorage";
 import { userNavItems, adminNavItems } from "./HomePageFields";
 import { useSelectedStore } from "../../hooks/useSelectStore";
-
-interface NavButtonProps {
-  to: string;
-  children: React.ReactNode;
-  disabled?: boolean;
-}
-
-const NavButton: React.FC<NavButtonProps> = ({
-  to,
-  children,
-  disabled = false,
-}) => (
-  <NavLink to={to}>
-    <button
-      disabled={disabled}
-      className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer w-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      {children}
-    </button>
-  </NavLink>
-);
+import { NavButton } from "../../components/NavButton/NavButton";
 
 const HomePage: React.FC = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userRole = userInfo?.role;
   const isAdmin = userRole === "admin";
   const selectedStore = useSelectedStore();

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { userInfo } from "../../utils/parseLocalStorage";
 
 const Header = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("authToken");

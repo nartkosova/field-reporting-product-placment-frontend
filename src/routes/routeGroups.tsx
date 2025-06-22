@@ -26,6 +26,7 @@ import UserList from "../pages/Features/Users/UserList";
 import UpdateUser from "../pages/Features/Users/UpdateUser";
 import CompetitorProductList from "../pages/Features/Products/ProductList";
 import UpdateCompetitorProduct from "../pages/Features/Products/UpdateCompetitorProducts";
+import EditPPL from "../pages/EditPPL/EditPPL";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -52,7 +53,11 @@ export const pplRoutes: RouteObject[] = [
     element: <CompetitorFacingsFormPage />,
   },
   {
-    path: "/ppl-podravka",
+    path: "/edit-ppl",
+    element: <EditPPL />,
+  },
+  {
+    path: "/edit-ppl/podravka",
     element: <PodravkaPPLEditor />,
   },
   {
@@ -60,7 +65,7 @@ export const pplRoutes: RouteObject[] = [
     element: <UpdatePodravkaFacingsPage />,
   },
   {
-    path: "/ppl-konkurrenca",
+    path: "/edit-ppl/konkurrenca",
     element: <CompetitorPPLEditor />,
   },
   {

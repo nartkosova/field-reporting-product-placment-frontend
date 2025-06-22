@@ -15,3 +15,8 @@ export interface CompetitorProduct {
   created_at: string;
   created_by?: string;
 }
+
+export interface BrandCategory {
+  competitor_id: number;
+  brand_name: string;
+}

@@ -1,12 +1,25 @@
 import { openDB } from "idb";
-import { PodravkaFacingInput } from "../types/podravkaFacingInterface";
+import {
+  CompetitorFacingInput,
+  PodravkaFacingInput,
+} from "../types/podravkaFacingInterface";
 import podravkaFacingsService from "../services/podravkaFacingsService";
+import { BrandCategory } from "../types/productInterface";
+import competitorFacingsService from "../services/competitorFacingsService";
 
 export const getDB = () => {
-  return openDB("p-app", 1, {
+  return openDB("p-app", 3, {
     upgrade(db) {
       if (!db.objectStoreNames.contains("pendingFacings")) {
         db.createObjectStore("pendingFacings", { autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains("competitorCategories")) {
+        db.createObjectStore("competitorCategories", { keyPath: "category" });
+      }
+      if (!db.objectStoreNames.contains("pendingCompetitorFacings")) {
+        db.createObjectStore("pendingCompetitorFacings", {
+          autoIncrement: true,
+        });
       }
     },
   });
@@ -44,4 +57,73 @@ export const syncQueuedFacings = async () => {
 
   await clearQueuedFacings();
   console.log("Synced all pending facings");
+};
+
+export const cacheCompetitorCategories = async (
+  categories: BrandCategory[]
+) => {
+  const db = await getDB();
+  const tx = db.transaction("competitorCategories", "readwrite");
+  const store = tx.objectStore("competitorCategories");
+
+  for (const item of categories) {
+    await store.put(item);
+  }
+
+  await tx.done;
+};
+
+export const saveCompetitorCategories = async (categories: BrandCategory[]) => {
+  const db = await getDB();
+  const tx = db.transaction("competitorCategories", "readwrite");
+  const store = tx.objectStore("competitorCategories");
+  await store.clear();
+  for (const c of categories) {
+    await store.put(c);
+  }
+  await tx.done;
+};
+
+export const getCachedBrandsByCategory = async (category: string) => {
+  const db = await getDB();
+  const tx = db.transaction("competitorCategories", "readonly");
+  const store = tx.objectStore("competitorCategories");
+  const record = await store.get(category);
+  return record?.brands || [];
+};
+
+export const queueCompetitorFacings = async (
+  payload: CompetitorFacingInput[]
+) => {
+  const db = await getDB();
+  await db.add("pendingCompetitorFacings", payload);
+  console.log("✅ Competitor facings saved to IndexedDB:", payload);
+};
+
+export const getAllQueuedCompetitorFacings = async (): Promise<
+  CompetitorFacingInput[][]
+> => {
+  const db = await getDB();
+  return db.getAll("pendingCompetitorFacings");
+};
+
+export const clearQueuedCompetitorFacings = async () => {
+  const db = await getDB();
+  await db.clear("pendingCompetitorFacings");
+};
+
+export const syncQueuedCompetitorFacings = async () => {
+  const queued = await getAllQueuedCompetitorFacings();
+  if (queued.length === 0) return;
+
+  for (const batch of queued) {
+    try {
+      await competitorFacingsService.batchCreateCompetitorFacings(batch);
+    } catch (err) {
+      console.error("Error syncing competitor batch:", err);
+      return;
+    }
+  }
+
+  await clearQueuedCompetitorFacings();
 };

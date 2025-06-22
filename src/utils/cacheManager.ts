@@ -20,19 +20,6 @@ export const isOnline = () => {
   return navigator.onLine;
 };
 
-export const handleOfflineError = (error: Error) => {
-  if (!isOnline()) {
-    return {
-      error: "You are offline. Please check your internet connection.",
-      isOffline: true,
-    };
-  }
-  return {
-    error: error.message || "An error occurred",
-    isOffline: false,
-  };
-};
-
 export const getCachedStoreProducts = (storeId: number) => {
   try {
     const cachedProducts = localStorage.getItem(`store_${storeId}_products`);

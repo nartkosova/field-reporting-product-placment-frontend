@@ -3,7 +3,6 @@ import podravkaFacingsService from "../../../services/podravkaFacingsService";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Product } from "../../../types/productInterface";
 import productServices from "../../../services/productServices";
-import { userInfo } from "../../../utils/parseLocalStorage";
 import { useSelectedStore } from "../../../hooks/useSelectStore";
 import { queueFacings } from "../../../db/db";
 import { isOnline } from "../../../utils/cacheManager";
@@ -19,6 +18,7 @@ const PodravkaFacingsFormPage = () => {
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id.toString()) : NaN;
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userId = userInfo?.id;
 
   useEffect(() => {

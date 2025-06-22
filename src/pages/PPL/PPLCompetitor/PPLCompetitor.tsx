@@ -4,8 +4,12 @@ import competitorServices from "../../../services/competitorServices";
 import Select from "react-select";
 import { AxiosError } from "axios";
 import competitorFacingsService from "../../../services/competitorFacingsService";
-import { userInfo } from "../../../utils/parseLocalStorage";
 import { useSelectedStore } from "../../../hooks/useSelectStore";
+import { isOnline } from "../../../utils/cacheManager";
+import {
+  getCachedBrandsByCategory,
+  queueCompetitorFacings,
+} from "../../../db/db";
 
 interface CompetitorEntry {
   id?: number;
@@ -14,6 +18,7 @@ interface CompetitorEntry {
 }
 
 const CompetitorFacingsFormPage = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const storeInfo = useSelectedStore();
   const id = storeInfo?.store_id || 0;
   const navigate = useNavigate();
@@ -33,10 +38,18 @@ const CompetitorFacingsFormPage = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const brands = await competitorServices.getCompetitorByCategory(
-          selectedCategory
-        );
-        setAllCompetitorBrands(brands);
+        if (!isOnline()) {
+          const cachedBrands = await getCachedBrandsByCategory(
+            selectedCategory
+          );
+          setAllCompetitorBrands(cachedBrands);
+          return;
+        } else {
+          const brands = await competitorServices.getCompetitorByCategory(
+            selectedCategory
+          );
+          setAllCompetitorBrands(brands);
+        }
       } catch (err) {
         console.error("Error fetching brands:", err);
       }
@@ -94,9 +107,14 @@ const CompetitorFacingsFormPage = () => {
           };
         });
 
-      await competitorFacingsService.batchCreateCompetitorFacings(facingData);
+      if (!isOnline()) {
+        await queueCompetitorFacings(facingData);
+        alert("Jeni offline – të dhënat janë ruajtur dhe do dërgohen më vonë.");
+      } else {
+        await competitorFacingsService.batchCreateCompetitorFacings(facingData);
+        alert("Facings te konkurencës janë dërguar me sukses.");
+      }
 
-      alert("Facings te konkurencës janë dërguar me sukses.");
       setCompetitors([{ name: "", facings: 0 }]);
       navigate(-1);
     } catch (err) {

@@ -11,15 +11,24 @@ const getPodravkaFacings = async () => {
   return response.data;
 };
 
-const getPodravkaFacingsWithCompetitors = async (params = {}) => {
+const getPodravkaFacingsWithCompetitors = async (
+  filters: Record<string, number> = {},
+  limit = 50,
+  offset = 0
+) => {
   const token = getToken();
-  const searchParams = new URLSearchParams(params).toString();
-  const response = await axios.get(
-    `${baseUrl}/api/facings/with-competitors?${searchParams}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+
+  const allParams = {
+    ...filters,
+    limit,
+    offset,
+  };
+
+  const response = await axios.get(`${baseUrl}/api/facings/with-competitors`, {
+    params: allParams,
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
   return response.data;
 };
 
