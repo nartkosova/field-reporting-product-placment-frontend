@@ -75,50 +75,52 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-xl mx-auto mt-8 bg-white rounded shadow-md">
-      {category && (
-        <div className="text-lg font-medium pb-2">
-          Kategoria: <span className="text-blue-600">{category}</span>
-        </div>
-      )}{" "}
-      {!category && (
-        <div className="text-lg font-medium pb-2">Fotografia Korporative</div>
-      )}
-      <label className="block bg-gray-100 text-center py-3 rounded border border-dashed border-gray-300 cursor-pointer hover:bg-gray-200 transition">
-        Krijo Foto
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="hidden"
-        />
-      </label>
-      {file && (
-        <div className="flex flex-col space-y-4">
-          <div className="w-full">
-            <img
-              src={URL.createObjectURL(file)}
-              alt="Preview"
-              className="object-cover"
-            />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-2 sm:p-0 overflow-auto">
+      <div className="p-4 sm:p-6 space-y-6 max-w-xl w-full bg-neutral-900 rounded-2xl shadow-md border border-neutral-800 max-h-[90vh] overflow-y-auto">
+        {category && (
+          <div className="text-lg font-medium pb-2 text-white">
+            Kategoria: <span className="text-blue-400">{category}</span>
           </div>
-
-          <textarea
-            value={photoDescription}
-            onChange={(e) => setPhotoDescription(e.target.value)}
-            placeholder="Përshkrimi i fotos (opsionale)"
-            className="w-full border border-gray-300 rounded p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+        )} {" "}
+        {!category && (
+          <div className="text-lg font-medium pb-2 text-white">Fotografia Korporative</div>
+        )}
+        <label className="block bg-neutral-800 text-center py-3 rounded border border-dashed border-neutral-700 cursor-pointer hover:bg-neutral-700 transition text-white">
+          Krijo Foto
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className="hidden"
           />
+        </label>
+        {file && (
+          <div className="flex flex-col space-y-4">
+            <div className="w-full">
+              <img
+                src={URL.createObjectURL(file)}
+                alt="Preview"
+                className="object-cover rounded border border-neutral-800 max-h-60 w-full"
+              />
+            </div>
 
-          <ActionButton onClick={handleSubmit} disabled={isLoading} fullWidth>
-            {isLoading ? "Duke e shfaqur..." : `Dergo ${photoType}`}
-          </ActionButton>
-          <ActionButton onClick={clearState} fullWidth>
-            Largo foton
-          </ActionButton>
-        </div>
-      )}
+            <textarea
+              value={photoDescription}
+              onChange={(e) => setPhotoDescription(e.target.value)}
+              placeholder="Përshkrimi i fotos (opsionale)"
+              className="w-full border border-neutral-700 bg-neutral-900 text-white rounded p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-neutral-600 placeholder-gray-500"
+            />
+
+            <ActionButton onClick={handleSubmit} disabled={isLoading} fullWidth>
+              {isLoading ? "Duke e shfaqur..." : `Dergo ${photoType}`}
+            </ActionButton>
+            <ActionButton onClick={clearState} fullWidth>
+              Largo foton
+            </ActionButton>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

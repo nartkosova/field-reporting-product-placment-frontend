@@ -5,6 +5,7 @@ import { StoreInput } from "../../../types/storeInterface";
 import userService from "../../../services/userService";
 import { UserInput } from "../../../types/userInterface";
 import { userFields } from "./StoreFields";
+
 const CreateStorePage = () => {
   const [userOptions, setUserOptions] = useState<
     { label: string; value: number }[]
@@ -49,12 +50,16 @@ const CreateStorePage = () => {
   };
 
   return (
-    <CreateUpdateForm
-      title="Krijo Dyqan të Ri"
-      fields={userFields({ userOptions })}
-      onSubmit={handleCreate}
-      submitText="Krijo"
-    />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        <CreateUpdateForm
+          title="Krijo Dyqan të Ri"
+          fields={userFields({ userOptions })}
+          onSubmit={handleCreate}
+          submitText="Krijo Dyqan"
+        />
+      </div>
+    </div>
   );
 };
 

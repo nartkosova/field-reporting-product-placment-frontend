@@ -43,7 +43,11 @@ const UpdateCompetitorFacingsPage = () => {
   );
 
   return (
-    <BatchFacingsEditor title="Edito Facings të konkurrencës" hook={hook} />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-2 sm:p-0">
+      <div className="max-w-xl w-full">
+        <BatchFacingsEditor title="Edito Facings të konkurrencës" hook={hook} />
+      </div>
+    </div>
   );
 };
 

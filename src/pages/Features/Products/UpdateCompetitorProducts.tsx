@@ -83,39 +83,41 @@ const UpdateCompetitorProduct = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-4">
-      {loading ? (
-        <p>Duke u ngarkuar...</p>
-      ) : (
-        <CreateUpdateForm
-          title="Përditëso Produktin"
-          fields={[
-            { name: "name", label: "Emri i produktit" },
-            {
-              name: "category",
-              label: "Kategoria",
-              type: "select",
-              options: categories.map((category) => ({
-                label: category,
-                value: category,
-              })),
-            },
-            {
-              name: "weight",
-              label: "Pesha (kg)",
-            },
-            {
-              name: "competitor_id",
-              label: "Brandi Konkurrent",
-              type: "select",
-              options: competitorOptions,
-            },
-          ]}
-          initialValues={initialValues}
-          onSubmit={handleUpdate}
-          submitText="Përditëso"
-        />
-      )}
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        {loading ? (
+          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+        ) : (
+          <CreateUpdateForm
+            title="Përditëso Produktin"
+            fields={[
+              { name: "name", label: "Emri i produktit" },
+              {
+                name: "category",
+                label: "Kategoria",
+                type: "select",
+                options: categories.map((category) => ({
+                  label: category,
+                  value: category,
+                })),
+              },
+              {
+                name: "weight",
+                label: "Pesha (kg)",
+              },
+              {
+                name: "competitor_id",
+                label: "Brandi Konkurrent",
+                type: "select",
+                options: competitorOptions,
+              },
+            ]}
+            initialValues={initialValues}
+            onSubmit={handleUpdate}
+            submitText="Përditëso"
+          />
+        )}
+      </div>
     </div>
   );
 };

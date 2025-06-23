@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +21,47 @@ interface CreateUpdateFormProps {
   initialValues?: Record<string, string | number | (string | number)[]>;
   submitText?: string;
 }
+
+const darkSelectStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#18181b",
+    borderColor: "#27272a",
+    color: "#fff",
+    minHeight: 48,
+    fontSize: 18,
+    borderRadius: 12,
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#18181b",
+    color: "#fff",
+    borderRadius: 12,
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? "#27272a"
+      : state.isFocused
+      ? "#27272a"
+      : "#18181b",
+    color: "#fff",
+    fontSize: 16,
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "#fff",
+  }),
+  multiValue: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#27272a",
+    color: "#fff",
+  }),
+  input: (provided: any) => ({
+    ...provided,
+    color: "#fff",
+  }),
+};
 
 export function CreateUpdateForm({
   title,
@@ -73,12 +115,14 @@ export function CreateUpdateForm({
   };
 
   return (
-    <div className="max-w-[400px] w-full mx-auto mt-10 bg-white p-8 border border-gray-200 rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">{title}</h2>
+    <div className="max-w-xl mx-auto mt-10 bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-6">
+      <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
+        {title}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {fields.map(({ name, label, type = "text", options, isMulti }) => (
           <div key={name} className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">{label}</label>
+            <label className="text-sm font-medium text-gray-300">{label}</label>
             {type === "select" && options ? (
               <Select
                 options={options}
@@ -113,28 +157,29 @@ export function CreateUpdateForm({
                 className="react-select-container"
                 classNamePrefix="react-select"
                 isClearable
+                styles={darkSelectStyles}
               />
             ) : (
               <input
                 type={type}
+                className="border border-neutral-700 bg-neutral-900 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-neutral-600 placeholder-gray-500"
+                placeholder={label}
                 value={
                   Array.isArray(formState[name])
                     ? formState[name].join(", ")
                     : formState[name] ?? ""
                 }
-                onChange={(e) => handleChange(name, e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
+                onChange={(e) =>
+                  handleChange(
+                    name,
+                    type === "number" ? Number(e.target.value) : e.target.value
+                  )
+                }
               />
             )}
           </div>
         ))}
-
-        <SubmitButton
-          loading={isSubmitting}
-          label={submitText}
-          loadingLabel="Duke i shfaqur..."
-        />
+        <SubmitButton loading={isSubmitting} label={submitText} />
       </form>
     </div>
   );

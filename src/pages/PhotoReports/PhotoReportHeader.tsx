@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import photoService from "../../services/photoService";
 import userService from "../../services/userService";
@@ -119,9 +120,45 @@ const PhotoReportHeader = () => {
     },
   ];
 
+  const darkSelectStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#18181b",
+      borderColor: "#27272a",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#18181b",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#27272a"
+        : state.isFocused
+        ? "#27272a"
+        : "#18181b",
+      color: "#fff",
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: "#fff",
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#27272a",
+      color: "#fff",
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      color: "#fff",
+    }),
+  };
+
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Photo Report</h2>
+    <div className="p-6 bg-black min-h-screen">
+      <h2 className="text-2xl font-bold mb-4 text-white">Photo Report</h2>
       <div className="flex flex-wrap gap-2 mb-4">
         {photoFilterConfigs.map(
           ({ key, options, placeholder, className = "" }) => (
@@ -137,11 +174,12 @@ const PhotoReportHeader = () => {
                   [key]: opts?.map((o) => o.value) || [],
                 }))
               }
+              styles={darkSelectStyles}
             />
           )
         )}
       </div>
-      <div className="flex justify-between items-center mt-4 text-sm mb-4">
+      <div className="flex justify-between items-center mt-4 text-sm mb-4 text-white">
         <div className="flex items-center gap-2">
           <span>
             Page {page + 1} of {Math.ceil(totalPhotos / pageSize)}
@@ -149,7 +187,7 @@ const PhotoReportHeader = () => {
           <ActionButton
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            variant="outline"
+            variant="fut"
           >
             Prev
           </ActionButton>
@@ -158,7 +196,7 @@ const PhotoReportHeader = () => {
               setPage((p) => ((p + 1) * pageSize < totalPhotos ? p + 1 : p))
             }
             disabled={(page + 1) * pageSize >= totalPhotos}
-            variant="outline"
+            variant="fut"
           >
             Next
           </ActionButton>
@@ -167,7 +205,7 @@ const PhotoReportHeader = () => {
         <div className="flex items-center gap-2">
           <label>Rows per page:</label>
           <select
-            className="border rounded p-1"
+            className="border border-neutral-800 rounded p-1 bg-neutral-900 text-white"
             value={pageSize}
             onChange={(e) => {
               setPage(0);
@@ -175,7 +213,11 @@ const PhotoReportHeader = () => {
             }}
           >
             {[10, 25, 50, 100].map((size) => (
-              <option key={size} value={size}>
+              <option
+                key={size}
+                value={size}
+                className="bg-neutral-900 text-white"
+              >
                 {size}
               </option>
             ))}

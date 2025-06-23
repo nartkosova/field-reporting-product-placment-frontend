@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import podravkaFacingsService from "../../services/podravkaFacingsService";
 import userService from "../../services/userService";
@@ -107,6 +108,42 @@ const ReportHeader = () => {
     },
   ];
 
+  const darkSelectStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#18181b",
+      borderColor: "#27272a",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#18181b",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#27272a"
+        : state.isFocused
+        ? "#27272a"
+        : "#18181b",
+      color: "#fff",
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: "#fff",
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#27272a",
+      color: "#fff",
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      color: "#fff",
+    }),
+  };
+
   const competitorColumns = useMemo(() => {
     const names = new Set<string>();
     facings.forEach((f) => {
@@ -196,8 +233,8 @@ const ReportHeader = () => {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Facings Overview</h2>
+    <div>
+      <h2 className="text-2xl font-bold mb-4 text-white">Facings Overview</h2>
 
       <div className="flex gap-2 mb-4 flex-wrap">
         {filterConfigs.map(
@@ -222,11 +259,12 @@ const ReportHeader = () => {
                 const values = selected?.map((s) => String(s.value)) ?? [];
                 setFilters((prev) => ({ ...prev, [key]: values }));
               }}
+              styles={darkSelectStyles}
             />
           )
         )}
       </div>
-      <div className="flex justify-between items-center mt-4 text-sm mb-4">
+      <div className="flex justify-between items-center mt-4 text-sm mb-4 text-white">
         <div className="flex items-center gap-2">
           <span>
             Page {page + 1} of {Math.ceil(totalFacings / pageSize) || 1}
@@ -235,7 +273,7 @@ const ReportHeader = () => {
           <ActionButton
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            variant="outline"
+            variant="fut"
           >
             Prev
           </ActionButton>
@@ -245,7 +283,7 @@ const ReportHeader = () => {
               setPage((p) => ((p + 1) * pageSize < totalFacings ? p + 1 : p))
             }
             disabled={(page + 1) * pageSize >= totalFacings}
-            variant="outline"
+            variant="fut"
           >
             Next
           </ActionButton>
@@ -254,7 +292,7 @@ const ReportHeader = () => {
         <div className="flex items-center gap-2">
           <label>Rows per page:</label>
           <select
-            className="border rounded p-1"
+            className="border border-neutral-800 rounded p-1 bg-neutral-900 text-white"
             value={pageSize}
             onChange={(e) => {
               setPage(0);
@@ -262,7 +300,7 @@ const ReportHeader = () => {
             }}
           >
             {[10, 25, 50, 100].map((s) => (
-              <option key={s} value={s}>
+              <option key={s} value={s} className="bg-neutral-900 text-white">
                 {s}
               </option>
             ))}
@@ -272,7 +310,7 @@ const ReportHeader = () => {
       <ReportTable data={facings} competitorColumns={competitorColumns} />
 
       <div className="pt-6 flex gap-2">
-        <ActionButton onClick={handleExportExcel} variant="primary">
+        <ActionButton onClick={handleExportExcel} variant="fut">
           Exporto ne Excel
         </ActionButton>
       </div>

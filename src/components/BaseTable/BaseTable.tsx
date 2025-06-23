@@ -20,7 +20,7 @@ export const BaseTable = <T,>({
   data,
   columns,
   customFooter,
-  rowClassName = "hover:bg-gray-50",
+  rowClassName = "hover:bg-neutral-900",
   cellClassName = () => "",
 }: Props<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -35,15 +35,15 @@ export const BaseTable = <T,>({
   });
 
   return (
-    <div className="overflow-x-auto border rounded shadow-sm">
-      <table className="w-full text-sm table-auto border-collapse min-w-max">
-        <thead className="bg-gray-200">
+    <div className="overflow-x-auto border border-neutral-800 rounded shadow-sm bg-black">
+      <table className="w-full text-sm table-auto border-collapse min-w-max bg-neutral-900 text-white">
+        <thead className="bg-neutral-800 text-gray-200">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="border px-2 py-1 text-left cursor-pointer select-none"
+                  className="border border-neutral-800 px-2 py-2 text-left cursor-pointer select-none font-semibold"
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   {flexRender(
@@ -63,7 +63,7 @@ export const BaseTable = <T,>({
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className={`border px-2 py-1 ${cellClassName(
+                  className={`border border-neutral-800 px-2 py-2 ${cellClassName(
                     cell.column.id
                   )}`}
                 >
@@ -74,7 +74,7 @@ export const BaseTable = <T,>({
           ))}
         </tbody>
         {customFooter && (
-          <tfoot className="bg-gray-100 font-semibold">
+          <tfoot className="bg-neutral-800 font-semibold text-gray-200">
             <tr>
               {customFooter(table.getRowModel().rows.map((r) => r.original))}
             </tr>

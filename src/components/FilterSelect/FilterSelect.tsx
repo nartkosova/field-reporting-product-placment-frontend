@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Select from "react-select";
 
 interface Option {
@@ -13,6 +14,42 @@ interface FilterSelectProps {
   className?: string;
   isClearable?: boolean;
 }
+
+const darkSelectStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#18181b",
+    borderColor: "#27272a",
+    color: "#fff",
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#18181b",
+    color: "#fff",
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? "#27272a"
+      : state.isFocused
+      ? "#27272a"
+      : "#18181b",
+    color: "#fff",
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "#fff",
+  }),
+  multiValue: (provided: any) => ({
+    ...provided,
+    backgroundColor: "#27272a",
+    color: "#fff",
+  }),
+  input: (provided: any) => ({
+    ...provided,
+    color: "#fff",
+  }),
+};
 
 const FilterSelect = ({
   options,
@@ -33,6 +70,7 @@ const FilterSelect = ({
       onChange={(selectedOptions) =>
         onChange(selectedOptions?.map((opt) => opt.value) || [])
       }
+      styles={darkSelectStyles}
     />
   );
 };

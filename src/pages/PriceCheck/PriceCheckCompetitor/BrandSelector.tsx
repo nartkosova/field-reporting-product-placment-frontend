@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import competitorServices from "../../../services/competitorServices";
 import Select from "react-select";
@@ -57,6 +58,41 @@ const BrandSelector = ({ selectedBrandId, onBrandSelect }: Props) => {
         onChange={(option) => option && onBrandSelect(option.value)}
         isClearable
         placeholder="Choose a brand..."
+        styles={{
+          control: (provided: any) => ({
+            ...provided,
+            backgroundColor: "#18181b",
+            borderColor: "#27272a",
+            color: "#fff",
+          }),
+          menu: (provided: any) => ({
+            ...provided,
+            backgroundColor: "#18181b",
+            color: "#fff",
+          }),
+          option: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: state.isSelected
+              ? "#27272a"
+              : state.isFocused
+              ? "#27272a"
+              : "#18181b",
+            color: "#fff",
+          }),
+          singleValue: (provided: any) => ({
+            ...provided,
+            color: "#fff",
+          }),
+          multiValue: (provided: any) => ({
+            ...provided,
+            backgroundColor: "#27272a",
+            color: "#fff",
+          }),
+          input: (provided: any) => ({
+            ...provided,
+            color: "#fff",
+          }),
+        }}
       />
 
       <div className="flex space-x-2">

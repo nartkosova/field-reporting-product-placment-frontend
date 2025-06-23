@@ -81,60 +81,48 @@ export const EntityList = <T extends Entity>({
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-4">
-      <h2 className="text-2xl font-semibold">{title}</h2>
+    <div className="max-w-2xl mx-auto mt-10 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-white mb-6">{title}</h2>
       {loading ? (
-        <p>Duke u ngarkuar...</p>
+        <div className="text-gray-400">Loading...</div>
       ) : items.length === 0 ? (
-        <p>Nuk ka asnjë {itemLabel}.</p>
+        <div className="text-gray-400">Nuk ka të dhëna.</div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="divide-y divide-neutral-800">
           {items.map((item) => (
             <li
               key={item.id}
-              className="border p-4 rounded flex justify-between items-center hover:bg-gray-50"
+              className="flex flex-col sm:flex-row sm:items-center justify-between py-4 px-2 hover:bg-neutral-800 rounded-lg transition-colors"
             >
-              <div
-                onClick={() => handleEdit(item.id)}
-                className="cursor-pointer w-full"
-              >
-                <div className="font-semibold">{item.name}</div>
-                {renderDetails ? (
-                  renderDetails(item)
-                ) : (
-                  <>
-                    {item.role && (
-                      <div className="text-sm text-gray-600">
-                        Roli: {item.role}
-                      </div>
-                    )}
-                    {item.created_at && (
-                      <div className="text-sm text-gray-600">
-                        Krijuar në: {formattedDate(item.created_at)}
-                      </div>
-                    )}
-                    {item.created_by && (
-                      <div className="text-sm text-gray-600">
-                        Krijuar nga: {item.created_by}
-                      </div>
-                    )}
-                    {item.category && (
-                      <div className="text-sm text-gray-600">
-                        Kategoria: {item.category}
-                      </div>
-                    )}
-                  </>
+              <div className="flex-1 text-white">
+                <span className="font-semibold">{item.name}</span>
+                {renderDetails && (
+                  <span className="ml-2">{renderDetails(item)}</span>
+                )}
+                {item.created_at && (
+                  <span className="ml-2 text-xs text-gray-400">
+                    ({formattedDate(item.created_at)})
+                  </span>
                 )}
               </div>
-              {onDelete && (
+              <div className="flex items-center mt-2 sm:mt-0">
                 <button
-                  onClick={() => handleDelete(item.id)}
-                  className="text-red-600 hover:text-red-800 text-xl ml-4 cursor-pointer"
-                  title="Delete"
+                  onClick={() => handleEdit(item.id)}
+                  className="text-gray-200 hover:text-white bg-neutral-800 border border-neutral-700 px-5 py-3 cursor-pointer rounded-xl text-base font-semibold mr-3 transition-colors min-w-[110px] min-h-[48px]"
+                  title="Ndrysho"
                 >
-                  🗑️
+                  ✏️ Ndrysho
                 </button>
-              )}
+                {onDelete && (
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="text-red-500 hover:text-red-700 bg-neutral-800 border border-neutral-700 px-5 py-3 cursor-pointer rounded-xl text-base font-semibold transition-colors min-w-[110px] min-h-[48px]"
+                    title="Fshi"
+                  >
+                    🗑️ Fshi
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ul>

@@ -3,7 +3,7 @@ import { userFields } from "./userFields";
 import userService from "../../../services/userService";
 import { AxiosError } from "axios";
 
-const CreateUser = () => {
+const CreateUserPage = () => {
   const handleSubmit = async (
     data: Record<string, string | number | (string | number)[]>
   ) => {
@@ -28,13 +28,17 @@ const CreateUser = () => {
   };
 
   return (
-    <CreateUpdateForm
-      title="Create User"
-      fields={userFields}
-      submitText="Create"
-      onSubmit={handleSubmit}
-    />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        <CreateUpdateForm
+          title="Krijo Përdorues të Ri"
+          fields={userFields}
+          submitText="Krijo Përdorues"
+          onSubmit={handleSubmit}
+        />
+      </div>
+    </div>
   );
 };
 
-export default CreateUser;
+export default CreateUserPage;

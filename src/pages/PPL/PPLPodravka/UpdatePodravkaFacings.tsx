@@ -45,7 +45,13 @@ const UpdatePodravkaFacingsPage = () => {
     config
   );
 
-  return <BatchFacingsEditor title="Edito Podravka Facings" hook={hook} />;
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-2 sm:p-0">
+      <div className="max-w-xl w-full">
+        <BatchFacingsEditor title="Edito Podravka Facings" hook={hook} />
+      </div>
+    </div>
+  );
 };
 
 export default UpdatePodravkaFacingsPage;

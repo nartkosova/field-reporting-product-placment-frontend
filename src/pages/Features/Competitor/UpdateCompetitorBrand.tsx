@@ -58,23 +58,25 @@ const UpdateCompetitorBrand = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-4">
-      {loading ? (
-        <p>Duke u ngarkuar...</p>
-      ) : (
-        <CreateUpdateForm
-          title="Përditëso Konkurrencën"
-          fields={competitorFields({
-            categoryOptions: categories.map((cat) => ({
-              label: cat,
-              value: cat,
-            })),
-          })}
-          initialValues={initialValues}
-          onSubmit={handleUpdate}
-          submitText="Vazhdo"
-        />
-      )}
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        {loading ? (
+          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+        ) : (
+          <CreateUpdateForm
+            title="Përditëso Konkurrencën"
+            fields={competitorFields({
+              categoryOptions: categories.map((cat) => ({
+                label: cat,
+                value: cat,
+              })),
+            })}
+            initialValues={initialValues}
+            onSubmit={handleUpdate}
+            submitText="Vazhdo"
+          />
+        )}
+      </div>
     </div>
   );
 };

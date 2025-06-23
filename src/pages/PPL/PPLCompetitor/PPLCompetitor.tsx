@@ -139,15 +139,19 @@ const PPLCompetitor = () => {
     }
   };
   return (
-    <FacingsForm
-      title="Facings Konkurrenca"
-      category={selectedCategory}
-      entries={entries}
-      onChange={handleFacingChange}
-      onSubmit={handleSubmit}
-      productsLoading={brandsLoading}
-      loading={isSubmitting}
-    />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        <FacingsForm
+          title="Facings Konkurrenca"
+          category={selectedCategory}
+          entries={entries}
+          onChange={handleFacingChange}
+          onSubmit={handleSubmit}
+          productsLoading={brandsLoading}
+          loading={isSubmitting}
+        />
+      </div>
+    </div>
   );
 };
 

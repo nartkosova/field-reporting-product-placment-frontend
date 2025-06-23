@@ -84,15 +84,19 @@ const PodravkaFacingsFormPage = () => {
     value: facings[p.product_id] || 0,
   }));
   return (
-    <FacingsForm
-      title="Podravka Facings"
-      category={selectedCategory}
-      entries={entries}
-      productsLoading={productsLoading}
-      loading={loading}
-      onChange={(id, val) => handleFacingChange(Number(id), val)}
-      onSubmit={handleSubmit}
-    />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        <FacingsForm
+          title="Podravka Facings"
+          category={selectedCategory}
+          entries={entries}
+          productsLoading={productsLoading}
+          loading={loading}
+          onChange={(id, val) => handleFacingChange(Number(id), val)}
+          onSubmit={handleSubmit}
+        />
+      </div>
+    </div>
   );
 };
 

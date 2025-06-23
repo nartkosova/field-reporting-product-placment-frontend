@@ -76,16 +76,25 @@ const UpdateStore = () => {
     await storeServices.updateStore(Number(id), payload);
   };
 
-  if (loading) return <p className="text-center mt-10">Duke u ngarkuar...</p>;
+  if (loading)
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+        <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+      </div>
+    );
 
   return (
-    <CreateUpdateForm
-      title="Përditëso Dyqanin"
-      fields={userFields({ userOptions })}
-      onSubmit={handleUpdate}
-      initialValues={initialValues ? { ...initialValues } : undefined}
-      submitText="Përditëso"
-    />
+    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-xl w-full">
+        <CreateUpdateForm
+          title="Përditëso Dyqanin"
+          fields={userFields({ userOptions })}
+          onSubmit={handleUpdate}
+          initialValues={initialValues ? { ...initialValues } : undefined}
+          submitText="Përditëso"
+        />
+      </div>
+    </div>
   );
 };
 
