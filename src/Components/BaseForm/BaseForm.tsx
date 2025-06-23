@@ -1,4 +1,5 @@
 import React from "react";
+import SubmitButton from "../Buttons/SubmitButton";
 
 interface Field {
   key: string;
@@ -73,12 +74,7 @@ const BaseForm: React.FC<BaseFormProps> = ({
           </div>
         ))}
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
-        >
-          {submitButtonLabel}
-        </button>
+        <SubmitButton label={submitButtonLabel} />
       </form>
     </div>
   );

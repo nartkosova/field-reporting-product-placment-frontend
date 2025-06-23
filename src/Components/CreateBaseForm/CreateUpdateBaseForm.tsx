@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
+import SubmitButton from "../Buttons/SubmitButton";
 
 interface Field {
   name: string;
@@ -129,13 +130,11 @@ export function CreateUpdateForm({
           </div>
         ))}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Submitting..." : submitText}
-        </button>
+        <SubmitButton
+          loading={isSubmitting}
+          label={submitText}
+          loadingLabel="Duke i shfaqur..."
+        />
       </form>
     </div>
   );

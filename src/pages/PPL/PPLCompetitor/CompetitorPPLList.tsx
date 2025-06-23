@@ -14,7 +14,7 @@ const CompetitorPPLEditor = () => {
         return data.map((batch: Batch) => ({
           id: batch.batch_id,
           name: batch.store_name,
-          created_at: batch.report_date,
+          created_at: batch.created_at,
           category: batch.category,
           product_count: batch.product_count,
         }));

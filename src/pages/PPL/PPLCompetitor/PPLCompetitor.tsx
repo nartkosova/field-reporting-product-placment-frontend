@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import competitorServices from "../../../services/competitorServices";
-import Select from "react-select";
 import { AxiosError } from "axios";
 import competitorFacingsService from "../../../services/competitorFacingsService";
 import { useSelectedStore } from "../../../hooks/useSelectStore";
@@ -10,6 +9,7 @@ import {
   getCachedBrandsByCategory,
   queueCompetitorFacings,
 } from "../../../db/db";
+import FacingsForm from "../../../components/FacingsForm/FacingsForm";
 
 interface CompetitorEntry {
   id?: number;
@@ -17,15 +17,13 @@ interface CompetitorEntry {
   facings: number;
 }
 
-const CompetitorFacingsFormPage = () => {
+const PPLCompetitor = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const storeInfo = useSelectedStore();
-  const id = storeInfo?.store_id || 0;
+  const storeId = storeInfo?.store_id || 0;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const storeId = id ? parseInt(id.toString()) : NaN;
   const userId = userInfo?.id;
 
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([
@@ -34,24 +32,36 @@ const CompetitorFacingsFormPage = () => {
   const [allCompetitorBrands, setAllCompetitorBrands] = useState<
     { competitor_id: number; brand_name: string }[]
   >([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchBrands = async () => {
+      setBrandsLoading(true);
       try {
+        let brands: { competitor_id: number; brand_name: string }[] = [];
+
         if (!isOnline()) {
-          const cachedBrands = await getCachedBrandsByCategory(
-            selectedCategory
-          );
-          setAllCompetitorBrands(cachedBrands);
-          return;
+          brands = await getCachedBrandsByCategory(selectedCategory);
         } else {
-          const brands = await competitorServices.getCompetitorByCategory(
+          brands = await competitorServices.getCompetitorByCategory(
             selectedCategory
           );
-          setAllCompetitorBrands(brands);
         }
+
+        setAllCompetitorBrands(brands);
+
+        setCompetitors(
+          brands.map((b) => ({
+            id: b.competitor_id,
+            name: b.brand_name,
+            facings: 0,
+          }))
+        );
       } catch (err) {
         console.error("Error fetching brands:", err);
+      } finally {
+        setBrandsLoading(false);
       }
     };
 
@@ -75,22 +85,13 @@ const CompetitorFacingsFormPage = () => {
     );
   };
 
-  const addCompetitor = () => {
-    setCompetitors([...competitors, { name: "", facings: 0 }]);
-  };
-
-  const totalCompetitorFacings = competitors.reduce(
-    (sum, comp) => sum + comp.facings,
-    0
-  );
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
       const facingData = competitors
-        .filter((comp) => comp.name)
+        .filter((comp) => comp.name.trim())
         .map((competitor) => {
           const existingBrand = allCompetitorBrands.find(
             (b) =>
@@ -126,86 +127,28 @@ const CompetitorFacingsFormPage = () => {
       setIsSubmitting(false);
     }
   };
-
+  const entries = competitors.map((comp, index) => ({
+    id: index,
+    label: comp.name || `Konkurent ${index + 1}`,
+    value: comp.facings,
+  }));
+  const handleFacingChange = (id: string | number, value: number) => {
+    const index = typeof id === "number" ? id : parseInt(id, 10);
+    if (!isNaN(index)) {
+      handleCompetitorChange(index, "facings", value);
+    }
+  };
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white p-8 border border-gray-200 rounded-2xl shadow-lg space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Facings Konkurrenca</h2>
-
-      <p className="text-gray-700">
-        Kategoria e zgjedhur:{" "}
-        <span className="text-blue-600 font-medium">{selectedCategory}</span>
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {competitors.map((comp, index) => (
-          <div key={index} className="flex gap-4">
-            <div className="w-1/2">
-              <Select
-                className="react-select-container"
-                classNamePrefix="react-select"
-                value={
-                  comp.name ? { label: comp.name, value: comp.name } : null
-                }
-                onChange={(selected) => {
-                  if (!selected) return;
-                  handleCompetitorChange(index, "name", selected.value);
-                  const selectedBrand = allCompetitorBrands.find(
-                    (b) => b.brand_name === selected.value
-                  );
-                  if (selectedBrand) {
-                    handleCompetitorChange(
-                      index,
-                      "id",
-                      selectedBrand.competitor_id
-                    );
-                  }
-                }}
-                options={allCompetitorBrands.map((brand) => ({
-                  label: brand.brand_name,
-                  value: brand.brand_name,
-                }))}
-                placeholder="Zgjedh konkurrentin"
-                isClearable
-              />
-            </div>
-            <div className="w-1/2">
-              <input
-                type="number"
-                placeholder="Facings"
-                min={0}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={comp.facings}
-                onChange={(e) =>
-                  handleCompetitorChange(index, "facings", e.target.value)
-                }
-              />
-            </div>
-          </div>
-        ))}
-
-        <button
-          type="button"
-          onClick={addCompetitor}
-          className="bg-gray-200 px-4 py-1 rounded hover:bg-gray-300"
-        >
-          + Shto konkurent
-        </button>
-
-        <div className="text-left font-semibold text-gray-700">
-          Total facings:{" "}
-          <span className="text-red-600">{totalCompetitorFacings}</span>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
-        >
-          Submit
-        </button>
-      </form>
-    </div>
+    <FacingsForm
+      title="Facings Konkurrenca"
+      category={selectedCategory}
+      entries={entries}
+      onChange={handleFacingChange}
+      onSubmit={handleSubmit}
+      productsLoading={brandsLoading}
+      loading={isSubmitting}
+    />
   );
 };
 
-export default CompetitorFacingsFormPage;
+export default PPLCompetitor;

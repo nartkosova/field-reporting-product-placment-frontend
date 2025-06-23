@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import ActionButton from "../../components/Buttons/ActionButtons";
 
 const Header = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
@@ -22,12 +23,7 @@ const Header = () => {
         Kthehu
       </NavLink>
       <h1 className="text-xl font-semibold">{userInfo.user}</h1>
-      <button
-        onClick={handleLogout}
-        className="bg-blue-600 text-white cursor-pointer font-medium px-4 py-2 rounded hover:bg-blue-800"
-      >
-        Logout
-      </button>
+      <ActionButton onClick={handleLogout}>Logout</ActionButton>
     </header>
   );
 };

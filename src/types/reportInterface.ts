@@ -15,7 +15,7 @@ export interface Facing {
   store_id: number;
   category: string;
   total_facings: number;
-  report_date: string;
+  created_at: string;
   competitors: Record<string, number>;
 }
 

@@ -24,7 +24,7 @@ export interface PhotoSchema {
   store_id: number;
   user: string;
   store_name: string;
-  uploaded_at: string;
+  created_at: string;
   photo_description?: string;
 }
 

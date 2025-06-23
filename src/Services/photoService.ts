@@ -39,6 +39,7 @@ export const getAllReportPhotos = async (
 
   return res.data;
 };
+
 const createPhoto = async (formData: FormData) => {
   const token = getToken();
   const response = await axios.post(

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation, NavLink } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Select from "react-select";
 // import storeServices from "../../services/storeServices";
 // import { Store } from "../../types/storeInterface";
 import productServices from "../../services/productServices";
 import { useSelectedStore } from "../../hooks/useSelectStore";
+import { NavButton } from "../NavButton/NavButton";
 interface CategorySelectorProps {
   routeBase: string;
   buttonLinks: {
@@ -111,18 +112,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           : categoryRequired && !selectedCategory;
 
         return (
-          <NavLink key={label} to={fullPath}>
-            <button
-              className={`px-4 py-2 rounded cursor-pointer max-w-xl w-full ${
-                isDisabled
-                  ? "bg-blue-600 opacity-70 text-gray-200 !cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
-              disabled={isDisabled}
-            >
-              {label}
-            </button>
-          </NavLink>
+          <NavButton key={label} to={fullPath} disabled={isDisabled}>
+            {label}
+          </NavButton>
         );
       })}
     </div>

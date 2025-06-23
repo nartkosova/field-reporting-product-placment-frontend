@@ -12,7 +12,7 @@ const getPodravkaFacings = async () => {
 };
 
 const getPodravkaFacingsWithCompetitors = async (
-  filters: Record<string, number> = {},
+  filters: Record<string, string | string[]> = {},
   limit = 50,
   offset = 0
 ) => {

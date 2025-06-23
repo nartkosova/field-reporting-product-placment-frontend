@@ -23,7 +23,7 @@ const PhotoList = () => {
         return photos.map((photo) => ({
           id: photo.photo_id,
           name: photo.store_name,
-          created_at: photo.uploaded_at,
+          created_at: photo.created_at,
           category: photo.category,
           photo_type: photo.photo_type,
           photo_description: photo.photo_description,

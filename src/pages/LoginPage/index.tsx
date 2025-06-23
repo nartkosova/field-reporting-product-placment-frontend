@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userService from "../../services/userService";
 import { setToken } from "../../services/authService";
+import ActionButton from "../../components/Buttons/ActionButtons";
 const LoginPage = () => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -54,12 +55,7 @@ const LoginPage = () => {
       <p className="cursor-pointer" onClick={handleViewPassword}>
         {viewPassword ? "Hide Password" : "Show Passowrd"}
       </p>
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700"
-        onClick={handleLogin}
-      >
-        Login
-      </button>
+      <ActionButton onClick={handleLogin}>Login</ActionButton>
     </div>
   );
 };

@@ -1,93 +1,70 @@
-import {
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  flexRender,
-  createColumnHelper,
-  SortingState,
-} from "@tanstack/react-table";
-import { useCallback, useMemo, useState } from "react";
+import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
+import { useMemo, useState, useCallback } from "react";
+import { BaseTable } from "../../components/BaseTable/BaseTable";
 import { PhotoSchema } from "../../types/photoInterface";
 import photoService from "../../services/photoService";
+import ActionButton from "../../components/Buttons/ActionButtons";
 
 const columnHelper = createColumnHelper<PhotoSchema>();
 
 const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
 
   const togglePhoto = useCallback((url: string) => {
     setSelectedPhotos((prev) => {
       const updated = new Set(prev);
-      if (updated.has(url)) {
-        updated.delete(url);
-      } else {
-        updated.add(url);
-      }
-      return new Set(updated);
+      if (updated.has(url)) updated.delete(url);
+      else updated.add(url);
+      return updated;
     });
   }, []);
 
   const toggleAllPhotos = useCallback(() => {
-    setSelectedPhotos((prev) => {
-      const all = data.map((d) => d.photo_url);
-      const allSelected = all.every((url) => prev.has(url));
-      return allSelected ? new Set() : new Set(all);
-    });
-  }, [data]);
+    const all = data.map((d) => d.photo_url);
+    const allSelected = all.every((url) => selectedPhotos.has(url));
+    setSelectedPhotos(allSelected ? new Set() : new Set(all));
+  }, [data, selectedPhotos]);
 
-  const columns = useMemo(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns = useMemo<ColumnDef<PhotoSchema, any>[]>(
     () => [
       columnHelper.display({
         id: "select",
         header: () => (
           <input
-            className="cursor-pointer align-middle"
             type="checkbox"
             checked={
               data.length > 0 &&
               data.every((d) => selectedPhotos.has(d.photo_url))
             }
             onChange={toggleAllPhotos}
+            className="cursor-pointer"
           />
         ),
         cell: ({ row }) => (
           <input
-            className="cursor-pointer align-middle"
             type="checkbox"
             checked={selectedPhotos.has(row.original.photo_url)}
             onChange={() => togglePhoto(row.original.photo_url)}
+            className="cursor-pointer"
           />
         ),
       }),
-      columnHelper.accessor("user", { header: "User", enableSorting: true }),
-      columnHelper.accessor("store_name", {
-        header: "Shitorja",
-        enableSorting: true,
-      }),
-      columnHelper.accessor("category", {
-        header: "Kategroria",
-        enableSorting: true,
-      }),
-      columnHelper.accessor("photo_type", {
-        header: "Lloji i Fotos",
-        enableSorting: true,
-      }),
+      columnHelper.accessor("user", { header: "User" }),
+      columnHelper.accessor("store_name", { header: "Shitorja" }),
+      columnHelper.accessor("category", { header: "Kategoria" }),
+      columnHelper.accessor("photo_type", { header: "Lloji i Fotos" }),
       columnHelper.accessor("photo_description", {
-        header: "Përshkrimi i Fotos",
-        enableSorting: false,
+        header: "Përshkrimi",
         cell: (info) => info.getValue() || "-",
       }),
       columnHelper.accessor("company", {
         header: "Kompania",
-        enableSorting: true,
         cell: (info) => info.getValue() || "-",
       }),
-      columnHelper.accessor("uploaded_at", {
+      columnHelper.accessor("created_at", {
         header: "Ngarkuar më",
-        enableSorting: true,
         cell: (info) => {
           const date = new Date(info.getValue());
           return isNaN(date.getTime())
@@ -113,61 +90,16 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         ),
       }),
     ],
-    [selectedPhotos, data, toggleAllPhotos, togglePhoto]
+    [data, selectedPhotos, toggleAllPhotos, togglePhoto]
   );
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto border rounded shadow-sm">
-        <table className="min-w-full table-auto border-collapse">
-          <thead className="bg-gray-200">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className="border px-2 py-1 text-left cursor-pointer"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {header.column.getIsSorted() === "asc" ? " ▲" : ""}
-                    {header.column.getIsSorted() === "desc" ? " ▼" : ""}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="border px-2 py-1">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <BaseTable data={data} columns={columns} />
 
       {selectedPhotos.size > 0 && (
         <div className="pt-2 flex gap-2">
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer"
+          <ActionButton
             onClick={async () => {
               const JSZip = (await import("jszip")).default;
               const zip = new JSZip();
@@ -191,18 +123,18 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
             }}
           >
             Download Selected ({selectedPhotos.size})
-          </button>
+          </ActionButton>
 
-          <button
-            className="px-4 py-2 bg-red-600 text-white rounded cursor-pointer"
+          <ActionButton
+            variant="danger"
             onClick={async () => {
               if (
                 !window.confirm(
                   "A je i sigurt që dëshiron të fshish këto foto?"
                 )
-              ) {
+              )
                 return;
-              }
+
               const photoUrls = Array.from(selectedPhotos);
               await photoService.bulkDeletePhotos(photoUrls);
               alert("Selected photos deleted successfully");
@@ -210,7 +142,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
             }}
           >
             Delete Selected ({selectedPhotos.size})
-          </button>
+          </ActionButton>
         </div>
       )}
 
@@ -223,7 +155,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
             <img
               src={selectedPhoto}
               alt="Full size"
-              className="rounded shadow-lg full h-auto max-h-[90vh] object-contain"
+              className="rounded shadow-lg h-auto max-h-[90vh] object-contain"
               onClick={(e) => e.stopPropagation()}
             />
             <button

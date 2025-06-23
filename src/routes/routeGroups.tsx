@@ -3,7 +3,7 @@ import LoginPage from "../pages/LoginPage";
 // import StoreSelector from "../components/StoreList/StoreSelector";
 import FacingsSelector from "../pages/PPL/PPLCompanySelector";
 import PodravkaFacingsFormPage from "../pages/PPL/PPLPodravka/PPLPodravka";
-import CompetitorFacingsFormPage from "../pages/PPL/PPLCompetitor/PPLCompetitor";
+import PPLCompetitor from "../pages/PPL/PPLCompetitor/PPLCompetitor";
 import PodravkaPPLEditor from "../pages/PPL/PPLPodravka/PodravkaPPLList";
 import UpdatePodravkaFacingsPage from "../pages/PPL/PPLPodravka/UpdatePodravkaFacings";
 import CompetitorPPLEditor from "../pages/PPL/PPLCompetitor/CompetitorPPLList";
@@ -50,7 +50,7 @@ export const pplRoutes: RouteObject[] = [
   },
   {
     path: `/ppl-store/:storeId/ppl-konkurrenca`,
-    element: <CompetitorFacingsFormPage />,
+    element: <PPLCompetitor />,
   },
   {
     path: "/edit-ppl",

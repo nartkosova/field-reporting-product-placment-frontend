@@ -31,7 +31,7 @@ export interface CompetitorFacingWithMeta extends CompetitorFacingInput {
 export interface Batch {
   batch_id: number | string;
   store_name: string;
-  report_date: string;
+  created_at: string;
   category: string;
   product_count: number;
 }
@@ -39,7 +39,7 @@ export interface Batch {
 export interface QueuedPodravkaBatch {
   meta: {
     store_name: string;
-    report_date: string;
+    created_at: string;
     category: string;
     product_count: number;
   };

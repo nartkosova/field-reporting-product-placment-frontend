@@ -5,6 +5,9 @@ import { PhotoInput } from "../../types/photoInterface";
 import storeServices from "../../services/storeServices";
 import { sanitizeFilename } from "../../utils/utils";
 import { useSelectedStore } from "../../hooks/useSelectStore";
+import ActionButton from "../../components/Buttons/ActionButtons";
+import { isOnline } from "../../utils/cacheManager";
+import { queuePhoto } from "../../db/db";
 interface Props {
   photoType: PhotoInput["photo_type"];
 }
@@ -50,8 +53,13 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
 
     try {
       setIsLoading(true);
-      await photoService.createPhoto(formData);
-      alert("Fotoja u ngarkua me sukses");
+      if (isOnline()) {
+        await photoService.createPhoto(formData);
+        alert("Fotoja u ngarkua me sukses");
+      } else {
+        await queuePhoto(formData);
+        alert("Nuk ka internet. Fotoja u ruajt për ngarkim më vonë.");
+      }
       clearState();
     } catch (e) {
       alert("Fotoja nuk u ngarkua, provo perseri.");
@@ -103,21 +111,12 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
             className="w-full border border-gray-300 rounded p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className={`bg-blue-600 text-white px-4 py-2 rounded w-full ${
-              isLoading ? "opacity-50 cursor-not-allowed" : "!cursor-pointer"
-            }`}
-          >
-            {isLoading ? "Uploading..." : `Upload ${photoType}`}
-          </button>
-          <button
-            onClick={clearState}
-            className="bg-blue-600 text-white px-4 py-2 rounded !cursor-pointer w-full"
-          >
+          <ActionButton onClick={handleSubmit} disabled={isLoading} fullWidth>
+            {isLoading ? "Duke e shfaqur..." : `Dergo ${photoType}`}
+          </ActionButton>
+          <ActionButton onClick={clearState} fullWidth>
             Largo foton
-          </button>
+          </ActionButton>
         </div>
       )}
     </div>

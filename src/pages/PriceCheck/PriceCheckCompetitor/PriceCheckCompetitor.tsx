@@ -8,6 +8,7 @@ import { CompetitorPriceCheckInput } from "../../../types/priceCheckInterface";
 import { CompetitorProduct } from "../../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
+import SubmitButton from "../../../components/Buttons/SubmitButton";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
@@ -105,13 +106,11 @@ const PriceCheckCompetitor = () => {
           onPriceChange={handlePriceChange}
         />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700"
-        >
-          {loading ? "Submitting..." : "Submit Prices"}
-        </button>
+        <SubmitButton
+          loading={loading}
+          label="Dergo qmimet"
+          loadingLabel="Duke i shfaqur..."
+        />
       </form>
     </div>
   );

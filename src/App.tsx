@@ -6,6 +6,7 @@ import {
   cacheCompetitorCategories,
   syncQueuedCompetitorFacings,
   syncQueuedFacings,
+  syncQueuedPhotos,
 } from "./db/db";
 import { useEffect, useRef } from "react";
 import competitorServices from "./services/competitorServices";
@@ -18,6 +19,7 @@ const App = () => {
         hasSyncedRef.current = true;
         syncQueuedFacings();
         syncQueuedCompetitorFacings();
+        syncQueuedPhotos();
       }
     };
     window.addEventListener("online", handleOnline);
@@ -26,6 +28,7 @@ const App = () => {
       hasSyncedRef.current = true;
       syncQueuedFacings();
       syncQueuedCompetitorFacings();
+      syncQueuedPhotos();
     }
 
     return () => window.removeEventListener("online", handleOnline);

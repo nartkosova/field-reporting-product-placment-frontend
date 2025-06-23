@@ -5,6 +5,7 @@ import storeService from "../../services/storeServices";
 import Select from "react-select";
 import { PhotoSchema } from "../../types/photoInterface";
 import PhotoTable from "./PhotoReportTable";
+import ActionButton from "../../components/Buttons/ActionButtons";
 
 const photoTypeOptions = [
   { value: "regular_shelf", label: "Regular Shelf" },
@@ -73,7 +74,7 @@ const PhotoReportHeader = () => {
   const categoryOptions = categories.map((c) => ({ value: c, label: c }));
 
   const filteredPhotos = photos.filter((p) => {
-    const uploadMonth = new Date(p.uploaded_at).getMonth() + 1;
+    const uploadMonth = new Date(p.created_at).getMonth() + 1;
     const uploadMonthStr = String(uploadMonth).padStart(2, "0");
 
     return (
@@ -89,89 +90,78 @@ const PhotoReportHeader = () => {
         filters.photo_types.includes(p.photo_type))
     );
   });
+  const photoFilterConfigs = [
+    {
+      key: "user_ids",
+      options: userOptions,
+      placeholder: "Zgjidh përdoruesin",
+    },
+    {
+      key: "store_ids",
+      options: storeOptions,
+      placeholder: "Zgjidh dyqanin",
+      className: "md:w-1/2 w-full",
+    },
+    {
+      key: "categories",
+      options: categoryOptions,
+      placeholder: "Zgjidh kategorinë",
+    },
+    {
+      key: "months",
+      options: monthOptions,
+      placeholder: "Zgjidh muajin",
+    },
+    {
+      key: "photo_types",
+      options: photoTypeOptions,
+      placeholder: "Zgjidh llojin e fotos",
+    },
+  ];
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Photo Report</h2>
       <div className="flex flex-wrap gap-2 mb-4">
-        <Select
-          isMulti
-          options={userOptions}
-          placeholder="Select user(s)"
-          onChange={(opts) =>
-            setFilters((prev) => ({
-              ...prev,
-              user_ids: opts?.map((o) => o.value) || [],
-            }))
-          }
-        />
-        <Select
-          className="md:w-1/2 w-full"
-          isMulti
-          options={storeOptions}
-          placeholder="Select store(s)"
-          onChange={(opts) =>
-            setFilters((prev) => ({
-              ...prev,
-              store_ids: opts?.map((o) => o.value) || [],
-            }))
-          }
-        />
-        <Select
-          isMulti
-          options={categoryOptions}
-          placeholder="Select category(s)"
-          onChange={(opts) =>
-            setFilters((prev) => ({
-              ...prev,
-              categories: opts?.map((o) => o.value) || [],
-            }))
-          }
-        />
-        <Select
-          isMulti
-          options={monthOptions}
-          placeholder="Select month(s)"
-          onChange={(opts) =>
-            setFilters((prev) => ({
-              ...prev,
-              months: opts?.map((o) => o.value) || [],
-            }))
-          }
-        />
-        <Select
-          isMulti
-          options={photoTypeOptions}
-          placeholder="Select photo type(s)"
-          onChange={(opts) =>
-            setFilters((prev) => ({
-              ...prev,
-              photo_types: opts?.map((o) => o.value) || [],
-            }))
-          }
-        />
+        {photoFilterConfigs.map(
+          ({ key, options, placeholder, className = "" }) => (
+            <Select
+              key={key}
+              isMulti
+              options={options}
+              placeholder={placeholder}
+              className={className}
+              onChange={(opts) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  [key]: opts?.map((o) => o.value) || [],
+                }))
+              }
+            />
+          )
+        )}
       </div>
       <div className="flex justify-between items-center mt-4 text-sm mb-4">
         <div className="flex items-center gap-2">
           <span>
             Page {page + 1} of {Math.ceil(totalPhotos / pageSize)}
           </span>
-          <button
-            className="px-2 py-1 border rounded disabled:opacity-50 cursor-pointer"
+          <ActionButton
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
+            variant="outline"
           >
             Prev
-          </button>
-          <button
-            className="px-2 py-1 border rounded disabled:opacity-50 cursor-pointer"
+          </ActionButton>
+          <ActionButton
             onClick={() =>
               setPage((p) => ((p + 1) * pageSize < totalPhotos ? p + 1 : p))
             }
             disabled={(page + 1) * pageSize >= totalPhotos}
+            variant="outline"
           >
             Next
-          </button>
+          </ActionButton>
         </div>
 
         <div className="flex items-center gap-2">

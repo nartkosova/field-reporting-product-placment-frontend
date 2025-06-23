@@ -7,6 +7,7 @@ import { useProductCategories } from "../../hooks/useProductCategories";
 import { PhotoSchema } from "../../types/photoInterface";
 import { AxiosError } from "axios";
 import { Store } from "../../types/storeInterface";
+import SubmitButton from "../../components/Buttons/SubmitButton";
 
 const UpdatePhotoPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -177,13 +178,11 @@ const UpdatePhotoPage = () => {
           )}
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Duke u përditësuar..." : "Përditëso Fotografinë"}
-        </button>
+        <SubmitButton
+          loading={isSubmitting}
+          label="Përditëso Fotot"
+          loadingLabel="Duke u përditësuar..."
+        />
       </form>
     </div>
   );

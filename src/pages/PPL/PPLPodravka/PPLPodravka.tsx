@@ -6,6 +6,7 @@ import productServices from "../../../services/productServices";
 import { useSelectedStore } from "../../../hooks/useSelectStore";
 import { queueFacings } from "../../../db/db";
 import { isOnline } from "../../../utils/cacheManager";
+import FacingsForm from "../../../components/FacingsForm/FacingsForm";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -46,11 +47,6 @@ const PodravkaFacingsFormPage = () => {
     setFacings({ ...facings, [productId]: value });
   };
 
-  const totalFacingsForCategory = products.reduce((sum, product) => {
-    const count = facings[product.product_id] || 0;
-    return sum + count;
-  }, 0);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -82,51 +78,21 @@ const PodravkaFacingsFormPage = () => {
     }
   };
 
+  const entries = products.map((p) => ({
+    id: p.product_id,
+    label: `${p.name} - ${p.product_category}`,
+    value: facings[p.product_id] || 0,
+  }));
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white p-8 border border-gray-200 rounded-2xl shadow-lg space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Podravka Facings</h2>
-
-      {productsLoading ? (
-        <p className="text-gray-600">Duke i shfaqur produktet...</p>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {products.map((product) => (
-            <div
-              key={product.product_id}
-              className="p-4 border border-gray-300 rounded-md "
-            >
-              <label className="block mb-2 font-medium text-gray-700">
-                {product.name} - {product.product_category}
-              </label>
-              <input
-                type="number"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Numri i facings"
-                min={0}
-                value={facings[product.product_id] || ""}
-                onChange={(e) =>
-                  handleFacingChange(product.product_id, Number(e.target.value))
-                }
-              />
-            </div>
-          ))}
-
-          <div className="text-left font-semibold text-gray-700">
-            Total i facings për kategorinë{" "}
-            <span className="text-blue-600">{selectedCategory}</span>:{" "}
-            <span className="text-red-600">{totalFacingsForCategory}</span>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 w-full rounded hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-        </form>
-      )}
-    </div>
+    <FacingsForm
+      title="Podravka Facings"
+      category={selectedCategory}
+      entries={entries}
+      productsLoading={productsLoading}
+      loading={loading}
+      onChange={(id, val) => handleFacingChange(Number(id), val)}
+      onSubmit={handleSubmit}
+    />
   );
 };
 
