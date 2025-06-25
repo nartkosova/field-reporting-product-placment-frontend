@@ -2,15 +2,17 @@ import CategorySelector from "../../components/CategorySelector/CategorySelector
 
 const PriceCheckSelector = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <CategorySelector
-        routeBase="/price-check"
-        buttonLinks={[
-          { label: "Shiko Qmimet Per Podravken", path: "/podravka" },
-          { label: "Shiko Qmimet Per Konkurrencen", path: "/konkurrenca" },
-        ]}
-        categoryRequired={true}
-      />
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
+        <CategorySelector
+          routeBase="/price-check"
+          buttonLinks={[
+            { label: "Shiko Qmimet Per Podravken", path: "/podravka" },
+            { label: "Shiko Qmimet Per Konkurrencen", path: "/konkurrenca" },
+          ]}
+          categoryRequired={true}
+        />
+      </div>
     </div>
   );
 };

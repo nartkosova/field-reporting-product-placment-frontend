@@ -40,8 +40,10 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-md bg-neutral-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-6 border border-neutral-800">
-        <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Sign in to your account</h2>
-        <p className="text-gray-400 text-sm mb-4">Field Reporting & Dashboard App</p>
+        <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">
+          Hyni në profilin tuaj
+        </h2>
+        <p className="text-gray-400 text-sm mb-4">PPL App</p>
         <div className="w-full flex flex-col space-y-4">
           <input
             className="border border-neutral-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-600 transition placeholder-gray-500 text-base bg-black text-white"
@@ -61,7 +63,7 @@ const LoginPage = () => {
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-white focus:outline-none"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-white focus:outline-none cursor-pointer"
               onClick={handleViewPassword}
               tabIndex={-1}
             >
@@ -73,7 +75,7 @@ const LoginPage = () => {
           onClick={handleLogin}
           className="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-semibold py-2 rounded-lg shadow border border-neutral-700 transition-none mt-2"
         >
-          Login
+          Hyr
         </ActionButton>
       </div>
     </div>

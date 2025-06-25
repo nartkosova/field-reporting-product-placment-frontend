@@ -71,8 +71,10 @@ export const StoreDropdown = () => {
   };
 
   return (
-    <div className="mb-4">
-      <h2 className="font-semibold text-lg mb-2">Zgjedh Marketin</h2>
+    <div>
+      <h2 className="font-extrabold text-white mb-6 tracking-tight text-center drop-shadowtext-lg ">
+        Zgjedh Marketin
+      </h2>
       <Select<StoreOption>
         options={storeOptions}
         onChange={handleChange}

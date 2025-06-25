@@ -4,21 +4,23 @@ import { Store } from "../../../types/storeInterface";
 
 const Stores = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <EntityList
-        title="Lista e Dyqaneve"
-        fetchAll={async () => {
-          const stores = await storeServices.getAllStores();
-          return stores.map((s: Store) => ({
-            id: s.store_id,
-            name: s.store_name,
-            category: s.store_category,
-          }));
-        }}
-        editPath="/settings/edit/store"
-        onDelete={storeServices.deleteStore}
-        itemLabel="dyqanin"
-      />
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
+        <EntityList
+          title="Lista e Dyqaneve"
+          fetchAll={async () => {
+            const stores = await storeServices.getAllStores();
+            return stores.map((s: Store) => ({
+              id: s.store_id,
+              name: s.store_name,
+              category: s.store_category,
+            }));
+          }}
+          editPath="/settings/edit/store"
+          onDelete={storeServices.deleteStore}
+          itemLabel="dyqanin"
+        />
+      </div>
     </div>
   );
 };

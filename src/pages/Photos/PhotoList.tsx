@@ -15,43 +15,45 @@ interface PhotoEntity {
 
 const PhotoList = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <EntityList<PhotoEntity>
-        title="Fotot nga raportet"
-        fetchAll={async () => {
-          const photos: PhotoSchema[] =
-            await photoService.getReportPhotosByUserId();
-          return photos.map((photo) => ({
-            id: photo.photo_id,
-            name: photo.store_name,
-            created_at: photo.created_at,
-            category: photo.category,
-            photo_type: photo.photo_type,
-            photo_description: photo.photo_description,
-            photo_url: photo.photo_url,
-          }));
-        }}
-        onDelete={async (photoId: number) => {
-          await photoService.deleteReportPhoto(photoId.toString());
-        }}
-        editPath="/photos/edit"
-        itemLabel="fotografi"
-        renderDetails={(item) => (
-          <div className="text-sm text-gray-600 space-y-1">
-            <div>Tipi: {item.photo_type}</div>
-            <div>Kategoria: {item.category}</div>
-            <div>Përshkrimi: {item.photo_description || "Pa përshkrim"}</div>
-            <div>Data: {formattedDate(item.created_at)}</div>
-            <div>
-              <img
-                src={item.photo_url}
-                alt="Foto"
-                className="w-32 h-20 object-cover mt-2 border rounded"
-              />
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
+        <EntityList<PhotoEntity>
+          title="Fotot nga raportet"
+          fetchAll={async () => {
+            const photos: PhotoSchema[] =
+              await photoService.getReportPhotosByUserId();
+            return photos.map((photo) => ({
+              id: photo.photo_id,
+              name: photo.store_name,
+              created_at: photo.created_at,
+              category: photo.category,
+              photo_type: photo.photo_type,
+              photo_description: photo.photo_description,
+              photo_url: photo.photo_url,
+            }));
+          }}
+          onDelete={async (photoId: number) => {
+            await photoService.deleteReportPhoto(photoId.toString());
+          }}
+          editPath="/photos/edit"
+          itemLabel="fotografi"
+          renderDetails={(item) => (
+            <div className="text-sm text-gray-600 space-y-1">
+              <div>Tipi: {item.photo_type}</div>
+              <div>Kategoria: {item.category}</div>
+              <div>Përshkrimi: {item.photo_description || "Pa përshkrim"}</div>
+              <div>Data: {formattedDate(item.created_at)}</div>
+              <div>
+                <img
+                  src={item.photo_url}
+                  alt="Foto"
+                  className="w-32 h-20 object-cover mt-2 border rounded"
+                />
+              </div>
             </div>
-          </div>
-        )}
-      />
+          )}
+        />
+      </div>
     </div>
   );
 };

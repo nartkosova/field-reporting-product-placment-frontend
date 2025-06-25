@@ -3,6 +3,7 @@ import productServices from "../services/productServices";
 
 export const useProductCategories = () => {
   const [categories, setCategories] = useState<string[]>([]);
+  const [businessUnits, setBusinessUnits] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -11,11 +12,21 @@ export const useProductCategories = () => {
       try {
         const products = (await productServices.getProducts()) as {
           category: string;
+          business_unit?: string;
         }[];
+
         const uniqueCategories = Array.from(
           new Set(products.map((p) => p.category))
         );
+
+        const uniqueBusinessUnits = Array.from(
+          new Set(
+            products.map((p) => p.business_unit).filter((b): b is string => !!b)
+          )
+        );
+
         setCategories(uniqueCategories);
+        setBusinessUnits(uniqueBusinessUnits);
       } catch (err) {
         console.error("Error fetching product categories:", err);
         setError(err as Error);
@@ -27,5 +38,5 @@ export const useProductCategories = () => {
     fetchData();
   }, []);
 
-  return { categories, isLoading, error };
+  return { categories, businessUnits, isLoading, error };
 };

@@ -81,7 +81,7 @@ export const EntityList = <T extends Entity>({
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6">
+    <div className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6 w-full">
       <h2 className="text-2xl font-bold text-white mb-6">{title}</h2>
       {loading ? (
         <div className="text-gray-400">Loading...</div>

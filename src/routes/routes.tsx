@@ -1,15 +1,12 @@
 import { RouteObject } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 
-import ReportView from "../pages/ReportView/ReportHeader";
-
-import PhotoReportHeader from "../pages/PhotoReports/PhotoReportHeader";
-
 import {
   publicRoutes,
   pplRoutes,
   photoRoutes,
   settingsRoutes,
+  reportRoutes,
 } from "./routeGroups";
 
 const userRoutes: RouteObject[] = [
@@ -19,22 +16,9 @@ const userRoutes: RouteObject[] = [
   },
   ...pplRoutes,
   ...photoRoutes,
-  {
-    path: "/reports",
-    element: <ReportView />,
-  },
+  ...reportRoutes,
 ];
 
-const adminRoutes: RouteObject[] = [
-  {
-    path: "/photos/report",
-    element: <PhotoReportHeader />,
-  },
-  {
-    path: "/reports",
-    element: <ReportView />,
-  },
-  ...settingsRoutes,
-];
+const adminRoutes: RouteObject[] = [...reportRoutes, ...settingsRoutes];
 
 export { publicRoutes, userRoutes, adminRoutes };

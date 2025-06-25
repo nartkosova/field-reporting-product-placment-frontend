@@ -1,13 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../components/Buttons/ActionButtons";
-
-const getInitials = (name: string) => {
-  if (!name) return "?";
-  const parts = name.split(" ");
-  if (parts.length === 1) return parts[0][0]?.toUpperCase() || "?";
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-};
+import { getInitials } from "../../utils/utils";
 
 const Header: React.FC = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}") || {};
@@ -25,7 +19,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-black/95 backdrop-blur border-b border-neutral-800 shadow-sm">
+    <header className="sticky top-0 z-30 w-full bg-black/95 backdrop-blur border-b border-neutral-800 shadow-sm px-4">
       <div className="flex items-center justify-between h-16">
         <div className="flex items-center">
           <button
@@ -36,20 +30,19 @@ const Header: React.FC = () => {
             <span>Kthehu</span>
           </button>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-gray-100 font-bold text-lg border border-neutral-700">
-              {getInitials(userInfo.user || userInfo.name || "")}
-            </div>
-            <span className="hidden sm:block text-base font-medium text-gray-100">
-              {userInfo.user || userInfo.name || "User"}
-            </span>
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 flex items-center justify-center text-gray-100 font-semibold text-sm border border-neutral-600 shadow-inner">
+            {getInitials(userInfo.user || userInfo.name || "")}
           </div>
+          <span className="hidden sm:block text-md font-medium text-gray-200 truncate max-w-[120px]">
+            {userInfo.user || userInfo.name || "User"}
+          </span>
           <ActionButton
             onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition-none"
+            variant="danger"
+            className="text-md font-semibold px-3 py-1.5 rounded-md shadow-md"
           >
-            Logout
+            Dilni
           </ActionButton>
         </div>
       </div>

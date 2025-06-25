@@ -5,6 +5,7 @@ import {
   getCachedStoreProducts,
   isOnline,
 } from "../utils/cacheManager";
+import { PodravkaProduct } from "../types/productInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -18,6 +19,43 @@ const getCompetitorProducts = async (params: {
       Authorization: `Bearer ${token}`,
     },
     params,
+  });
+  return response.data;
+};
+
+const createPodravkaProduct = async (data: PodravkaProduct) => {
+  const token = getToken();
+  const response = await axios.post(`${baseUrl}/api/products`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+const updatePodravkaProduct = async (
+  productId: number,
+  data: PodravkaProduct
+) => {
+  const token = getToken();
+  const response = await axios.put(
+    `${baseUrl}/api/products/${productId}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+const deletePodravkaProduct = async (productId: number) => {
+  const token = getToken();
+  const response = await axios.delete(`${baseUrl}/api/products/${productId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return response.data;
 };
@@ -111,9 +149,12 @@ export const getProductsByStoreId = async (storeId: number) => {
 
 export default {
   getCompetitorProducts,
+  getProducts,
+  getProductsByStoreId,
+  createPodravkaProduct,
+  updatePodravkaProduct,
+  deletePodravkaProduct,
   createCompetitorProduct,
   updateCompetitorProduct,
   deleteCompetitorProduct,
-  getProducts,
-  getProductsByStoreId,
 };

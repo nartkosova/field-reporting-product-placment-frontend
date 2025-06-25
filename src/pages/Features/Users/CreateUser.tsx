@@ -28,8 +28,8 @@ const CreateUserPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <div className="max-w-xl w-full">
+    <div className="w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-2xl w-full">
         <CreateUpdateForm
           title="Krijo Përdorues të Ri"
           fields={userFields}

@@ -6,12 +6,15 @@ const CreateCompetitorBrand = () => {
   const { categories } = useProductCategories();
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <div className="max-w-xl w-full">
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         <CreateUpdateForm
           title="Krijo Konkurrencen"
           fields={competitorFields({
-            categoryOptions: categories.map((cat) => ({ label: cat, value: cat })),
+            categoryOptions: categories.map((cat) => ({
+              label: cat,
+              value: cat,
+            })),
           })}
           onSubmit={(data) =>
             competitorServices.createCompetitorBrand({

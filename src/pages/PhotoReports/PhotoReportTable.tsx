@@ -39,7 +39,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
               data.every((d) => selectedPhotos.has(d.photo_url))
             }
             onChange={toggleAllPhotos}
-            className="cursor-pointer"
+            className="w-4 h-4 appearance-none rounded border border-neutral-700 bg-neutral-900 checked:bg-blue-600 checked:border-blue-600 focus:outline-none cursor-pointer transition-colors"
           />
         ),
         cell: ({ row }) => (
@@ -47,7 +47,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
             type="checkbox"
             checked={selectedPhotos.has(row.original.photo_url)}
             onChange={() => togglePhoto(row.original.photo_url)}
-            className="cursor-pointer"
+            className="w-4 h-4 appearance-none rounded border border-neutral-700 bg-neutral-900 checked:bg-blue-600 checked:border-blue-600 focus:outline-none cursor-pointer transition-colors"
           />
         ),
       }),

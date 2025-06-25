@@ -47,8 +47,22 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         columnHelper.accessor((row) => row.competitors?.[comp] ?? 0, {
           header: comp,
           id: comp,
+          cell: (info) => {
+            const row = info.row.original;
+            const compCount = Number(row.competitors?.[comp] || 0);
+            const podravka = Number(row.total_facings);
+            const total =
+              podravka +
+              Object.values(row.competitors || {}).reduce(
+                (sum, val) => sum + Number(val),
+                0
+              );
+            const percent = total === 0 ? 0 : (compCount / total) * 100;
+            return `${compCount} (${percent.toFixed(1)}%)`;
+          },
         })
       ),
+
       columnHelper.display({
         id: "total_competitor_facings",
         header: "Konkurrenca Total",
@@ -81,13 +95,13 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
   const customFooter = (rows: FacingTable[]) => {
     const { podravka, competitor, total } = getFacingTotals(rows);
     return columns.map((col) => {
-      const id = col.id?.toString() ?? "";
+      const id = col.id?.toString() ?? `col-${Math.random()}`;
       if (id === "total_facings") {
         const percent = total === 0 ? 0 : (podravka / total) * 100;
         return (
           <td
             key={id}
-            className="border px-2 py-1 text-center"
+            className=" px-2 py-1 text-center"
           >{`${podravka} (${percent.toFixed(1)}%)`}</td>
         );
       }
@@ -97,7 +111,7 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         return (
           <td
             key={id}
-            className="border px-2 py-1 text-center"
+            className=" px-2 py-1 text-center"
           >{`${competitor} (${percent.toFixed(1)}%)`}</td>
         );
       }
@@ -111,12 +125,12 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         return (
           <td
             key={id}
-            className="border px-2 py-1 text-center"
+            className=" px-2 py-1 text-center"
           >{`${compTotal} (${percent.toFixed(1)}%)`}</td>
         );
       }
 
-      return <td key={id} className="border px-2 py-1"></td>;
+      return <td key={id} className=" px-2 py-1"></td>;
     });
   };
 

@@ -58,8 +58,8 @@ const UpdateCompetitorBrand = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <div className="max-w-xl w-full">
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         {loading ? (
           <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
         ) : (

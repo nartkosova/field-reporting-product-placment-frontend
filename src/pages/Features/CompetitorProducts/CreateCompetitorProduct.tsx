@@ -15,7 +15,10 @@ const CreateCompetitorProductPage = () => {
     const fetchBrands = async () => {
       const brands = await competitorServices.getAllCompetitorBrands();
       setCompetitorOptions(
-        brands.map((b: { brand_name: string; competitor_id: number }) => ({ label: b.brand_name, value: b.competitor_id }))
+        brands.map((b: { brand_name: string; competitor_id: number }) => ({
+          label: b.brand_name,
+          value: b.competitor_id,
+        }))
       );
     };
     fetchBrands();
@@ -36,8 +39,8 @@ const CreateCompetitorProductPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <div className="max-w-xl w-full">
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         <CreateUpdateForm
           title="Krijo Produkt Konkurrent"
           submitText="Krijo Produkt"

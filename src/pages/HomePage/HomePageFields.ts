@@ -14,11 +14,10 @@ export const userNavItems = (storeInfo: Store | null) => [
     disabled: !storeInfo,
   },
   { to: "/photos/edit", label: "Edito Fotot" },
-  { to: "/reports", label: "Raporte" },
+  { to: "/reports/ppl-reports", label: "Raporte" },
 ];
 
 export const adminNavItems = [
   { to: "/reports", label: "Raporte" },
-  { to: "/photos/report", label: "Raportet e Fotove" },
   { to: "/settings", label: "Krijo/Edito" },
 ];

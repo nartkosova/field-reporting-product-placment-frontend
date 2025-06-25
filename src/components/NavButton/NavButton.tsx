@@ -1,10 +1,12 @@
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import React from "react";
 
 export interface NavButtonProps {
   to: string;
   children: React.ReactNode;
   disabled?: boolean;
   variant?: "default" | "card";
+  scrollToTop?: boolean;
 }
 
 export const NavButton: React.FC<NavButtonProps> = ({
@@ -12,9 +14,27 @@ export const NavButton: React.FC<NavButtonProps> = ({
   children,
   disabled = false,
   variant = "default",
-}) => (
-  <NavLink to={to} tabIndex={disabled ? -1 : 0} className="w-full">
+  scrollToTop = true,
+}) => {
+  const navigate = useNavigate();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
+
+    if (scrollToTop) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Delay navigation slightly to allow smooth scroll to start
+    setTimeout(() => navigate(to), 0);
+  };
+
+  return (
     <button
+      onClick={handleClick}
       disabled={disabled}
       className={
         variant === "card"
@@ -24,5 +44,5 @@ export const NavButton: React.FC<NavButtonProps> = ({
     >
       {children}
     </button>
-  </NavLink>
-);
+  );
+};

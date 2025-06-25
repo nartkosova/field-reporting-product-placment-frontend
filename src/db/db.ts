@@ -7,6 +7,7 @@ import podravkaFacingsService from "../services/podravkaFacingsService";
 import { BrandCategory } from "../types/productInterface";
 import competitorFacingsService from "../services/competitorFacingsService";
 import photoService from "../services/photoService";
+import competitorServices from "../services/competitorServices";
 
 export const getDB = () => {
   return openDB("p-app", 4, {
@@ -70,21 +71,34 @@ export const cacheCompetitorCategories = async (
   const store = tx.objectStore("competitorCategories");
 
   for (const item of categories) {
-    await store.put(item);
+    await store.put(item); // item must include a 'category' key (your keyPath)
   }
 
   await tx.done;
 };
 
-export const saveCompetitorCategories = async (categories: BrandCategory[]) => {
-  const db = await getDB();
-  const tx = db.transaction("competitorCategories", "readwrite");
-  const store = tx.objectStore("competitorCategories");
-  await store.clear();
-  for (const c of categories) {
-    await store.put(c);
+const CACHE_KEY = "competitorCategoriesLastUpdated";
+const CACHE_DURATION = 72 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+export const fetchAndCacheCompetitorCategories = async () => {
+  const lastUpdatedStr = localStorage.getItem(CACHE_KEY);
+  const lastUpdated = lastUpdatedStr ? Number(lastUpdatedStr) : 0;
+  const now = Date.now();
+
+  if (now - lastUpdated < CACHE_DURATION) {
+    console.log("✅ Competitor categories cache still valid.");
+    return;
   }
-  await tx.done;
+
+  try {
+    const categories =
+      await competitorServices.getAllCompetitorsWithCategories();
+    await cacheCompetitorCategories(categories);
+    localStorage.setItem(CACHE_KEY, String(now));
+    console.log("✅ Competitor categories updated.");
+  } catch (err) {
+    console.error("❌ Failed to fetch competitor categories", err);
+  }
 };
 
 export const getCachedBrandsByCategory = async (category: string) => {
@@ -179,4 +193,28 @@ export const syncQueuedPhotos = async () => {
 
   await db.clear("pendingPhotos");
   console.log("✅ Synced all queued photos");
+};
+
+export const syncAllIfNeeded = async () => {
+  const [queuedFacings, queuedCompetitorFacings, queuedPhotos] =
+    await Promise.all([
+      getAllQueuedFacings(),
+      getAllQueuedCompetitorFacings(),
+      getDB().then((db) => db.getAll("pendingPhotos")),
+    ]);
+
+  const shouldSync =
+    queuedFacings.length > 0 ||
+    queuedCompetitorFacings.length > 0 ||
+    queuedPhotos.length > 0;
+
+  if (!shouldSync) {
+    console.log("✅ Nothing to sync.");
+    return;
+  }
+
+  console.log("🔁 Syncing all pending data...");
+  await syncQueuedFacings();
+  await syncQueuedCompetitorFacings();
+  await syncQueuedPhotos();
 };

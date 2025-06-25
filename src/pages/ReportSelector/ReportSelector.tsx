@@ -1,13 +1,13 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
-import { editPPLFields } from "./EditPPLFields";
+import { reportSelectorFIelds } from "./reportSelectorFields";
 
-const EditPPL = () => {
+const ReportSelector = () => {
   return (
-    <div className="w-full flex flex-col items-center justify-center bg-black">
+    <div className="w-full flex flex-col items-center justify-center">
       <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
         <CategorySelector
-          routeBase="/edit-ppl"
-          buttonLinks={editPPLFields}
+          routeBase="/reports"
+          buttonLinks={reportSelectorFIelds}
           categoryRequired={false}
           textRendered={false}
           storeRequired={false}
@@ -17,4 +17,4 @@ const EditPPL = () => {
   );
 };
 
-export default EditPPL;
+export default ReportSelector;

@@ -15,6 +15,7 @@ interface CategorySelectorProps {
   }[];
   categoryRequired?: boolean;
   textRendered?: boolean;
+  storeRequired?: boolean;
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
@@ -22,6 +23,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   buttonLinks,
   categoryRequired = true,
   textRendered = true,
+  storeRequired = true,
 }) => {
   const selectedStore = useSelectedStore();
   const storeId = selectedStore?.store_id || 0;
@@ -33,6 +35,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
+    if (!storeRequired && !categoryRequired) return;
+
     const fetchData = async () => {
       try {
         // const store = await storeServices.getStoreById(storeId);
@@ -47,9 +51,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         console.error("Error fetching data:", err);
       }
     };
-
     if (!isNaN(storeId)) fetchData();
-  }, [storeId]);
+  }, [storeId, storeRequired, categoryRequired]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -73,9 +76,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   };
 
   return (
-    <div className="flex flex-col justify-center items-center p-8 max-w-xl mx-auto bg-black min-h-[60vh] rounded-2xl border border-neutral-800 shadow-lg space-y-6">
+    <div className="flex flex-col w-full justify-center items-center bg-black shadow-lg space-y-6">
       {textRendered && (
-        <p className="text-2xl font-bold text-white text-center mb-2">
+        <p className="text-2xl font-bold text-white text-center mb-6">
           Jeni në shitoren{" "}
           <span className="text-neutral-300">{selectedStore?.store_name}</span>
           {categoryRequired && (
@@ -103,15 +106,11 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               backgroundColor: "#18181b",
               borderColor: "#27272a",
               color: "#fff",
-              minHeight: 48,
-              fontSize: 18,
-              borderRadius: 12,
             }),
             menu: (provided: any) => ({
               ...provided,
               backgroundColor: "#18181b",
               color: "#fff",
-              borderRadius: 12,
             }),
             option: (provided: any, state: any) => ({
               ...provided,
@@ -121,7 +120,6 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                 ? "#27272a"
                 : "#18181b",
               color: "#fff",
-              fontSize: 16,
             }),
             singleValue: (provided: any) => ({
               ...provided,
@@ -139,8 +137,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           }}
         />
       )}
-
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
         {buttonLinks.map(({ label, path }) => {
           const categoryNotRequired =
             label.toLowerCase() === "fletushka" ||
@@ -148,17 +145,19 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           const storeSegment = storeId ? `/${storeId}` : "";
           const companySegment = company ? `/${company}` : "";
 
-          const fullPath = categoryNotRequired
+          const fullPath = !storeRequired
+            ? `${routeBase}${path}`
+            : categoryNotRequired
             ? `${routeBase}${storeSegment}${companySegment}${path}`
             : categoryRequired
             ? `${routeBase}${storeSegment}${companySegment}${path}?category=${selectedCategory}`
             : `${routeBase}${storeSegment}${companySegment}${path}`;
-
           const isDisabled = categoryNotRequired
             ? !!selectedCategory
             : categoryRequired && !selectedCategory;
 
           return (
+            // <div className="flex flex-col justify-center items-center bg-black shadow-lg space-y-6">
             <NavButton
               key={label}
               to={fullPath}

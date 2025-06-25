@@ -29,8 +29,10 @@ const BaseForm: React.FC<BaseFormProps> = ({
   submitButtonLabel,
 }) => {
   return (
-    <div className="flex flex-col p-6 max-w-xl mx-auto space-y-4 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg mt-8">
-      <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">{title}</h2>
+    <div className="flex flex-col p-6 space-y-4 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg mt-8">
+      <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
+        {title}
+      </h2>
       <form onSubmit={onSubmit} className="space-y-4">
         {entries.map((entry, index) => (
           <div
@@ -47,7 +49,11 @@ const BaseForm: React.FC<BaseFormProps> = ({
                 >
                   <option value="">Select {field.label}</option>
                   {field.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value} className="bg-neutral-900 text-white">
+                    <option
+                      key={opt.value}
+                      value={opt.value}
+                      className="bg-neutral-900 text-white"
+                    >
                       {opt.label}
                     </option>
                   ))}

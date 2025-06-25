@@ -75,15 +75,17 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-2 sm:p-0 overflow-auto">
+    <div className="w-full flex items-center justify-center bg-black p-2 sm:p-0 overflow-auto">
       <div className="p-4 sm:p-6 space-y-6 max-w-xl w-full bg-neutral-900 rounded-2xl shadow-md border border-neutral-800 max-h-[90vh] overflow-y-auto">
         {category && (
           <div className="text-lg font-medium pb-2 text-white">
             Kategoria: <span className="text-blue-400">{category}</span>
           </div>
-        )} {" "}
+        )}{" "}
         {!category && (
-          <div className="text-lg font-medium pb-2 text-white">Fotografia Korporative</div>
+          <div className="text-lg font-medium pb-2 text-white">
+            Fotografia Korporative
+          </div>
         )}
         <label className="block bg-neutral-800 text-center py-3 rounded border border-dashed border-neutral-700 cursor-pointer hover:bg-neutral-700 transition text-white">
           Krijo Foto

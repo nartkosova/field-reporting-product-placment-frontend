@@ -16,7 +16,7 @@ import UpdatePhotoPage from "../pages/Photos/UpdateProdravkaPhotos";
 import SelectCreateEdit from "../pages/SelectCreateUpdate/SelectCreateUpdate";
 import CreateStorePage from "../pages/Features/Stores/CreateStore";
 import CreateCompetitorBrand from "../pages/Features/Competitor/CreateCompetitorBrand";
-import CreateCompetitorProduct from "../pages/Features/Products/CreateCompetitorProduct";
+import CreateCompetitorProduct from "../pages/Features/CompetitorProducts/CreateCompetitorProduct";
 import CreateUser from "../pages/Features/Users/CreateUser";
 import Stores from "../pages/Features/Stores/Stores";
 import UpdateStore from "../pages/Features/Stores/UpdateStore";
@@ -24,9 +24,15 @@ import CompetitorList from "../pages/Features/Competitor/CompetitorList";
 import UpdateCompetitorBrand from "../pages/Features/Competitor/UpdateCompetitorBrand";
 import UserList from "../pages/Features/Users/UserList";
 import UpdateUser from "../pages/Features/Users/UpdateUser";
-import CompetitorProductList from "../pages/Features/Products/ProductList";
-import UpdateCompetitorProduct from "../pages/Features/Products/UpdateCompetitorProducts";
+import CompetitorProductList from "../pages/Features/CompetitorProducts/CompetitorProductList";
+import UpdateCompetitorProduct from "../pages/Features/CompetitorProducts/UpdateCompetitorProducts";
 import EditPPL from "../pages/EditPPL/EditPPL";
+import ReportSelector from "../pages/ReportSelector/ReportSelector";
+import PhotoReportHeader from "../pages/PhotoReports/PhotoReportHeader";
+import ReportHeader from "../pages/ReportView/ReportHeader";
+import CreatePodravkaProduct from "../pages/Features/PodravkaProducts/CreatePodravkaProduct";
+import UpdatePodravkaProduct from "../pages/Features/PodravkaProducts/UpdatePodravkaProducts";
+import PodravkaProductList from "../pages/Features/PodravkaProducts/PodravkaProductList";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -143,6 +149,18 @@ export const settingsRoutes: RouteObject[] = [
     element: <UpdateStore />,
   },
   {
+    path: "/settings/create/podravka-products",
+    element: <CreatePodravkaProduct />,
+  },
+  {
+    path: "/settings/edit/podravka-products",
+    element: <PodravkaProductList />,
+  },
+  {
+    path: "/settings/edit/podravka-products/:id",
+    element: <UpdatePodravkaProduct />,
+  },
+  {
     path: "/settings/edit/competitor-brands",
     element: <CompetitorList />,
   },
@@ -165,5 +183,20 @@ export const settingsRoutes: RouteObject[] = [
   {
     path: "/settings/edit/competitor-products/:id",
     element: <UpdateCompetitorProduct />,
+  },
+];
+
+export const reportRoutes: RouteObject[] = [
+  {
+    path: "/reports",
+    element: <ReportSelector />,
+  },
+  {
+    path: "/reports/photo-reports",
+    element: <PhotoReportHeader />,
+  },
+  {
+    path: "/reports/ppl-reports",
+    element: <ReportHeader />,
   },
 ];

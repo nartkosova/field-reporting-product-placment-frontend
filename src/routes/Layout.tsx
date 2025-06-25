@@ -3,10 +3,12 @@ import Header from "../pages/Navigation/Header";
 
 const Layout = () => {
   return (
-    <div className="min-h-screen w-full bg-black block flex-col px-4">
+    <div className="min-h-screen w-full bg-black flex flex-col ">
       <Header />
-      <main className="w-full h-full items-center justify-center overflow-auto">
-        <Outlet />
+      <main className="flex-1 flex items-center  justify-center overflow-hidden px-4">
+        <div className="w-full h-fulloverflow-hidden">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

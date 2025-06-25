@@ -9,21 +9,23 @@ interface CompetitorBrand {
 
 const CompetitorList = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <EntityList
-        title="Konkurrnca"
-        fetchAll={async () => {
-          const brands = await competitorServices.getAllCompetitorBrands();
-          return brands.map((b: CompetitorBrand) => ({
-            id: b.competitor_id,
-            name: b.brand_name,
-            created_at: b.created_at,
-          }));
-        }}
-        onDelete={competitorServices.deleteCompetitorBrand}
-        editPath="/settings/edit/competitor-brands"
-        itemLabel="Konkurrenca"
-      />
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
+        <EntityList
+          title="Konkurrnca"
+          fetchAll={async () => {
+            const brands = await competitorServices.getAllCompetitorBrands();
+            return brands.map((b: CompetitorBrand) => ({
+              id: b.competitor_id,
+              name: b.brand_name,
+              created_at: b.created_at,
+            }));
+          }}
+          onDelete={competitorServices.deleteCompetitorBrand}
+          editPath="/settings/edit/competitor-brands"
+          itemLabel="Konkurrenca"
+        />
+      </div>
     </div>
   );
 };

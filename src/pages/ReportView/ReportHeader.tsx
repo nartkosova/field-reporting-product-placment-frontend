@@ -11,6 +11,8 @@ import { User, Store, Facing, FilterState } from "../../types/reportInterface";
 import { monthOptions } from "../../utils/monthOptions";
 import ReportChart from "./ReportChart";
 import ActionButton from "../../components/Buttons/ActionButtons";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
+import darkSelectStyles from "../../utils/darkSelectStyles";
 
 const ReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -26,23 +28,17 @@ const ReportHeader = () => {
     categories: [],
     report_month: [],
   });
+  const debouncedFilters = useDebouncedValue(filters, 800);
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      const [userList, storeList, facingsResponse] = await Promise.all([
+      const [userList, storeList] = await Promise.all([
         userService.getAllUsers(),
         storeServices.getStoresWithUserId(),
-        podravkaFacingsService.getPodravkaFacingsWithCompetitors({}, 10, 0),
       ]);
 
       setUsers(userList);
       setStores(storeList);
-      setFacings(facingsResponse.data);
-
-      const cats = Array.from(
-        new Set<string>(facingsResponse.data.map((f: Facing) => f.category))
-      );
-      setCategories(cats);
     };
 
     fetchInitialData();
@@ -108,42 +104,6 @@ const ReportHeader = () => {
     },
   ];
 
-  const darkSelectStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#18181b",
-      borderColor: "#27272a",
-      color: "#fff",
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#18181b",
-      color: "#fff",
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isSelected
-        ? "#27272a"
-        : state.isFocused
-        ? "#27272a"
-        : "#18181b",
-      color: "#fff",
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: "#fff",
-    }),
-    multiValue: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#27272a",
-      color: "#fff",
-    }),
-    input: (provided: any) => ({
-      ...provided,
-      color: "#fff",
-    }),
-  };
-
   const competitorColumns = useMemo(() => {
     const names = new Set<string>();
     facings.forEach((f) => {
@@ -158,18 +118,18 @@ const ReportHeader = () => {
     const fetchData = async () => {
       const filterParams: Record<string, string | string[]> = {};
 
-      if (filters.user_ids.length > 0) {
-        filterParams.user_id = filters.user_ids;
+      if (debouncedFilters.user_ids.length > 0) {
+        filterParams.user_id = debouncedFilters.user_ids;
       }
-      if (filters.store_ids.length > 0) {
-        filterParams.store_id = filters.store_ids;
+      if (debouncedFilters.store_ids.length > 0) {
+        filterParams.store_id = debouncedFilters.store_ids;
       }
-      if (filters.categories.length > 0) {
-        filterParams.category = filters.categories;
+      if (debouncedFilters.categories.length > 0) {
+        filterParams.category = debouncedFilters.categories;
       }
-      if (filters.report_month.length > 0) {
+      if (debouncedFilters.report_month.length > 0) {
         const year = new Date().getFullYear();
-        const monthIndex = parseInt(filters.report_month[0], 10) - 1;
+        const monthIndex = parseInt(debouncedFilters.report_month[0], 10) - 1;
         const start = new Date(year, monthIndex, 1);
         const end = new Date(year, monthIndex + 1, 0);
 
@@ -186,10 +146,15 @@ const ReportHeader = () => {
 
       setFacings(res.data);
       setTotalFacings(res.total);
+
+      const cats = Array.from(
+        new Set(res.data.map((f: Facing) => f.category))
+      ) as string[];
+      setCategories(cats);
     };
 
     fetchData();
-  }, [filters, page, pageSize]);
+  }, [debouncedFilters, page, pageSize]);
 
   const handleExportExcel = () => {
     const dataToExport = facings.map((row) => {
@@ -233,7 +198,7 @@ const ReportHeader = () => {
   };
 
   return (
-    <div>
+    <div className="py-4">
       <h2 className="text-2xl font-bold mb-4 text-white">Facings Overview</h2>
 
       <div className="flex gap-2 mb-4 flex-wrap">
@@ -260,6 +225,7 @@ const ReportHeader = () => {
                 setFilters((prev) => ({ ...prev, [key]: values }));
               }}
               styles={darkSelectStyles}
+              closeMenuOnSelect={false}
             />
           )
         )}
@@ -310,7 +276,7 @@ const ReportHeader = () => {
       <ReportTable data={facings} competitorColumns={competitorColumns} />
 
       <div className="pt-6 flex gap-2">
-        <ActionButton onClick={handleExportExcel} variant="fut">
+        <ActionButton onClick={handleExportExcel} variant="primary">
           Exporto ne Excel
         </ActionButton>
       </div>

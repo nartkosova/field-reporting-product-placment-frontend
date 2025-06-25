@@ -29,7 +29,7 @@ const FacingsForm = ({
   const total = entries.reduce((sum, entry) => sum + entry.value, 0);
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-6">
+    <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-6">
       <h2 className="text-2xl font-bold text-white">{title}</h2>
 
       <p className="text-gray-300">

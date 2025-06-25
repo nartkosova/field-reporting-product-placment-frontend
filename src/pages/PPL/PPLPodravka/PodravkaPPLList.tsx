@@ -6,8 +6,8 @@ import { Batch } from "../../../types/podravkaFacingInterface";
 
 const PodravkaPPLEditor = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-2 sm:p-0">
-      <div className="max-w-2xl w-full">
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
         <EntityList
           title="Raportet PPL"
           fetchAll={async () => {

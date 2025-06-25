@@ -1,8 +1,8 @@
 import {
-  flexRender,
+  useReactTable,
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
+  flexRender,
   SortingState,
   ColumnDef,
 } from "@tanstack/react-table";
@@ -35,15 +35,17 @@ export const BaseTable = <T,>({
   });
 
   return (
-    <div className="overflow-x-auto border border-neutral-800 rounded shadow-sm bg-black">
-      <table className="w-full text-sm table-auto border-collapse min-w-max bg-neutral-900 text-white">
-        <thead className="bg-neutral-800 text-gray-200">
+    <div className="overflow-x-auto border border-neutral-800 rounded-2xl shadow bg-[#0f0f0f]">
+      <table className="w-full text-sm table-auto min-w-max text-white">
+        <thead className="bg-neutral-900 text-gray-300">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="border border-neutral-800 px-2 py-2 text-left cursor-pointer select-none font-semibold"
+                  className={`px-4 py-3 font-semibold text-left border-b border-neutral-800 cursor-pointer select-none ${cellClassName(
+                    header.column.id
+                  )}`}
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   {flexRender(
@@ -63,7 +65,7 @@ export const BaseTable = <T,>({
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className={`border border-neutral-800 px-2 py-2 ${cellClassName(
+                  className={`px-4 py-3 border-b border-neutral-800 ${cellClassName(
                     cell.column.id
                   )}`}
                 >
@@ -74,7 +76,7 @@ export const BaseTable = <T,>({
           ))}
         </tbody>
         {customFooter && (
-          <tfoot className="bg-neutral-800 font-semibold text-gray-200">
+          <tfoot className="bg-neutral-900 font-semibold text-gray-300">
             <tr>
               {customFooter(table.getRowModel().rows.map((r) => r.original))}
             </tr>

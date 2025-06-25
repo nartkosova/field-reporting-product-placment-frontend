@@ -7,12 +7,19 @@ import Select from "react-select";
 import { PhotoSchema } from "../../types/photoInterface";
 import PhotoTable from "./PhotoReportTable";
 import ActionButton from "../../components/Buttons/ActionButtons";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
+import darkSelectStyles from "../../utils/darkSelectStyles";
 
 const photoTypeOptions = [
-  { value: "regular_shelf", label: "Regular Shelf" },
-  { value: "secondary_position", label: "Secondary Position" },
+  { value: "regular_shelf", label: "Pozita Primare" },
+  { value: "secondary_position", label: "Pozita Sekondare" },
   { value: "fletushka", label: "Fletushka" },
   { value: "korporative", label: "Korporative" },
+];
+
+const companyOptions = [
+  { value: "podravka", label: "Podravka" },
+  { value: "competitor", label: "Competitor" },
 ];
 
 const PhotoReportHeader = () => {
@@ -25,14 +32,15 @@ const PhotoReportHeader = () => {
   const [totalPhotos, setTotalPhotos] = useState(0);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-
   const [filters, setFilters] = useState({
     user_ids: [] as string[],
     store_ids: [] as string[],
     categories: [] as string[],
     months: [] as string[],
     photo_types: [] as string[],
+    company: "",
   });
+  const debouncedFilters = useDebouncedValue(filters, 800);
 
   const monthOptions = Array.from({ length: 12 }, (_, i) => {
     const val = String(i + 1).padStart(2, "0");
@@ -43,15 +51,25 @@ const PhotoReportHeader = () => {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const [userList, storeList, photoResponse] = await Promise.all([
+    const fetchInitialData = async () => {
+      const [userList, storeList] = await Promise.all([
         userService.getAllUsers(),
         storeService.getStoresWithUserId(),
-        photoService.getAllReportPhotos(pageSize, page * pageSize),
       ]);
-
       setUsers(userList);
       setStores(storeList);
+    };
+
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      const photoResponse = await photoService.getAllReportPhotos(
+        pageSize,
+        page * pageSize,
+        debouncedFilters
+      );
       setPhotos(photoResponse.data);
       setTotalPhotos(photoResponse.total);
 
@@ -61,9 +79,8 @@ const PhotoReportHeader = () => {
       setCategories(cats);
     };
 
-    fetchData();
-  }, [page, pageSize]);
-
+    fetchPhotos();
+  }, [page, pageSize, debouncedFilters]);
   const userOptions = users.map((u) => ({
     value: String(u.user_id),
     label: u.user,
@@ -88,7 +105,8 @@ const PhotoReportHeader = () => {
       (filters.months.length === 0 ||
         filters.months.includes(uploadMonthStr)) &&
       (filters.photo_types.length === 0 ||
-        filters.photo_types.includes(p.photo_type))
+        filters.photo_types.includes(p.photo_type)) &&
+      (filters.company.length === 0 || filters.company.includes(p.company))
     );
   });
   const photoFilterConfigs = [
@@ -118,47 +136,16 @@ const PhotoReportHeader = () => {
       options: photoTypeOptions,
       placeholder: "Zgjidh llojin e fotos",
     },
+    {
+      key: "company",
+      options: companyOptions,
+      placeholder: "Zgjedh kompanin",
+    },
   ];
 
-  const darkSelectStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#18181b",
-      borderColor: "#27272a",
-      color: "#fff",
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#18181b",
-      color: "#fff",
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isSelected
-        ? "#27272a"
-        : state.isFocused
-        ? "#27272a"
-        : "#18181b",
-      color: "#fff",
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: "#fff",
-    }),
-    multiValue: (provided: any) => ({
-      ...provided,
-      backgroundColor: "#27272a",
-      color: "#fff",
-    }),
-    input: (provided: any) => ({
-      ...provided,
-      color: "#fff",
-    }),
-  };
-
   return (
-    <div className="p-6 bg-black min-h-screen">
-      <h2 className="text-2xl font-bold mb-4 text-white">Photo Report</h2>
+    <div className="py-4">
+      <h2 className="text-2xl font-bold mb-4 text-white">Raportet e Fotove</h2>
       <div className="flex flex-wrap gap-2 mb-4">
         {photoFilterConfigs.map(
           ({ key, options, placeholder, className = "" }) => (
@@ -175,6 +162,7 @@ const PhotoReportHeader = () => {
                 }))
               }
               styles={darkSelectStyles}
+              closeMenuOnSelect={false}
             />
           )
         )}

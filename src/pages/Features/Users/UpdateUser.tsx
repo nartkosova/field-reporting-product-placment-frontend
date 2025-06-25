@@ -58,8 +58,8 @@ const UpdateUser = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <div className="max-w-xl w-full">
+    <div className="w-full flex items-center justify-center bg-black p-0 sm:p-0">
+      <div className="max-w-2xl w-full">
         {loading ? (
           <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
         ) : (

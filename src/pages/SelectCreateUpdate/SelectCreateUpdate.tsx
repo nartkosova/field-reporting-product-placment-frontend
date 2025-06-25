@@ -1,28 +1,34 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
+import { createLinks, editLinks } from "./selectCreateUpdateFields";
 
 const SelectCreateEdit = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <CategorySelector
-        routeBase="/settings"
-        buttonLinks={[
-          { label: "Krijo Shitore", path: "/create/store" },
-          { label: "Krijo Konkurrenc", path: "/create/competitor-brand" },
-          {
-            label: "Krijo Produkt Konkurrence",
-            path: "/create/competitor-product",
-          },
-          { label: "Krijo User Te Ri", path: "/create/user" },
-          { label: "Edito Shitoren", path: "/edit/store" },
-          { label: "Edito Konkurrencen", path: "/edit/competitor-brands" },
-          {
-            label: "Edito Produktet e Konkurrences",
-            path: "/edit/competitor-products",
-          },
-          { label: "Edito Userat", path: "/edit/users" },
-        ]}
-        categoryRequired={false}
-      />
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
+        <div className="w-full max-w-4xl text-center mb-6">
+          <h2 className="text-3xl font-bold text-white">Panel i Menaxhimit</h2>
+          <p className="text-neutral-400 mt-2">
+            Zgjidh një veprim për të krijuar ose edituar të dhënat
+          </p>
+        </div>
+        <CategorySelector
+          routeBase="/settings"
+          buttonLinks={createLinks}
+          categoryRequired={false}
+          textRendered={false}
+          storeRequired={false}
+        />
+
+        <div className="max-w-2xl h-[1px] w-full bg-neutral-700 rounded-full my-6" />
+
+        <CategorySelector
+          routeBase="/settings"
+          buttonLinks={editLinks}
+          categoryRequired={false}
+          textRendered={false}
+          storeRequired={false}
+        />
+      </div>
     </div>
   );
 };

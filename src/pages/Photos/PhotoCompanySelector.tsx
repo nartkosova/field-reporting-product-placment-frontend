@@ -2,15 +2,17 @@ import CategorySelector from "../../components/CategorySelector/CategorySelector
 
 const PhotoCompanySelector = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-black p-0 sm:p-0">
-      <CategorySelector
-        routeBase="/photos"
-        buttonLinks={[
-          { label: "Foto Podravka", path: `/podravka` },
-          { label: "Foto Konkurrenca", path: `/competitor` },
-        ]}
-        categoryRequired={false}
-      />
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
+        <CategorySelector
+          routeBase="/photos"
+          buttonLinks={[
+            { label: "Foto Podravka", path: `/podravka` },
+            { label: "Foto Konkurrenca", path: `/competitor` },
+          ]}
+          categoryRequired={false}
+        />
+      </div>
     </div>
   );
 };

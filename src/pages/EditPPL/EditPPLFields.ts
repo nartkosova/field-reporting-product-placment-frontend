@@ -1,4 +1,4 @@
 export const editPPLFields = [
-  { to: "/edit-ppl/podravka", label: "Edito PPL Podravka" },
-  { to: "/edit-ppl/konkurrenca", label: "Edito PPL Konkurrenca" },
+  { path: "/podravka", label: "Edito PPL Podravka" },
+  { path: "/konkurrenca", label: "Edito PPL Konkurrenca" },
 ];

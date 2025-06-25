@@ -28,12 +28,25 @@ export const getReportPhotosByPhotoId = async (
 
 export const getAllReportPhotos = async (
   limit: number,
-  offset: number
+  offset: number,
+  filters: Record<string, string[] | string>
 ): Promise<PaginatedPhotoResponse> => {
   const token = getToken();
 
+  const params: Record<string, string | number> = { limit, offset };
+
+  for (const [key, value] of Object.entries(filters)) {
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        params[key] = value.join(","); // backend handles comma-separated
+      }
+    } else if (typeof value === "string" && value.trim() !== "") {
+      params[key] = value;
+    }
+  }
+
   const res = await axios.get(`${baseUrl}/api/photos`, {
-    params: { limit, offset },
+    params,
     headers: { Authorization: `Bearer ${token}` },
   });
 
