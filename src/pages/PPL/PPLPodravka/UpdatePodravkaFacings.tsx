@@ -37,7 +37,7 @@ const UpdatePodravkaFacingsPage = () => {
       submitBatch: (id: string, facings: PodravkaFacingInput[]) =>
         podravkaFacingsService.updatePodravkaBatch({ batchId: id, facings }),
     }),
-    [batchId]
+    []
   );
 
   const hook = useBatchFacings<PodravkaFacingWithMeta, PodravkaFacingInput>(

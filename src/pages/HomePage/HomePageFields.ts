@@ -14,7 +14,7 @@ export const userNavItems = (storeInfo: Store | null) => [
     disabled: !storeInfo,
   },
   { to: "/photos/edit", label: "Edito Fotot" },
-  { to: "/reports/ppl-reports", label: "Raporte" },
+  { to: "/reports", label: "Raporte" },
 ];
 
 export const adminNavItems = [

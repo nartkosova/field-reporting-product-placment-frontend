@@ -1,28 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
+import { User, Store } from "../../types/reportInterface";
+import { PodravkaFacingReport } from "../../types/podravkaFacingInterface";
 import podravkaFacingsService from "../../services/podravkaFacingsService";
 import userService from "../../services/userService";
-import storeServices from "../../services/storeServices";
-import ReportTable, { FacingTable } from "./ReportTable";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { User, Store } from "../../types/reportInterface";
-import ReportChart from "./ReportChart";
+import storeService from "../../services/storeServices";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
+import ProductFacingsReportTable from "./ProductFacingsReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
 
-const ReportHeader = () => {
+const ProductFacingsReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
-  const [facings, setFacings] = useState<FacingTable[]>([]);
+  const [facings, setFacings] = useState<PodravkaFacingReport[]>([]);
   const { categories: productCategories } = useProductCategories();
+
   useEffect(() => {
     const fetchInitialData = async () => {
       const [userList, storeList] = await Promise.all([
         userService.getAllUsers(),
-        storeServices.getStoresWithUserId(),
+        storeService.getStoresWithUserId(),
       ]);
-
       setUsers(userList);
       setStores(storeList);
     };
@@ -44,12 +44,12 @@ const ReportHeader = () => {
     {
       key: "user_ids",
       options: userOptions,
-      placeholder: "Zgjedh raportuesin",
+      placeholder: "Zgjidh përdoruesin",
     },
     {
       key: "store_ids",
       options: storeOptions,
-      placeholder: "Zgjedh marketet",
+      placeholder: "Zgjidh dyqanin",
       className: "md:w-1/2 w-full",
     },
     {
@@ -61,16 +61,6 @@ const ReportHeader = () => {
       placeholder: "Zgjedh kategorinë",
     },
   ];
-
-  const competitorColumns = useMemo(() => {
-    const names = new Set<string>();
-    facings.forEach((f) => {
-      Object.entries(f.competitors || {}).forEach(([brand, count]) => {
-        if (Number(count) > 0) names.add(brand);
-      });
-    });
-    return Array.from(names);
-  }, [facings]);
 
   const fetchData = useCallback(
     async (pageSize: number, offset: number, filters: Record<string, any>) => {
@@ -85,9 +75,9 @@ const ReportHeader = () => {
 
       const query: Record<string, string | string[]> = {};
 
-      if (user_ids?.length > 0) query.user_id = user_ids;
-      if (store_ids?.length > 0) query.store_id = store_ids;
-      if (categories?.length > 0) query.category = categories;
+      if (user_ids?.length > 0) query.user_ids = user_ids;
+      if (store_ids?.length > 0) query.store_ids = store_ids;
+      if (categories?.length > 0) query.categories = categories;
 
       if (start_date && end_date) {
         query.start_date = start_date;
@@ -101,14 +91,13 @@ const ReportHeader = () => {
         query.end_date = end.toISOString().split("T")[0];
       }
 
-      const res =
-        await podravkaFacingsService.getPodravkaFacingsWithCompetitors(
-          query,
-          pageSize,
-          offset
-        );
+      const res = await podravkaFacingsService.getPodravkaFacingsReport(
+        query,
+        pageSize,
+        offset
+      );
 
-      const typedData = res.data as FacingTable[];
+      const typedData = res.data as PodravkaFacingReport[];
       setFacings(typedData);
 
       return {
@@ -120,28 +109,19 @@ const ReportHeader = () => {
   );
 
   const handleExportExcel = () => {
-    const dataToExport = facings.map((row) => {
-      const competitors = competitorColumns.reduce((acc, brand) => {
-        acc[brand] = row.competitors[brand] ?? 0;
-        return acc;
-      }, {} as Record<string, number>);
+    const dataToExport = facings.map((row) => ({
+      Product: row.product_name,
+      Category: row.product_category,
+      "Podravka Facings": row.facings_count,
+      Date: new Date(row.created_at).toLocaleDateString(),
+      Location: row.location,
+      Store: row.store_name,
+      Reporter: row.reported_by,
+    }));
 
-      return {
-        User: row.user,
-        Store: row.store_name,
-        Category: row.category,
-        "Podravka Facings": row.total_facings,
-        ...competitors,
-        "Total Competitor Facings": Object.values(row.competitors).reduce(
-          (sum, val) => sum + Number(val),
-          0
-        ),
-        Date: new Date(row.created_at).toLocaleDateString(),
-      };
-    });
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Facings Report");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Podravka Report");
 
     const blob = XLSX.write(workbook, {
       bookType: "xlsx",
@@ -156,21 +136,21 @@ const ReportHeader = () => {
 
     saveAs(
       new Blob([buf], { type: "application/octet-stream" }),
-      `facings_report_${Date.now()}.xlsx`
+      `podravka_report_${Date.now()}.xlsx`
     );
   };
 
   return (
     <div className="py-4">
       <GenericReportHeader
-        title="Raportet PPL"
+        title="Raporti i Podravkës"
         filtersConfig={filterConfigs}
         fetchData={fetchData}
         renderTable={(data) => (
-          <>
-            <ReportTable data={data} competitorColumns={competitorColumns} />
-            <ReportChart data={data} />
-          </>
+          <ProductFacingsReportTable
+            data={data as PodravkaFacingReport[]}
+            categories={productCategories}
+          />
         )}
         exportExcel={handleExportExcel}
       />
@@ -178,4 +158,4 @@ const ReportHeader = () => {
   );
 };
 
-export default ReportHeader;
+export default ProductFacingsReportHeader;

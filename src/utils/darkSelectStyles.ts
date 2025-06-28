@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const darkSelectStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -43,4 +44,4 @@ const darkSelectStyles = {
   }),
 };
 
-export default darkSelectStyles; 
+export default darkSelectStyles;

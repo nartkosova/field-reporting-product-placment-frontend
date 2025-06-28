@@ -45,3 +45,19 @@ export interface QueuedPodravkaBatch {
   };
   facings: PodravkaFacingInput[];
 }
+
+export interface PodravkaFacingReport {
+  podravka_facings_id: number;
+  facings_count: number;
+  created_at: string;
+  facing_category: string;
+  product_name: string;
+  business_unit: string;
+  product_category: string;
+  weight: number | null;
+  product_category_rank?: number;
+  store_name: string;
+  sales_rep: string;
+  location: string;
+  reported_by: string;
+}

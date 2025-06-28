@@ -5,7 +5,10 @@ import {
   getCachedStoreProducts,
   isOnline,
 } from "../utils/cacheManager";
-import { PodravkaProduct } from "../types/productInterface";
+import {
+  PodravkaProduct,
+  PodravkaProductWithRanking,
+} from "../types/productInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -35,7 +38,7 @@ const createPodravkaProduct = async (data: PodravkaProduct) => {
 
 const updatePodravkaProduct = async (
   productId: number,
-  data: PodravkaProduct
+  data: PodravkaProductWithRanking
 ) => {
   const token = getToken();
   const response = await axios.put(
@@ -123,7 +126,7 @@ const getProducts = async () => {
   return response.data;
 };
 
-export const getProductsByStoreId = async (storeId: number) => {
+const getProductsByStoreId = async (storeId: number) => {
   const token = getToken();
 
   if (!isOnline() || localStorage.getItem(`store_${storeId}_products`)) {
@@ -147,14 +150,49 @@ export const getProductsByStoreId = async (storeId: number) => {
   return products;
 };
 
+const getProductCategories = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/api/products/categories`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+const getProductsByIdWithRanking = async (
+  productId: number
+): Promise<PodravkaProductWithRanking | null> => {
+  const token = getToken();
+
+  try {
+    const response = await axios.get(`${baseUrl}/api/products/${productId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const product = response.data as PodravkaProductWithRanking;
+
+    return {
+      ...product,
+      year: product.year ?? 2024,
+      total_rank: product.total_rank ?? 0,
+      category_rank: product.category_rank ?? 0,
+      sales_last_year: product.sales_last_year ?? 0,
+    };
+  } catch (error) {
+    console.error("Failed to fetch product with ranking:", error);
+    return null;
+  }
+};
+
 export default {
   getCompetitorProducts,
   getProducts,
   getProductsByStoreId,
+  getProductsByIdWithRanking,
   createPodravkaProduct,
   updatePodravkaProduct,
   deletePodravkaProduct,
   createCompetitorProduct,
   updateCompetitorProduct,
   deleteCompetitorProduct,
+  getProductCategories,
 };

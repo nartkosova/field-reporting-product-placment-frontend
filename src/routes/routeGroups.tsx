@@ -33,6 +33,7 @@ import ReportHeader from "../pages/ReportView/ReportHeader";
 import CreatePodravkaProduct from "../pages/Features/PodravkaProducts/CreatePodravkaProduct";
 import UpdatePodravkaProduct from "../pages/Features/PodravkaProducts/UpdatePodravkaProducts";
 import PodravkaProductList from "../pages/Features/PodravkaProducts/PodravkaProductList";
+import ProductFacingsReportHeader from "../pages/ProductFacingsReport/ProductFacingsReportHeader";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -198,5 +199,9 @@ export const reportRoutes: RouteObject[] = [
   {
     path: "/reports/ppl-reports",
     element: <ReportHeader />,
+  },
+  {
+    path: "/reports/product-facings",
+    element: <ProductFacingsReportHeader />,
   },
 ];

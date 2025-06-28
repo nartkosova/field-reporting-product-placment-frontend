@@ -27,6 +27,13 @@ export interface PodravkaProduct {
   weight: number;
 }
 
+export interface PodravkaProductWithRanking extends PodravkaProduct {
+  year?: number;
+  total_rank?: number;
+  category_rank?: number;
+  sales_last_year?: number;
+}
+
 export interface BrandCategory {
   competitor_id: number;
   brand_name: string;

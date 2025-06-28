@@ -3,7 +3,7 @@ import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import { BaseTable } from "../../components/BaseTable/BaseTable";
 import { getFacingTotals } from "../../utils/getFacingTotals";
 
-interface FacingTable {
+export interface FacingTable {
   user: string;
   store_name: string;
   category: string;

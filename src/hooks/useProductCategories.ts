@@ -10,7 +10,7 @@ export const useProductCategories = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const products = (await productServices.getProducts()) as {
+        const products = (await productServices.getProductCategories()) as {
           category: string;
           business_unit?: string;
         }[];

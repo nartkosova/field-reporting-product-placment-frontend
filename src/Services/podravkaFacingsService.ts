@@ -54,6 +54,34 @@ const getUserPPLBatches = async () => {
   return response.data;
 };
 
+const getPodravkaFacingsReport = async (
+  filters: Record<string, string | string[]> = {},
+  limit = 50,
+  offset = 0
+) => {
+  const token = getToken();
+
+  const { user_ids, store_ids, ...rest } = filters;
+
+  const allParams = {
+    ...rest,
+    ...(user_ids ? { user_id: user_ids } : {}),
+    ...(store_ids ? { store_id: store_ids } : {}),
+    limit,
+    offset,
+  };
+
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/report`,
+    {
+      params: allParams,
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
+  return response.data;
+};
+
 const batchCreatePodravkaFacings = async (
   facingDataArray: PodravkaFacingInput[]
 ) => {
@@ -104,6 +132,7 @@ export default {
   getPodravkaFacingsWithCompetitors,
   getPodravkaFacingsByBatchId,
   getUserPPLBatches,
+  getPodravkaFacingsReport,
   batchCreatePodravkaFacings,
   updatePodravkaBatch,
   deletePodravkaFacingBatch,

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 
 export interface BatchFacingsConfig<TMeta, TInput> {
@@ -16,6 +17,7 @@ export const useBatchFacings = <
   batchId: string,
   config: BatchFacingsConfig<TMeta, TInput>
 ) => {
+  const navigate = useNavigate();
   const [meta, setMeta] = useState<(TMeta & { label: string; _key: string })[]>(
     []
   );
@@ -65,7 +67,8 @@ export const useBatchFacings = <
         config.makePayload(item, counts[config.makeKey(item)] ?? 0)
       );
       await config.submitBatch(batchId, payload);
-      alert("Facings përditësuan me sukses!");
+      alert("Përditësimi u krye me sukses.");
+      navigate(-1);
     } catch (err) {
       const msg =
         (err as AxiosError<{ error: string }>)?.response?.data?.error ??
@@ -74,7 +77,7 @@ export const useBatchFacings = <
     } finally {
       setSubmitting(false);
     }
-  }, [meta, counts, batchId, config]);
+  }, [meta, counts, batchId, config, navigate]);
 
   return { meta, counts, loading, submitting, total, change, submit };
 };
