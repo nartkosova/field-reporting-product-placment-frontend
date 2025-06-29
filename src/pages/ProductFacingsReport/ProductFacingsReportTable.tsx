@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
 import { useMemo } from "react";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import { BaseTable } from "../../components/BaseTable/BaseTable";
@@ -20,17 +21,30 @@ const ProductFacingsReportTable = ({ data }: Props) => {
           const row = info.row.original;
           const name = row.product_name;
           const rank = row.product_category_rank;
-          return `${name}${rank ? ` (${rank})` : ""}`;
+          const percentage = row.category_sales_share;
+
+          const rankText = rank ? ` (${rank}` : "";
+          const percentText =
+            percentage != null
+              ? `${rank ? " - " : " ("}${(percentage * 100).toFixed(1)}%`
+              : "";
+          const suffix = rankText || percentText ? ")" : "";
+
+          return `${name}${
+            rankText || percentText ? rankText + percentText + suffix : ""
+          }`;
         },
       }),
       columnHelper.accessor("facings_count", {
         header: "Facings",
-        cell: (info) => info.getValue().toString(),
+        cell: (info) => {
+          const count = info.getValue();
+          const percentage = info.row.original.facing_percentage_in_category;
+          return `${count} (${percentage.toFixed(1)}%)`;
+        },
       }),
       columnHelper.accessor("product_category", { header: "Kategoria" }),
       columnHelper.accessor("store_name", { header: "Dyqani" }),
-      columnHelper.accessor("sales_rep", { header: "Përfaqësuesi" }),
-      columnHelper.accessor("location", { header: "Lokacioni" }),
       columnHelper.accessor("reported_by", { header: "Raportuar nga" }),
       columnHelper.accessor("created_at", {
         header: "Data",

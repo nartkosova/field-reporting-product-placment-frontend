@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import SubmitButton from "../Buttons/SubmitButton";
 import darkSelectStyles from "../../utils/darkSelectStyles";
+import React from "react";
 
 interface Field {
   name: string;
@@ -29,7 +29,7 @@ export function CreateUpdateForm({
   fields,
   onSubmit,
   initialValues = {},
-  submitText = "Submit",
+  submitText = "Vazhdo",
 }: CreateUpdateFormProps) {
   const [formState, setFormState] =
     useState<Record<string, string | number | (string | number)[]>>(
@@ -64,14 +64,15 @@ export function CreateUpdateForm({
       navigate(-1);
     } catch (err: unknown) {
       console.error("Submit error:", err);
-      if (typeof err === "object" && err && "response" in err) {
+
+      if (err instanceof Error && err.message) {
+        alert(err.message);
+      } else if (typeof err === "object" && err && "response" in err) {
         const res = err as { response?: { data?: { error?: string } } };
         alert(res.response?.data?.error || "Error, provo perseri.");
       } else {
         alert("Error, provo perseri.");
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

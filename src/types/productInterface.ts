@@ -32,6 +32,7 @@ export interface PodravkaProductWithRanking extends PodravkaProduct {
   total_rank?: number;
   category_rank?: number;
   sales_last_year?: number;
+  category_sales_share?: number;
 }
 
 export interface BrandCategory {

@@ -7,6 +7,7 @@ import Select from "react-select";
 import productServices from "../../services/productServices";
 import { useSelectedStore } from "../../hooks/useSelectStore";
 import { NavButton } from "../NavButton/NavButton";
+import React from "react";
 interface CategorySelectorProps {
   routeBase: string;
   buttonLinks: {

@@ -1,5 +1,6 @@
 import React from "react";
 import SubmitButton from "../Buttons/SubmitButton";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 interface Entry {
   id: number | string;
@@ -38,7 +39,7 @@ const FacingsForm = ({
       </p>
 
       {productsLoading ? (
-        <p className="text-gray-400">Duke i ngarkuar produktet...</p>
+        <LoadingSpinner text="Duke i ngarkuar produktet..." />
       ) : (
         <form onSubmit={onSubmit} className="space-y-6">
           {entries.map((entry) => (

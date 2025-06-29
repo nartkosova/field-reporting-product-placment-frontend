@@ -2,15 +2,17 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../components/Buttons/ActionButtons";
 import { getInitials } from "../../utils/utils";
+import { useUser } from "../../hooks/useUser";
 
 const Header: React.FC = () => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}") || {};
+  const { user, clearUser } = useUser();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    localStorage.removeItem("userInfo");
+    clearUser();
     localStorage.removeItem("selectedCategory");
+    localStorage.removeItem("selectedStore");
     navigate("/login");
   };
 
@@ -32,10 +34,10 @@ const Header: React.FC = () => {
         </div>
         <div className="flex items-center space-x-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 flex items-center justify-center text-gray-100 font-semibold text-sm border border-neutral-600 shadow-inner">
-            {getInitials(userInfo.user || userInfo.name || "")}
+            {getInitials(user?.user || user?.name || "")}
           </div>
           <span className="hidden sm:block text-md font-medium text-gray-200 truncate max-w-[120px]">
-            {userInfo.user || userInfo.name || "User"}
+            {user?.user || user?.name || "User"}
           </span>
           <ActionButton
             onClick={handleLogout}

@@ -1,3 +1,4 @@
+import React from "react";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
@@ -17,7 +18,6 @@ const CreatePodravkaProduct = () => {
       product_category: data.product_category as string,
       weight: data.weight as number,
       business_unit: data.business_unit as string,
-      // created_by: userInfo?.id,  // <--- check schema
     };
 
     await productServices.createPodravkaProduct(payload);
@@ -54,7 +54,12 @@ const CreatePodravkaProduct = () => {
             },
             { name: "podravka_code", label: "Kodi Podravka" },
             { name: "elkos_code", label: "Kodi Elkos", type: "number" },
-            { name: "weight", label: "Pesha (Kg)", type: "number", step: "0.01" },
+            {
+              name: "weight",
+              label: "Pesha (Kg)",
+              type: "number",
+              step: "0.01",
+            },
           ]}
           onSubmit={handleSubmit}
         />

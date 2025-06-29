@@ -1,6 +1,7 @@
 import { EntityList } from "../../../components/EntityList/EntityList";
 import storeServices from "../../../services/storeServices";
 import { Store } from "../../../types/storeInterface";
+import React from "react";
 
 const Stores = () => {
   return (

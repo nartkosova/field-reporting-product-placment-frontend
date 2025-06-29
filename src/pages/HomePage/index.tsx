@@ -3,6 +3,7 @@ import { userNavItems, adminNavItems } from "./HomePageFields";
 import { useSelectedStore } from "../../hooks/useSelectStore";
 import { NavButton } from "../../components/NavButton/NavButton";
 import { getInitials } from "../../utils/utils";
+import React from "react";
 
 const HomePage: React.FC = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");

@@ -9,6 +9,8 @@ import { Product } from "../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../services/productServices";
 import SubmitButton from "../../components/Buttons/SubmitButton";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import React from "react";
 
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -94,7 +96,7 @@ const PriceCheckPodravka = () => {
     <div className="flex flex-col p-6 max-w-xl mx-auto space-y-4">
       <h2 className="text-2xl font-semibold">Submit Podravka Prices</h2>
       {productsLoading ? (
-        <p>Loading products...</p>
+        <LoadingSpinner text="Loading products..." />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           {products.map((product) => (

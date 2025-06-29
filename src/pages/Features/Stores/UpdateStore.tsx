@@ -6,6 +6,9 @@ import { StoreInput } from "../../../types/storeInterface";
 import { userFields } from "./StoreFields";
 import userService from "../../../services/userService";
 import { UserInput } from "../../../types/userInterface";
+import React from "react";
+import { AxiosError } from "axios";
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdateStore = () => {
   const { id } = useParams<{ id: string }>();
@@ -67,20 +70,28 @@ const UpdateStore = () => {
       store_name: data.store_name as string,
       location: data.location as string,
       store_category: data.store_category as string,
-      store_code: data.store_code as number,
+      store_code: Number(data.store_code),
       store_channel: data.store_channel as string,
-      user_id: data.user_id as number,
+      user_id: Number(data.user_id),
       sales_rep: data.sales_rep as string,
     };
 
-    await storeServices.updateStore(Number(id), payload);
+    try {
+      await storeServices.updateStore(Number(id), payload);
+    } catch (err) {
+      console.error("Gabim gjatë përditësimit", err);
+      const axiosError = err as AxiosError<{ error: string }>;
+      throw new Error(
+        axiosError.response?.data?.error || "Gabim gjatë përditësimit."
+      );
+    }
   };
 
   return (
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         {loading ? (
-          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+          <LoadingSpinner className="mt-10" />
         ) : (
           <CreateUpdateForm
             title="Përditëso Dyqanin"

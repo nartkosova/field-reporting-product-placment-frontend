@@ -4,6 +4,8 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import { AxiosError } from "axios";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
+import React from "react";
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdatePodravkaProduct = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +38,7 @@ const UpdatePodravkaProduct = () => {
           total_rank: product.total_rank ?? "",
           category_rank: product.category_rank ?? "",
           sales_last_year: product.sales_last_year ?? "",
+          category_sales_share: product.category_sales_share ?? "",
           year: product.year ?? 2024,
         });
       } catch (err) {
@@ -73,13 +76,17 @@ const UpdatePodravkaProduct = () => {
         sales_last_year: data.sales_last_year
           ? Number(data.sales_last_year)
           : undefined,
+        category_sales_share: data.category_sales_share
+          ? Number(data.category_sales_share)
+          : undefined,
         year: data.year ? Number(data.year) : 2024,
       });
-      alert("Produkti u përditësua me sukses.");
     } catch (err) {
       console.error("Gabim gjatë përditësimit", err);
       const axiosError = err as AxiosError<{ error: string }>;
-      alert(axiosError.response?.data?.error || "Gabim gjatë përditësimit.");
+      throw new Error(
+        axiosError.response?.data?.error || "Gabim gjatë përditësimit."
+      );
     }
   };
 
@@ -87,7 +94,7 @@ const UpdatePodravkaProduct = () => {
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         {loading ? (
-          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+          <LoadingSpinner className="mt-10" />
         ) : (
           <CreateUpdateForm
             title="Përditëso Produktin Podravka"
@@ -152,8 +159,14 @@ const UpdatePodravkaProduct = () => {
                 step: "0.01",
               },
               {
+                name: "category_sales_share",
+                label: "Pjesa e tregut në kategori",
+                type: "number",
+                step: "0.01",
+              },
+              {
                 name: "year",
-                label: "Viti",
+                label: "Viti i shitjes",
                 type: "number",
                 step: "1",
               },

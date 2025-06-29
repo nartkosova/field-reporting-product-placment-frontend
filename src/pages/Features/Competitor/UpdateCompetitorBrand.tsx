@@ -5,6 +5,8 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import { AxiosError } from "axios";
 import { competitorFields } from "./CompetitorFields";
 import { useProductCategories } from "../../../hooks/useProductCategories";
+import React from "react";
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdateCompetitorBrand = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,13 +49,12 @@ const UpdateCompetitorBrand = () => {
         brand_name: data.brand_name as string,
         categories: data.categories as string[],
       });
-      alert("Konkurrenca u përditësua me sukses.");
     } catch (err) {
       console.error("Error updating brand", err);
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Gabim gjatë përditësimit.";
-      alert(backendMessage);
+      throw new Error(backendMessage);
     }
   };
 
@@ -61,7 +62,7 @@ const UpdateCompetitorBrand = () => {
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         {loading ? (
-          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+          <LoadingSpinner className="mt-10" />
         ) : (
           <CreateUpdateForm
             title="Përditëso Konkurrencën"

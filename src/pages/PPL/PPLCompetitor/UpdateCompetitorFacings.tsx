@@ -7,6 +7,7 @@ import {
   CompetitorFacingInput,
 } from "../../../types/podravkaFacingInterface";
 import competitorFacingsService from "../../../services/competitorFacingsService";
+import React from "react";
 
 const UpdateCompetitorFacingsPage = () => {
   const { batchId = "" } = useParams();
@@ -34,7 +35,7 @@ const UpdateCompetitorFacingsPage = () => {
           facings,
         }),
     }),
-    [batchId]
+    []
   );
 
   const hook = useBatchFacings<CompetitorFacingWithMeta, CompetitorFacingInput>(

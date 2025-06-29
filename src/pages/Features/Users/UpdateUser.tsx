@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import userService from "../../../services/userService";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { AxiosError } from "axios";
 import { updateUserFields } from "./userFields";
+import React from "react";
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+
 const UpdateUser = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState<Record<string, string>>(
     {}
   );
@@ -46,14 +48,12 @@ const UpdateUser = () => {
         password: data.password as string,
         role: data.role as string,
       });
-      alert("Përdoruesi u përditësua me sukses.");
-      navigate(`/settings/edit/users`);
     } catch (err) {
       console.error("Error updating user", err);
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Gabim gjatë përditësimit.";
-      alert(backendMessage);
+      throw new Error(backendMessage);
     }
   };
 
@@ -61,7 +61,7 @@ const UpdateUser = () => {
     <div className="w-full flex items-center justify-center bg-black p-0 sm:p-0">
       <div className="max-w-2xl w-full">
         {loading ? (
-          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+          <LoadingSpinner className="mt-10" />
         ) : (
           <CreateUpdateForm
             title="Përditëso Përdoruesin"

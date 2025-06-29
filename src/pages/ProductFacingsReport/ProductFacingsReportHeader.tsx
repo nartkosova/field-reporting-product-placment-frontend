@@ -10,6 +10,7 @@ import storeService from "../../services/storeServices";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import ProductFacingsReportTable from "./ProductFacingsReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
+import React from "react";
 
 const ProductFacingsReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -114,7 +115,6 @@ const ProductFacingsReportHeader = () => {
       Category: row.product_category,
       "Podravka Facings": row.facings_count,
       Date: new Date(row.created_at).toLocaleDateString(),
-      Location: row.location,
       Store: row.store_name,
       Reporter: row.reported_by,
     }));

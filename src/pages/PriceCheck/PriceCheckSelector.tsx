@@ -1,4 +1,5 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
+import React from "react";
 
 const PriceCheckSelector = () => {
   return (

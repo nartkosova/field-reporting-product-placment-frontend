@@ -1,3 +1,4 @@
+import React from "react";
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
 
 const PhotoSelector = () => {

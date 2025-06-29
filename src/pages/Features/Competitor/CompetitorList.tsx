@@ -1,3 +1,4 @@
+import React from "react";
 import { EntityList } from "../../../components/EntityList/EntityList";
 import competitorServices from "../../../services/competitorServices";
 

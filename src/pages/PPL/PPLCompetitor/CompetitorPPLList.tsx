@@ -3,6 +3,7 @@ import { EntityList } from "../../../components/EntityList/EntityList";
 import competitorFacingsService from "../../../services/competitorFacingsService";
 import { formattedDate } from "../../../utils/utils";
 import { Batch } from "../../../types/podravkaFacingInterface";
+import React from "react";
 
 const CompetitorPPLEditor = () => {
   return (

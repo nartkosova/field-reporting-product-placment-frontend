@@ -6,6 +6,8 @@ import { AxiosError } from "axios";
 import { CompetitorProduct } from "../../../types/productInterface";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
+import React from "react";
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdateCompetitorProduct = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,13 +74,12 @@ const UpdateCompetitorProduct = () => {
         weight: data.weight ? Number(data.weight) : undefined,
         competitor_id: Number(data.competitor_id),
       });
-      alert("Produkti u përditësua me sukses.");
     } catch (err) {
       console.error("Gabim gjatë përditësimit", err);
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Gabim gjatë përditësimit.";
-      alert(backendMessage);
+      throw new Error(backendMessage);
     }
   };
 
@@ -86,7 +87,7 @@ const UpdateCompetitorProduct = () => {
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         {loading ? (
-          <p className="text-center text-white mt-10">Duke u ngarkuar...</p>
+          <LoadingSpinner className="mt-10" />
         ) : (
           <CreateUpdateForm
             title="Përditëso Produktin"

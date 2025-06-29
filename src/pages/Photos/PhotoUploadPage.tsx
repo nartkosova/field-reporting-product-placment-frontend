@@ -8,6 +8,8 @@ import { useSelectedStore } from "../../hooks/useSelectStore";
 import ActionButton from "../../components/Buttons/ActionButtons";
 import { isOnline } from "../../utils/cacheManager";
 import { queuePhoto } from "../../db/db";
+import React from "react";
+
 interface Props {
   photoType: PhotoInput["photo_type"];
 }

@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { formattedDate } from "../../utils/utils";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import React from "react";
+import { useErrorHandler } from "../../hooks/useErrorHandler";
+import { BaseEntity } from "../../types/common";
 
-export interface Entity {
-  id: number;
-  name: string;
+export interface Entity extends BaseEntity {
   role?: string;
-  created_at?: string;
-  created_by?: string;
   category?: string;
 }
 
@@ -32,8 +32,9 @@ export const EntityList = <T extends Entity>({
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { handleError } = useErrorHandler();
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       const data = await fetchAll();
       setItems(data);
@@ -43,21 +44,21 @@ export const EntityList = <T extends Entity>({
       const backendMessage =
         axiosError.response?.data?.error ||
         `Gabim gjatë ngarkimit të ${title.toLowerCase()}.`;
-      alert(backendMessage);
+      handleError(backendMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchAll, title, handleError]);
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [fetchItems]);
 
   const handleEdit = (id: number) => {
     navigate(`${editPath}/${id}`);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!onDelete) return;
     const confirm = window.confirm(
       `A jeni të sigurt që dëshironi të fshini këtë ${itemLabel}?`
@@ -76,15 +77,15 @@ export const EntityList = <T extends Entity>({
       const backendMessage =
         axiosError.response?.data?.error ||
         `Gabim gjatë fshirjes së ${itemLabel}.`;
-      alert(backendMessage);
+      handleError(backendMessage);
     }
-  };
+  }, [onDelete, itemLabel, fetchItems, handleError]);
 
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6 w-full">
       <h2 className="text-2xl font-bold text-white mb-6">{title}</h2>
       {loading ? (
-        <div className="text-gray-400">Loading...</div>
+        <LoadingSpinner />
       ) : items.length === 0 ? (
         <div className="text-gray-400">Nuk ka të dhëna.</div>
       ) : (

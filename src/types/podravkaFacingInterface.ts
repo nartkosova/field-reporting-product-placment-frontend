@@ -56,8 +56,8 @@ export interface PodravkaFacingReport {
   product_category: string;
   weight: number | null;
   product_category_rank?: number;
+  category_sales_share?: number;
   store_name: string;
-  sales_rep: string;
-  location: string;
   reported_by: string;
+  facing_percentage_in_category: number;
 }

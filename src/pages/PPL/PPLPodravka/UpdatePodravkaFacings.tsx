@@ -7,6 +7,7 @@ import {
   PodravkaFacingWithMeta,
   PodravkaFacingInput,
 } from "../../../types/podravkaFacingInterface";
+import React from "react";
 
 const UpdatePodravkaFacingsPage = () => {
   const { batchId = "" } = useParams();

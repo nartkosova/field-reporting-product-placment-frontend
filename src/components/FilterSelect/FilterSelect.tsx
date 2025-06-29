@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Select from "react-select";
 import darkSelectStyles from "../../utils/darkSelectStyles";
+import React from "react";
 
 interface Option {
   value: string;

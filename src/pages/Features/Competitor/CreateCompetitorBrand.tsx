@@ -2,6 +2,8 @@ import competitorServices from "../../../services/competitorServices";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { competitorFields } from "./CompetitorFields";
 import { useProductCategories } from "../../../hooks/useProductCategories";
+import React from "react";
+
 const CreateCompetitorBrand = () => {
   const { categories } = useProductCategories();
 

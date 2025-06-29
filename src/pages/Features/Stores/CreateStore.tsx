@@ -5,6 +5,7 @@ import { StoreInput } from "../../../types/storeInterface";
 import userService from "../../../services/userService";
 import { UserInput } from "../../../types/userInterface";
 import { userFields } from "./StoreFields";
+import React from "react";
 
 const CreateStorePage = () => {
   const [userOptions, setUserOptions] = useState<

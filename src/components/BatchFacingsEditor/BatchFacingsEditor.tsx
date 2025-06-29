@@ -1,5 +1,6 @@
 import SubmitButton from "../Buttons/SubmitButton";
-
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import React from "react";
 type HookResult = {
   meta: { facings_count: number; label: string; _key: string }[];
   counts: Record<string, number>;
@@ -23,7 +24,7 @@ export const BatchFacingsEditor = ({ title, hook }: Props) => {
       <h2 className="text-2xl font-bold text-white">{title}</h2>
 
       {loading ? (
-        <p className="text-gray-400">Duke u ngarkuar...</p>
+        <LoadingSpinner />
       ) : (
         <form
           onSubmit={(e) => {

@@ -7,6 +7,7 @@ import { useSelectedStore } from "../../../hooks/useSelectStore";
 import { queueFacings } from "../../../db/db";
 import { isOnline } from "../../../utils/cacheManager";
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
+import React from "react";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);

@@ -10,6 +10,7 @@ import {
   queueCompetitorFacings,
 } from "../../../db/db";
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
+import React from "react";
 
 interface CompetitorEntry {
   id?: number;
