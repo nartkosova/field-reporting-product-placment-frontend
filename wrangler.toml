@@ -1,0 +1,6 @@
+name = "ppl"
+compatibility_date = "2025-06-30"
+
+[site]
+bucket = "./dist"
+entry-point = "."

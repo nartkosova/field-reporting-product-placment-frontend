@@ -1,4 +1,3 @@
-import React from "react";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import { ButtonVariant } from "../../types/common";
 

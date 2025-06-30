@@ -10,7 +10,6 @@ import { User, Store } from "../../types/reportInterface";
 import ReportChart from "./ReportChart";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import { useProductCategories } from "../../hooks/useProductCategories";
-import React from "react";
 
 const ReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);

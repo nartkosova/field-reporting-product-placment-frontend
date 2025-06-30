@@ -10,7 +10,6 @@ import { AxiosError } from "axios";
 import productServices from "../../services/productServices";
 import SubmitButton from "../../components/Buttons/SubmitButton";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
-import React from "react";
 
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);

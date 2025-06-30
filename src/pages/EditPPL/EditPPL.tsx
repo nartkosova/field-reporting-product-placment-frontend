@@ -1,6 +1,5 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
 import { editPPLFields } from "./EditPPLFields";
-import React from "react";
 
 const EditPPL = () => {
   return (

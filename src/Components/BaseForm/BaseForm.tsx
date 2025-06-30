@@ -1,4 +1,3 @@
-import React from "react";
 import SubmitButton from "../Buttons/SubmitButton";
 
 interface Field {

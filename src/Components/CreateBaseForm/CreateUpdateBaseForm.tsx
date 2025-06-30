@@ -3,7 +3,6 @@ import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import SubmitButton from "../Buttons/SubmitButton";
 import darkSelectStyles from "../../utils/darkSelectStyles";
-import React from "react";
 
 interface Field {
   name: string;

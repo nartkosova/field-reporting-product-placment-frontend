@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { formattedDate } from "../../utils/utils";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import React from "react";
+
 import { useErrorHandler } from "../../hooks/useErrorHandler";
 import { BaseEntity } from "../../types/common";
 
@@ -58,28 +58,31 @@ export const EntityList = <T extends Entity>({
     navigate(`${editPath}/${id}`);
   };
 
-  const handleDelete = useCallback(async (id: number) => {
-    if (!onDelete) return;
-    const confirm = window.confirm(
-      `A jeni të sigurt që dëshironi të fshini këtë ${itemLabel}?`
-    );
-    if (!confirm) return;
-
-    try {
-      await onDelete(id);
-      fetchItems();
-      alert(
-        `${itemLabel[0].toUpperCase() + itemLabel.slice(1)} u fshi me sukses.`
+  const handleDelete = useCallback(
+    async (id: number) => {
+      if (!onDelete) return;
+      const confirm = window.confirm(
+        `A jeni të sigurt që dëshironi të fshini këtë ${itemLabel}?`
       );
-    } catch (err) {
-      console.error(`Gabim gjatë fshirjes së ${itemLabel}:`, err);
-      const axiosError = err as AxiosError<{ error: string }>;
-      const backendMessage =
-        axiosError.response?.data?.error ||
-        `Gabim gjatë fshirjes së ${itemLabel}.`;
-      handleError(backendMessage);
-    }
-  }, [onDelete, itemLabel, fetchItems, handleError]);
+      if (!confirm) return;
+
+      try {
+        await onDelete(id);
+        fetchItems();
+        alert(
+          `${itemLabel[0].toUpperCase() + itemLabel.slice(1)} u fshi me sukses.`
+        );
+      } catch (err) {
+        console.error(`Gabim gjatë fshirjes së ${itemLabel}:`, err);
+        const axiosError = err as AxiosError<{ error: string }>;
+        const backendMessage =
+          axiosError.response?.data?.error ||
+          `Gabim gjatë fshirjes së ${itemLabel}.`;
+        handleError(backendMessage);
+      }
+    },
+    [onDelete, itemLabel, fetchItems, handleError]
+  );
 
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6 w-full">

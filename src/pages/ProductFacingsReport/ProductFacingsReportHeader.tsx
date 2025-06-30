@@ -10,7 +10,6 @@ import storeService from "../../services/storeServices";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import ProductFacingsReportTable from "./ProductFacingsReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
-import React from "react";
 
 const ProductFacingsReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);

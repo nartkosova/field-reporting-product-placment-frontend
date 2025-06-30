@@ -1,7 +1,6 @@
 import { EntityList } from "../../../components/EntityList/EntityList";
 import userService from "../../../services/userService";
 import { UserInput } from "../../../types/userInterface";
-import React from "react";
 
 const UserList = () => {
   return (

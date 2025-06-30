@@ -1,13 +1,4 @@
-import React from "react";
-
-type Variant =
-  | "primary"
-  | "secondary"
-  | "danger"
-  | "outline"
-  | "gray"
-  | "icon"
-  | "fut";
+type Variant = "primary" | "secondary" | "danger" | "gray" | "icon" | "fut";
 
 type ActionButtonProps = {
   onClick?: () => void;
@@ -27,8 +18,7 @@ const variantStyles: Record<Variant, string> = {
     "bg-neutral-900 text-gray-200 hover:bg-neutral-800 border border-neutral-800 cursor-pointer disabled:opacity-50",
   danger:
     "bg-red-600 text-white hover:bg-red-700 cursor-pointer disabled:opacity-50",
-  outline:
-    "border border-neutral-700 px-2 py-1 cursor-pointer rounded disabled:opacity-50 text-white bg-black hover:bg-neutral-900",
+
   gray: "bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 text-gray-100 px-4 py-2 rounded border border-neutral-600 shadow-inner hover:brightness-110 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
   icon: "p-2 cursor-pointer text-sm text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800",
   fut: "bg-neutral-900 text-white border-2 border-white font-bold px-6 py-2 rounded-lg shadow hover:bg-neutral-800 hover:border-neutral-400 transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",

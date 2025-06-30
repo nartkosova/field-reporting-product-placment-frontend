@@ -1,6 +1,5 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
 import { reportSelectorFields } from "./reportSelectorFields";
-import React from "react";
 
 const ReportSelector = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");

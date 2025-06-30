@@ -1,4 +1,3 @@
-import React from "react";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";

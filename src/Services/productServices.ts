@@ -26,6 +26,19 @@ const getCompetitorProducts = async (params: {
   return response.data;
 };
 
+const getProductsByCategory = async (
+  category: string
+): Promise<PodravkaProduct[]> => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/products/category/${category}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const createPodravkaProduct = async (data: PodravkaProduct) => {
   const token = getToken();
   const response = await axios.post(`${baseUrl}/api/products`, data, {
@@ -188,6 +201,7 @@ export default {
   getProducts,
   getProductsByStoreId,
   getProductsByIdWithRanking,
+  getProductsByCategory,
   createPodravkaProduct,
   updatePodravkaProduct,
   deletePodravkaProduct,

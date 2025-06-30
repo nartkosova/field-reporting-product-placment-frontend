@@ -2,7 +2,6 @@ import { EntityList } from "../../components/EntityList/EntityList";
 import photoService from "../../services/photoService";
 import { formattedDate } from "../../utils/utils";
 import { PhotoSchema } from "../../types/photoInterface";
-import React from "react";
 
 interface PhotoEntity {
   id: number;

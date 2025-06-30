@@ -6,7 +6,7 @@ import {
   SortingState,
   ColumnDef,
 } from "@tanstack/react-table";
-import React from "react";
+
 import { useState } from "react";
 
 interface Props<T> {

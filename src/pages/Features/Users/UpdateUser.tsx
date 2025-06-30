@@ -4,7 +4,7 @@ import userService from "../../../services/userService";
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { AxiosError } from "axios";
 import { updateUserFields } from "./userFields";
-import React from "react";
+
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdateUser = () => {

@@ -1,6 +1,5 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
 import { createLinks, editLinks } from "./selectCreateUpdateFields";
-import React from "react";
 
 const SelectCreateEdit = () => {
   return (

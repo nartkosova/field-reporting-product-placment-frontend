@@ -1,6 +1,6 @@
 import SubmitButton from "../Buttons/SubmitButton";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import React from "react";
+
 type HookResult = {
   meta: { facings_count: number; label: string; _key: string }[];
   counts: Record<string, number>;
@@ -20,7 +20,7 @@ export const BatchFacingsEditor = ({ title, hook }: Props) => {
   const { meta, counts, loading, submitting, total, change, submit } = hook;
 
   return (
-    <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-6">
+    <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-4">
       <h2 className="text-2xl font-bold text-white">{title}</h2>
 
       {loading ? (
@@ -31,7 +31,7 @@ export const BatchFacingsEditor = ({ title, hook }: Props) => {
             e.preventDefault();
             submit();
           }}
-          className="space-y-6"
+          className="space-y-4"
         >
           {meta.map((m) => {
             const key = m._key;

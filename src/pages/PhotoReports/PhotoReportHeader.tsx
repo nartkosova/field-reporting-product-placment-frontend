@@ -6,7 +6,6 @@ import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeade
 import { User, Store } from "../../types/reportInterface";
 import PhotoTable from "./PhotoReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
-import React from "react";
 
 const PhotoReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);

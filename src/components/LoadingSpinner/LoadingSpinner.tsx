@@ -1,4 +1,3 @@
-import React from "react";
 import { Size } from "../../types/common";
 
 type LoadingSpinnerProps = {

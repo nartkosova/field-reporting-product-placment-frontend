@@ -1,31 +1,18 @@
 import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdateBaseForm";
 import { userFields } from "./userFields";
 import userService from "../../../services/userService";
-import { AxiosError } from "axios";
-import React from "react";
 
 const CreateUserPage = () => {
   const handleSubmit = async (
     data: Record<string, string | number | (string | number)[]>
   ) => {
-    const { user, password, role } = data as {
-      user: string;
-      password: string;
-      role: string;
+    const payload = {
+      user: data.user as string,
+      password: data.password as string,
+      role: data.role as string,
     };
 
-    try {
-      const response = await userService.createUser({ user, password, role });
-      const successMessage =
-        response?.data?.message || "User eshte krijuar me sukses!";
-      alert(successMessage);
-    } catch (error) {
-      console.error("Error creating user:", error);
-      const axiosError = error as AxiosError<{ error: string }>;
-      const backendMessage =
-        axiosError.response?.data?.error || "Gabim gjatë krijimit të userit.";
-      alert(backendMessage);
-    }
+    await userService.createUser(payload);
   };
 
   return (

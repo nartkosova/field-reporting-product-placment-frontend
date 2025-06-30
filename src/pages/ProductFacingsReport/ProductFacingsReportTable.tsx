@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+
 import { useMemo } from "react";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import { BaseTable } from "../../components/BaseTable/BaseTable";

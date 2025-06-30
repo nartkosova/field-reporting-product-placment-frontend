@@ -4,7 +4,7 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import { AxiosError } from "axios";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
-import React from "react";
+
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdatePodravkaProduct = () => {

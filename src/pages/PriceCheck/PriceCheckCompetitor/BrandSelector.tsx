@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import competitorServices from "../../../services/competitorServices";
 import Select from "react-select";
-import React from "react";
 
 interface Brand {
   competitor_id: number;

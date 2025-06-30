@@ -6,7 +6,7 @@ import { StoreInput } from "../../../types/storeInterface";
 import { userFields } from "./StoreFields";
 import userService from "../../../services/userService";
 import { UserInput } from "../../../types/userInterface";
-import React from "react";
+
 import { AxiosError } from "axios";
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 

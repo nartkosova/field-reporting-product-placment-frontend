@@ -5,7 +5,7 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import { AxiosError } from "axios";
 import { competitorFields } from "./CompetitorFields";
 import { useProductCategories } from "../../../hooks/useProductCategories";
-import React from "react";
+
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 
 const UpdateCompetitorBrand = () => {
