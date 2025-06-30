@@ -23,7 +23,7 @@ export const isOnline = () => {
 export const getCachedStoreProducts = (storeId: number) => {
   try {
     const cachedProducts = localStorage.getItem(`store_${storeId}_products`);
-    console.log("Cached products retrieved successfully", cachedProducts);
+    console.log("Cached products retrieved successfully");
     return cachedProducts ? JSON.parse(cachedProducts) : null;
   } catch (error) {
     console.error("Error retrieving cached products:", error);

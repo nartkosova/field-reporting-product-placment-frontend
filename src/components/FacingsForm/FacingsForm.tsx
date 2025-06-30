@@ -65,7 +65,7 @@ const FacingsForm = ({
                 </button>
               )}
 
-              <label className="block mb-2 font-medium text-gray-200">
+              <label className="block mb-2 font-medium text-gray-200 pr-4">
                 {entry.label}
               </label>
               <input

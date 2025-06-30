@@ -2,7 +2,7 @@
 const darkSelectStyles = {
   control: (provided: any) => ({
     ...provided,
-    backgroundColor: "#18181b",
+    backgroundColor: "#171717",
     borderColor: "#27272a",
     color: "#fff",
     minHeight: 48,
@@ -11,7 +11,7 @@ const darkSelectStyles = {
   }),
   menu: (provided: any) => ({
     ...provided,
-    backgroundColor: "#18181b",
+    backgroundColor: "#171717",
     color: "#fff",
     borderRadius: 12,
   }),

@@ -108,6 +108,11 @@ export const EntityList = <T extends Entity>({
                     ({formattedDate(item.created_at)})
                   </span>
                 )}
+                {item.category && (
+                  <span className="ml-2 text-xs text-gray-400">
+                    ({item.category})
+                  </span>
+                )}
               </div>
               <div className="flex items-center mt-2 sm:mt-0">
                 <button

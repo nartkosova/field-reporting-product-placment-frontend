@@ -32,11 +32,15 @@ const getStoreById = async (store_id: number) => {
   return response.data;
 };
 
-const getAllStores = async () => {
+const getAllStores = async (channel?: string) => {
   const token = getToken();
-  const response = await axios.get(`${baseUrl}/api/stores`, {
+  const url = new URL(`${baseUrl}/api/stores`);
+  if (channel) url.searchParams.append("channel", channel);
+
+  const response = await axios.get(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return response.data;
 };
 
