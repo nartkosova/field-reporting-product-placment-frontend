@@ -8,6 +8,7 @@ import { PhotoSchema } from "../../types/photoInterface";
 import { AxiosError } from "axios";
 import { Store } from "../../types/storeInterface";
 import SubmitButton from "../../components/Buttons/SubmitButton";
+import darkSelectStyles from "../../utils/darkSelectStyles";
 
 const UpdatePhotoPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,67 +124,78 @@ const UpdatePhotoPage = () => {
   ];
 
   return (
-    <div className="max-w-[400px] w-full mx-auto mt-10 bg-white p-8 border border-gray-200 rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Përditëso foton e raportit
-      </h2>
+    <div className="w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
+        <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-4">
+          <h2 className="text-2xl font-bold text-white">
+            Përditëso foton e raportit
+          </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {fields.map(({ name, label, type, options }) => (
-          <div key={name} className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">{label}</label>
-            {type === "select" && options ? (
-              <Select
-                options={options}
-                value={
-                  options.find(
-                    (opt) =>
-                      opt.value === formState[name as keyof typeof formState]
-                  ) || null
-                }
-                onChange={(selected) =>
-                  handleChange(name, selected?.value ?? "")
-                }
-                className="react-select-container"
-                classNamePrefix="react-select"
-                isClearable
-              />
-            ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {fields.map(({ name, label, type, options }) => (
+              <div
+                key={name}
+                className="p-4 border border-neutral-800 rounded-xl bg-black"
+              >
+                <label className="block mb-2 font-medium text-gray-200">
+                  {label}
+                </label>
+                {type === "select" && options ? (
+                  <Select
+                    options={options}
+                    value={
+                      options.find(
+                        (opt) =>
+                          opt.value ===
+                          formState[name as keyof typeof formState]
+                      ) || null
+                    }
+                    onChange={(selected) =>
+                      handleChange(name, selected?.value ?? "")
+                    }
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    isClearable
+                    styles={darkSelectStyles}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={formState[name] ?? ""}
+                    onChange={(e) => handleChange(name, e.target.value)}
+                    className="w-full border border-neutral-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-600 bg-neutral-900 text-white"
+                  />
+                )}
+              </div>
+            ))}
+
+            <div className="p-4 border border-neutral-800 rounded-xl bg-black">
+              <label className="block mb-2 font-medium text-gray-200">
+                Zëvendëso foton (opsionale)
+              </label>
               <input
-                type="text"
-                value={formState[name] ?? ""}
-                onChange={(e) => handleChange(name, e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full border border-dashed border-neutral-700 rounded px-3 py-2 bg-neutral-900 text-white cursor-pointer"
               />
-            )}
-          </div>
-        ))}
+              {file && (
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="Preview"
+                  className="rounded border mt-2 object-cover max-h-64"
+                />
+              )}
+            </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">
-            Zëvendëso foton (opsionale)
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="border border-dashed border-gray-300 rounded px-3 py-2 bg-gray-50"
-          />
-          {file && (
-            <img
-              src={URL.createObjectURL(file)}
-              alt="Preview"
-              className="rounded border mt-2 object-cover max-h-64"
+            <SubmitButton
+              loading={isSubmitting}
+              label="Përditëso Fotot"
+              loadingLabel="Duke u përditësuar..."
             />
-          )}
+          </form>
         </div>
-
-        <SubmitButton
-          loading={isSubmitting}
-          label="Përditëso Fotot"
-          loadingLabel="Duke u përditësuar..."
-        />
-      </form>
+      </div>
     </div>
   );
 };
