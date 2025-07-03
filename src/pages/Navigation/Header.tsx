@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ActionButton from "../../components/Buttons/ActionButtons";
 import { getInitials } from "../../utils/utils";
 import { useUser } from "../../hooks/useUser";
@@ -15,8 +15,17 @@ const Header: React.FC = () => {
     navigate("/login");
   };
 
+  const location = useLocation();
+
   const handleBack = () => {
-    navigate(-1);
+    const isFreshLoad = location.key === "default";
+    const shortHistory = window.history.length <= 2;
+
+    if (isFreshLoad || shortHistory) {
+      navigate("/");
+    } else {
+      navigate(-1);
+    }
   };
 
   return (

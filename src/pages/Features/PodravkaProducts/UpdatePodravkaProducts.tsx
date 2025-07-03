@@ -162,7 +162,7 @@ const UpdatePodravkaProduct = () => {
                 name: "category_sales_share",
                 label: "Pjesa e tregut në kategori",
                 type: "number",
-                step: "0.01",
+                step: "0.0001",
               },
               {
                 name: "year",

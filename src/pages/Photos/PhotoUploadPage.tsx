@@ -8,6 +8,7 @@ import { useSelectedStore } from "../../hooks/useSelectStore";
 import ActionButton from "../../components/Buttons/ActionButtons";
 import { isOnline } from "../../utils/cacheManager";
 import { queuePhoto } from "../../db/db";
+import imageCompression from "browser-image-compression";
 
 interface Props {
   photoType: PhotoInput["photo_type"];
@@ -43,8 +44,14 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
       category || photoType
     }-${company}-${timestamp}`.toLowerCase();
 
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB: 0.2,
+      maxWidthOrHeight: 1280,
+      useWebWorker: true,
+    });
+
     const formData = new FormData();
-    formData.append("photo", file, customName);
+    formData.append("photo", compressedFile, customName);
     formData.append("photo_type", photoType);
     formData.append("category", category || photoType);
     formData.append("company", company || "podravka");
