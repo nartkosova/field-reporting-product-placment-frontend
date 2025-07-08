@@ -9,6 +9,7 @@ import ActionButton from "../../components/Buttons/ActionButtons";
 import { isOnline } from "../../utils/cacheManager";
 import { queuePhoto } from "../../db/db";
 import imageCompression from "browser-image-compression";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 interface Props {
   photoType: PhotoInput["photo_type"];
@@ -36,6 +37,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   }, [storeId]);
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     if (!file || !storeId || !userId)
       return alert("Ju lutem plotësoni të gjitha fushat.");
     const safeName = sanitizeFilename(String(storeName));
@@ -60,7 +62,6 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     formData.append("photo_description", photoDescription);
 
     try {
-      setIsLoading(true);
       if (isOnline()) {
         await photoService.createPhoto(formData);
         alert("Fotoja u ngarkua me sukses");
@@ -122,8 +123,17 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
               className="w-full border border-neutral-700 bg-neutral-900 text-white rounded p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-neutral-600 placeholder-gray-500"
             />
 
-            <ActionButton onClick={handleSubmit} disabled={isLoading} fullWidth>
-              {isLoading ? "Duke e shfaqur..." : `Dergo ${photoType}`}
+            <ActionButton
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="h-[41px]"
+              fullWidth
+            >
+              {isLoading ? (
+                <LoadingSpinner size="sm" text="" />
+              ) : (
+                `Dërgo ${photoType}`
+              )}
             </ActionButton>
             <ActionButton onClick={clearState} fullWidth>
               Largo foton

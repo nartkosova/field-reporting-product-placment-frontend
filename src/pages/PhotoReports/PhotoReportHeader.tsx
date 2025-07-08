@@ -44,6 +44,7 @@ const PhotoReportHeader = () => {
   const photoTypeOptions = [
     { value: "regular_shelf", label: "Pozita Primare" },
     { value: "secondary_position", label: "Pozita Sekondare" },
+    { value: "sale", label: "Aksion" },
     { value: "fletushka", label: "Fletushka" },
     { value: "korporative", label: "Korporative" },
   ];

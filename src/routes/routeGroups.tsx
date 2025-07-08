@@ -111,6 +111,10 @@ export const photoRoutes: RouteObject[] = [
     element: <PhotoUploadPage photoType="secondary_position" />,
   },
   {
+    path: `/photos/:storeId/:company/aksion`,
+    element: <PhotoUploadPage photoType="sale" />,
+  },
+  {
     path: `/photos/:storeId/:company/fletushka`,
     element: <PhotoUploadPage photoType="fletushka" />,
   },

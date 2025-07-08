@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
@@ -64,14 +65,26 @@ export function CreateUpdateForm({
     } catch (err: unknown) {
       console.error("Submit error:", err);
 
-      if (err instanceof Error && err.message) {
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "isAxiosError" in err &&
+        (err as any).isAxiosError
+      ) {
+        const axiosErr = err as import("axios").AxiosError<any>;
+        const message =
+          axiosErr.response?.data?.error ||
+          axiosErr.response?.data?.message ||
+          axiosErr.response?.statusText ||
+          "Gabim nga serveri";
+        alert(message);
+      } else if (err instanceof Error) {
         alert(err.message);
-      } else if (typeof err === "object" && err && "response" in err) {
-        const res = err as { response?: { data?: { error?: string } } };
-        alert(res.response?.data?.error || "Error, provo perseri.");
       } else {
-        alert("Error, provo perseri.");
+        alert("Gabim i panjohur. Provo përsëri.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

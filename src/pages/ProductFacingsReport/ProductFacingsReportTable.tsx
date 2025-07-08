@@ -23,16 +23,22 @@ const ProductFacingsReportTable = ({ data }: Props) => {
           const rank = row.product_category_rank;
           const percentage = row.category_sales_share;
 
-          const rankText = rank ? ` (${rank}` : "";
-          const percentText =
-            percentage != null
-              ? `${rank ? " - " : " ("}${(percentage * 100).toFixed(1)}%`
-              : "";
-          const suffix = rankText || percentText ? ")" : "";
+          const hasRank = typeof rank === "number";
+          const hasPercentage = typeof percentage === "number";
 
-          return `${name}${
-            rankText || percentText ? rankText + percentText + suffix : ""
-          }`;
+          const rankText = hasRank ? ` (${rank}` : "";
+          let percentText = "";
+
+          if (hasPercentage) {
+            const percentValue = (percentage * 100).toFixed(1);
+            percentText = hasRank
+              ? ` - ${percentValue}%`
+              : ` (${percentValue}%`;
+          }
+
+          const suffix = hasRank || hasPercentage ? ")" : "";
+
+          return `${name}${rankText}${percentText}${suffix}`;
         },
       }),
       columnHelper.accessor("facings_count", {

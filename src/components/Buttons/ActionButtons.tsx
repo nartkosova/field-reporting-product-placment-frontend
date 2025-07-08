@@ -13,7 +13,7 @@ type ActionButtonProps = {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    "bg-neutral-800 text-white hover:bg-neutral-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-700",
+    "bg-neutral-800 text-white hover:bg-neutral-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-700 ",
   secondary:
     "bg-neutral-900 text-gray-200 hover:bg-neutral-800 border border-neutral-800 cursor-pointer disabled:opacity-50",
   danger:

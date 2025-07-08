@@ -2,6 +2,7 @@ export interface PhotoInput {
   photo_type:
     | "regular_shelf"
     | "secondary_position"
+    | "sale"
     | "fletushka"
     | "korporative";
   photo_url: string;
@@ -15,6 +16,7 @@ export interface PhotoSchema {
   photo_type:
     | "regular_shelf"
     | "secondary_position"
+    | "sale"
     | "fletushka"
     | "korporative";
   photo_url: string;

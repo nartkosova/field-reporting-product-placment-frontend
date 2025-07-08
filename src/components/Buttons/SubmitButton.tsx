@@ -27,7 +27,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
     <button
       type="submit"
       disabled={loading}
-      className={`text-white px-4 py-2 w-full rounded border cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}
+      className={`text-white px-4 h-full py-2 w-full rounded border cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}
     >
       {loading ? (
         <LoadingSpinner

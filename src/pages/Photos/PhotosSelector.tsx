@@ -9,6 +9,7 @@ const PhotoSelector = () => {
           buttonLinks={[
             { label: "Primare", path: "/primare" },
             { label: "Sekondare", path: "/sekondare" },
+            { label: "Aksion", path: "/aksion" },
             { label: "Fletushka", path: "/fletushka" },
             { label: "Korporative", path: "/korporative" },
           ]}

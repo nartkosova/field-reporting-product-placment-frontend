@@ -20,14 +20,14 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   };
 
   const textSizeClasses = {
-    sm: "text-sm",
+    sm: "text-base",
     md: "text-base",
     lg: "text-lg",
   };
 
   return (
     <div
-      className={`flex flex-col items-center justify-center space-y-3 ${className}`}
+      className={`flex flex-col items-center justify-center ${className} h-full`}
     >
       <div
         className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-neutral-700 border-t-white`}
