@@ -12,6 +12,12 @@ type GenericReportHeaderProps<T> = {
     placeholder: string;
     className?: string;
     isMulti?: boolean;
+    onChange?: (
+      selected: { value: string; label: string }[],
+      updateFilters: React.Dispatch<
+        React.SetStateAction<Record<string, string[]>>
+      >
+    ) => void;
   }[];
   fetchData: (
     pageSize: number,
@@ -68,24 +74,30 @@ export default function GenericReportHeader<T>({
       <h2 className="text-2xl font-bold mb-4 text-white">{title}</h2>
 
       <div className="flex gap-2 mb-4 flex-wrap">
-        {filtersConfig.map(({ key, options, placeholder, className }) => (
-          <Select
-            key={key}
-            isMulti
-            isClearable
-            options={options}
-            placeholder={placeholder}
-            className={className}
-            onChange={(selected) =>
-              setFilters((prev) => ({
-                ...prev,
-                [key]: selected?.map((s) => String(s.value)) ?? [],
-              }))
-            }
-            styles={darkSelectStyles}
-            closeMenuOnSelect={false}
-          />
-        ))}
+        {filtersConfig.map(
+          ({ key, options, placeholder, className, onChange }) => (
+            <Select
+              key={key}
+              isMulti
+              isClearable
+              options={options}
+              placeholder={placeholder}
+              className={className}
+              styles={darkSelectStyles}
+              closeMenuOnSelect={false}
+              onChange={(selected) => {
+                setFilters((prev) => ({
+                  ...prev,
+                  [key]: selected?.map((s) => String(s.value)) ?? [],
+                }));
+
+                if (onChange) {
+                  onChange(Array.from(selected ?? []), setFilters);
+                }
+              }}
+            />
+          )
+        )}
         {dateNeeded && (
           <DateRangePicker
             startDate={startDate}

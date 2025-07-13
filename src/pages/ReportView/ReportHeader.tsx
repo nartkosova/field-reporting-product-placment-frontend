@@ -15,8 +15,13 @@ const ReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
   const [facings, setFacings] = useState<FacingTable[]>([]);
-  const { categories: productCategories, businessUnits } =
-    useProductCategories();
+  const {
+    categories: productCategories,
+    businessUnits,
+    getCategoriesForBusinessUnit,
+  } = useProductCategories();
+  const [selectedBU, setSelectedBU] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchInitialData = async () => {
       const [userList, storeList] = await Promise.all([
@@ -41,35 +46,55 @@ const ReportHeader = () => {
     label: s.store_name,
   }));
 
-  const filterConfigs = [
-    {
-      key: "business_unit",
-      options: businessUnits.map((unit) => ({
-        value: unit,
-        label: unit,
-      })),
-      placeholder: "Zgjedh njësi biznesi",
-    },
-    {
-      key: "categories",
-      options: productCategories.map((category) => ({
-        value: category,
-        label: category,
-      })),
-      placeholder: "Zgjedh kategorinë",
-    },
-    {
-      key: "user_ids",
-      options: userOptions,
-      placeholder: "Zgjedh raportuesin",
-    },
-    {
-      key: "store_ids",
-      options: storeOptions,
-      placeholder: "Zgjedh marketet",
-      className: "md:w-1/2 w-full",
-    },
-  ];
+  const filteredCategories = useMemo(() => {
+    const cleanBU = selectedBU?.trim();
+    return cleanBU ? getCategoriesForBusinessUnit(cleanBU) : productCategories;
+  }, [selectedBU, getCategoriesForBusinessUnit, productCategories]);
+
+  const filterConfigs = useMemo(() => {
+    interface FilterOption {
+      value: string;
+      label: string;
+    }
+
+    interface FilterConfig {
+      key: string;
+      options: FilterOption[];
+      placeholder: string;
+      className?: string;
+      onChange?: (selected: FilterOption[]) => void;
+    }
+
+    return [
+      {
+        key: "user_ids",
+        options: userOptions,
+        placeholder: "Zgjidh përdoruesin",
+      },
+      {
+        key: "store_ids",
+        options: storeOptions,
+        placeholder: "Zgjidh dyqanin",
+        className: "md:w-1/2 w-full",
+      },
+      {
+        key: "categories",
+        options: filteredCategories.map((c) => ({ value: c, label: c })),
+        placeholder: "Zgjedh kategorinë",
+      },
+      {
+        key: "business_unit",
+        options: businessUnits.map((unit) => ({
+          value: unit,
+          label: unit,
+        })),
+        placeholder: "Zgjedh njesinë e biznesit",
+        onChange: (selected) => {
+          setSelectedBU(selected[0]?.value ?? null);
+        },
+      },
+    ] as FilterConfig[];
+  }, [userOptions, storeOptions, filteredCategories, businessUnits]);
 
   const competitorColumns = useMemo(() => {
     const names = new Set<string>();

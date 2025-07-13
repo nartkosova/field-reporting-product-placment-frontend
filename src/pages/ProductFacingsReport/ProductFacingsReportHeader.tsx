@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { User, Store } from "../../types/reportInterface";
@@ -15,8 +15,12 @@ const ProductFacingsReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
   const [facings, setFacings] = useState<PodravkaFacingReport[]>([]);
-  const { categories: productCategories, businessUnits } =
-    useProductCategories();
+  const {
+    categories: productCategories,
+    businessUnits,
+    getCategoriesForBusinessUnit,
+  } = useProductCategories();
+  const [selectedBU, setSelectedBU] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -41,35 +45,55 @@ const ProductFacingsReportHeader = () => {
     label: s.store_name,
   }));
 
-  const filterConfigs = [
-    {
-      key: "user_ids",
-      options: userOptions,
-      placeholder: "Zgjidh përdoruesin",
-    },
-    {
-      key: "store_ids",
-      options: storeOptions,
-      placeholder: "Zgjidh dyqanin",
-      className: "md:w-1/2 w-full",
-    },
-    {
-      key: "categories",
-      options: productCategories.map((category) => ({
-        value: category,
-        label: category,
-      })),
-      placeholder: "Zgjedh kategorinë",
-    },
-    {
-      key: "business_unit",
-      options: businessUnits.map((unit) => ({
-        value: unit,
-        label: unit,
-      })),
-      placeholder: "Zgjedh njesinë e biznesit",
-    },
-  ];
+  const filteredCategories = useMemo(() => {
+    const cleanBU = selectedBU?.trim();
+    return cleanBU ? getCategoriesForBusinessUnit(cleanBU) : productCategories;
+  }, [selectedBU, getCategoriesForBusinessUnit, productCategories]);
+
+  const filterConfigs = useMemo(() => {
+    interface FilterOption {
+      value: string;
+      label: string;
+    }
+
+    interface FilterConfig {
+      key: string;
+      options: FilterOption[];
+      placeholder: string;
+      className?: string;
+      onChange?: (selected: FilterOption[]) => void;
+    }
+
+    return [
+      {
+        key: "user_ids",
+        options: userOptions,
+        placeholder: "Zgjidh përdoruesin",
+      },
+      {
+        key: "store_ids",
+        options: storeOptions,
+        placeholder: "Zgjidh dyqanin",
+        className: "md:w-1/2 w-full",
+      },
+      {
+        key: "categories",
+        options: filteredCategories.map((c) => ({ value: c, label: c })),
+        placeholder: "Zgjedh kategorinë",
+      },
+      {
+        key: "business_unit",
+        options: businessUnits.map((unit) => ({
+          value: unit,
+          label: unit,
+        })),
+        placeholder: "Zgjedh njesinë e biznesit",
+        onChange: (selected) => {
+          setSelectedBU(selected[0]?.value ?? null);
+        },
+      },
+    ] as FilterConfig[];
+  }, [userOptions, storeOptions, filteredCategories, businessUnits]);
 
   const fetchData = useCallback(
     async (pageSize: number, offset: number, filters: Record<string, any>) => {
