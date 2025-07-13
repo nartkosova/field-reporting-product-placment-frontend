@@ -10,6 +10,7 @@ import {
   queueCompetitorFacings,
 } from "../../../db/db";
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
+import { CompetitorBrand } from "../../../types/competitorBrandsInterface";
 
 interface CompetitorEntry {
   id?: number;
@@ -39,27 +40,39 @@ const PPLCompetitor = () => {
     const fetchBrands = async () => {
       setBrandsLoading(true);
       try {
-        let brands: { competitor_id: number; brand_name: string }[] = [];
+        const cachedBrands = await getCachedBrandsByCategory(selectedCategory);
 
-        if (!isOnline()) {
-          brands = await getCachedBrandsByCategory(selectedCategory);
-        } else {
-          brands = await competitorServices.getCompetitorByCategory(
-            selectedCategory
+        if (cachedBrands.length > 0) {
+          console.log("✅ Using cached competitor brands");
+          setAllCompetitorBrands(cachedBrands);
+          setCompetitors(
+            cachedBrands.map((b: CompetitorBrand) => ({
+              id: b.competitor_id,
+              name: b.brand_name,
+              facings: 0,
+            }))
           );
+          return;
         }
 
-        setAllCompetitorBrands(brands);
+        if (!navigator.onLine) {
+          throw new Error("Offline and no cached data available");
+        }
 
+        const apiBrands = await competitorServices.getCompetitorByCategory(
+          selectedCategory
+        );
+
+        setAllCompetitorBrands(apiBrands);
         setCompetitors(
-          brands.map((b) => ({
+          apiBrands.map((b: CompetitorBrand) => ({
             id: b.competitor_id,
             name: b.brand_name,
             facings: 0,
           }))
         );
       } catch (err) {
-        console.error("Error fetching brands:", err);
+        console.error("Error fetching competitor brands:", err);
       } finally {
         setBrandsLoading(false);
       }

@@ -60,4 +60,5 @@ export interface PodravkaFacingReport {
   store_name: string;
   reported_by: string;
   facing_percentage_in_category: number;
+  total_facings: number;
 }

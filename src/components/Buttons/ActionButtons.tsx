@@ -13,9 +13,9 @@ type ActionButtonProps = {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    "bg-neutral-800 text-white hover:bg-neutral-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-700 ",
+    "bg-neutral-800 text-white hover:bg-neutral-700 cursor-pointer rounded-lg disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-700 ",
   secondary:
-    "bg-neutral-900 text-gray-200 hover:bg-neutral-800 border border-neutral-800 cursor-pointer disabled:opacity-50",
+    "flex items-center gap-2 bg-neutral-900 text-gray-100 px-4 py-2 rounded-lg font-semibold shadow cursor-pointer hover:bg-neutral-800 focus:outline-none border border-neutral-800",
   danger:
     "bg-red-600 text-white hover:bg-red-700 cursor-pointer disabled:opacity-50",
 

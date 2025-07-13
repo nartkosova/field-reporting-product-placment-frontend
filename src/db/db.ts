@@ -78,14 +78,15 @@ export const cacheCompetitorCategories = async (
 };
 
 const CACHE_KEY = "competitorCategoriesLastUpdated";
-const CACHE_DURATION = 72 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_DURATION = 30 * 60 * 1000; // 72 hours
 
 export const fetchAndCacheCompetitorCategories = async () => {
   const lastUpdatedStr = localStorage.getItem(CACHE_KEY);
-  const lastUpdated = lastUpdatedStr ? Number(lastUpdatedStr) : 0;
-  const now = Date.now();
 
-  if (now - lastUpdated < CACHE_DURATION) {
+  const shouldFetch =
+    !lastUpdatedStr || Date.now() - Number(lastUpdatedStr) >= CACHE_DURATION;
+
+  if (!shouldFetch) {
     console.log("✅ Competitor categories cache still valid.");
     return;
   }
@@ -94,7 +95,7 @@ export const fetchAndCacheCompetitorCategories = async () => {
     const categories =
       await competitorServices.getAllCompetitorsWithCategories();
     await cacheCompetitorCategories(categories);
-    localStorage.setItem(CACHE_KEY, String(now));
+    localStorage.setItem(CACHE_KEY, String(Date.now()));
     console.log("✅ Competitor categories updated.");
   } catch (err) {
     console.error("❌ Failed to fetch competitor categories", err);
@@ -195,7 +196,7 @@ export const syncQueuedPhotos = async () => {
   console.log("✅ Synced all queued photos");
 };
 
-export const syncAllIfNeeded = async () => {
+export const syncAllIfNeeded = async (): Promise<boolean> => {
   const [queuedFacings, queuedCompetitorFacings, queuedPhotos] =
     await Promise.all([
       getAllQueuedFacings(),
@@ -210,11 +211,13 @@ export const syncAllIfNeeded = async () => {
 
   if (!shouldSync) {
     console.log("✅ Nothing to sync.");
-    return;
+    return false;
   }
 
   console.log("🔁 Syncing all pending data...");
   await syncQueuedFacings();
   await syncQueuedCompetitorFacings();
   await syncQueuedPhotos();
+
+  return true;
 };

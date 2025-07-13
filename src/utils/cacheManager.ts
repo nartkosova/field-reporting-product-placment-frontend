@@ -1,3 +1,5 @@
+import { getDB } from "../db/db";
+import { CompetitorCategoryCache } from "../types/competitorBrandsInterface";
 import { Product } from "../types/productInterface";
 
 export const clearApiCache = async () => {
@@ -52,4 +54,18 @@ export const cacheStoreProducts = async (
     console.error("Error caching products:", error);
     return false;
   }
+};
+
+export const cacheCompetitorCategories = async (
+  categories: CompetitorCategoryCache[]
+) => {
+  const db = await getDB();
+  const tx = db.transaction("competitorCategories", "readwrite");
+  const store = tx.objectStore("competitorCategories");
+
+  for (const item of categories) {
+    await store.put(item); // { category, brands[] }
+  }
+
+  await tx.done;
 };

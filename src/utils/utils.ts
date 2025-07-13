@@ -9,13 +9,12 @@ export function sanitizeFilename(input: string): string {
 }
 
 export function formattedDate(date: string): string {
-  return new Date(date).toLocaleString("sq-AL", {
+  return new Date(date).toLocaleString("en-GB", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
-    hour12: false,
   });
 }
 

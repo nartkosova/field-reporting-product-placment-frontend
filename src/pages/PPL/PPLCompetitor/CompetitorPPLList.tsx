@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EntityList } from "../../../components/EntityList/EntityList";
 import competitorFacingsService from "../../../services/competitorFacingsService";
-import { formattedDate } from "../../../utils/utils";
 import { Batch } from "../../../types/podravkaFacingInterface";
 
 const CompetitorPPLEditor = () => {
@@ -30,9 +29,7 @@ const CompetitorPPLEditor = () => {
           itemLabel="raport PPL"
           renderDetails={(item) => (
             <div className="text-sm text-gray-600">
-              Kategoria: {(item as any).category} | Konkurrent:{" "}
-              {(item as any).product_count} | Data:{" "}
-              {formattedDate(item.created_at!)}
+              Konkurrent: {(item as any).product_count}
             </div>
           )}
         />

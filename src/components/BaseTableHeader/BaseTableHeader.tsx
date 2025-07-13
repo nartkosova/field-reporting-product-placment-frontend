@@ -23,6 +23,7 @@ type GenericReportHeaderProps<T> = {
   ) => Promise<{ data: T[]; total: number }>;
   renderTable: (data: T[]) => React.ReactNode;
   exportExcel?: (data: T[]) => void;
+  dateNeeded?: boolean;
 };
 
 export default function GenericReportHeader<T>({
@@ -31,6 +32,7 @@ export default function GenericReportHeader<T>({
   fetchData,
   renderTable,
   exportExcel,
+  dateNeeded = true,
 }: GenericReportHeaderProps<T>) {
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -84,14 +86,16 @@ export default function GenericReportHeader<T>({
             closeMenuOnSelect={false}
           />
         ))}
-        <DateRangePicker
-          startDate={startDate}
-          endDate={endDate}
-          onChange={([start, end]) => {
-            setStartDate(start);
-            setEndDate(end);
-          }}
-        />
+        {dateNeeded && (
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onChange={([start, end]) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+          />
+        )}
       </div>
 
       <div className="flex justify-between items-center mt-4 text-sm mb-4 text-white">
@@ -113,6 +117,7 @@ export default function GenericReportHeader<T>({
             }
             disabled={(page + 1) * pageSize >= total}
             variant="fut"
+            scrollToTop={false}
           >
             Next
           </ActionButton>
@@ -126,7 +131,7 @@ export default function GenericReportHeader<T>({
               setPageSize(Number(e.target.value));
             }}
           >
-            {[10, 25, 50, 100].map((s) => (
+            {[10, 25, 50, 100, 300].map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
@@ -136,6 +141,7 @@ export default function GenericReportHeader<T>({
       </div>
 
       {renderTable(data)}
+
       {exportExcel && (
         <div className="pt-6 flex gap-2">
           <ActionButton onClick={() => exportExcel(data)} variant="primary">

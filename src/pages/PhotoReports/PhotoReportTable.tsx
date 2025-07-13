@@ -69,7 +69,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
           const date = new Date(info.getValue());
           return isNaN(date.getTime())
             ? "—"
-            : date.toLocaleString([], {
+            : date.toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",

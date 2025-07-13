@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EntityList } from "../../../components/EntityList/EntityList";
 import podravkaFacingsService from "../../../services/podravkaFacingsService";
-import { formattedDate } from "../../../utils/utils";
 import { Batch } from "../../../types/podravkaFacingInterface";
 
 const PodravkaPPLEditor = () => {
@@ -29,9 +28,7 @@ const PodravkaPPLEditor = () => {
           itemLabel="raport PPL"
           renderDetails={(item) => (
             <div className="text-sm text-gray-600">
-              Kategoria: {(item as any).category} | Produkte:{" "}
-              {(item as any).product_count} | Data:{" "}
-              {formattedDate(item.created_at!)}
+              Produkte: {(item as any).product_count}
             </div>
           )}
         />

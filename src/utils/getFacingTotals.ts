@@ -1,3 +1,4 @@
+import { PodravkaFacingReport } from "../types/podravkaFacingInterface";
 import { Facing } from "../types/reportInterface";
 
 export const getFacingTotals = (rows: Facing[]) => {
@@ -20,5 +21,26 @@ export const getFacingTotals = (rows: Facing[]) => {
     podravka,
     competitor,
     total: podravka + competitor,
+  };
+};
+
+export const getPodravkaOnlyFacingTotals = (rows: PodravkaFacingReport[]) => {
+  let podravka = 0;
+  let estimatedTotal = 0;
+
+  for (const row of rows) {
+    const pf = Number(row.total_facings);
+    const percent = Number(row.facing_percentage_in_category ?? 0);
+
+    podravka += pf;
+
+    if (percent > 0) {
+      estimatedTotal += pf / (percent / 100);
+    }
+  }
+
+  return {
+    podravka,
+    total: estimatedTotal,
   };
 };

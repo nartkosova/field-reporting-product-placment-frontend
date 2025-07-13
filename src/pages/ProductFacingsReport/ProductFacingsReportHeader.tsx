@@ -15,7 +15,8 @@ const ProductFacingsReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
   const [facings, setFacings] = useState<PodravkaFacingReport[]>([]);
-  const { categories: productCategories } = useProductCategories();
+  const { categories: productCategories, businessUnits } =
+    useProductCategories();
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -60,6 +61,14 @@ const ProductFacingsReportHeader = () => {
       })),
       placeholder: "Zgjedh kategorinë",
     },
+    {
+      key: "business_unit",
+      options: businessUnits.map((unit) => ({
+        value: unit,
+        label: unit,
+      })),
+      placeholder: "Zgjedh njesinë e biznesit",
+    },
   ];
 
   const fetchData = useCallback(
@@ -69,6 +78,7 @@ const ProductFacingsReportHeader = () => {
         store_ids,
         categories,
         start_date,
+        business_unit,
         end_date,
         report_month,
       } = filters;
@@ -78,7 +88,9 @@ const ProductFacingsReportHeader = () => {
       if (user_ids?.length > 0) query.user_ids = user_ids;
       if (store_ids?.length > 0) query.store_ids = store_ids;
       if (categories?.length > 0) query.categories = categories;
-
+      if (business_unit?.length > 0) {
+        query.business_unit = business_unit[0];
+      }
       if (start_date && end_date) {
         query.start_date = start_date;
         query.end_date = end_date;
@@ -112,6 +124,7 @@ const ProductFacingsReportHeader = () => {
     const dataToExport = facings.map((row) => ({
       Product: row.product_name,
       Category: row.product_category,
+      "Business Unit": row.business_unit,
       "Podravka Facings": row.facings_count,
       Date: new Date(row.created_at).toLocaleDateString(),
       Store: row.store_name,
@@ -145,6 +158,7 @@ const ProductFacingsReportHeader = () => {
         title="Raporti i Podravkës"
         filtersConfig={filterConfigs}
         fetchData={fetchData}
+        dateNeeded={false}
         renderTable={(data) => (
           <ProductFacingsReportTable
             data={data as PodravkaFacingReport[]}

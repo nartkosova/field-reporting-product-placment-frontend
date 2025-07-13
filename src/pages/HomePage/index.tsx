@@ -3,12 +3,19 @@ import { userNavItems, adminNavItems } from "./HomePageFields";
 import { useSelectedStore } from "../../hooks/useSelectStore";
 import { NavButton } from "../../components/NavButton/NavButton";
 import { getInitials } from "../../utils/utils";
+import { useEffect } from "react";
+import { fetchAndCacheCompetitorCategories } from "../../db/db";
 
 const HomePage: React.FC = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const userRole = userInfo?.role;
   const isAdmin = userRole === "admin";
   const selectedStore = useSelectedStore();
+
+  useEffect(() => {
+    fetchAndCacheCompetitorCategories();
+  }, []);
+
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center bg-transparent">
       <div className="w-full max-w-4xl flex flex-col items-center justify-center py-12 bg-transparent">

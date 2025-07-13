@@ -7,6 +7,7 @@ export interface FacingTable {
   user: string;
   store_name: string;
   category: string;
+  business_unit: string;
   total_facings: number;
   created_at: string;
   competitors: Record<string, number>;
@@ -25,9 +26,13 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<FacingTable, any>[] = useMemo(() => {
     return [
+      columnHelper.accessor("business_unit", {
+        header: "Business Unit",
+        cell: (info) => info.getValue() || "—",
+      }),
+      columnHelper.accessor("category", { header: "Category" }),
       columnHelper.accessor("user", { header: "User" }),
       columnHelper.accessor("store_name", { header: "Store" }),
-      columnHelper.accessor("category", { header: "Category" }),
       columnHelper.accessor("total_facings", {
         id: "total_facings",
         header: "Podravka Facings",
@@ -77,15 +82,19 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         },
       }),
       columnHelper.accessor("created_at", {
-        header: "Date",
+        header: "Date & Time",
         cell: (info) => {
           const date = new Date(info.getValue());
           return isNaN(date.getTime())
             ? "—"
-            : date.toLocaleDateString(undefined, {
+            : date.toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
               });
         },
       }),
@@ -130,7 +139,7 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
         );
       }
 
-      return <td key={id} className=" px-2 py-1"></td>;
+      return <td key={id} className="px-2 py-1" />;
     });
   };
 

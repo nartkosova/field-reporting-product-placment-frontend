@@ -15,7 +15,8 @@ const ReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
   const [facings, setFacings] = useState<FacingTable[]>([]);
-  const { categories: productCategories } = useProductCategories();
+  const { categories: productCategories, businessUnits } =
+    useProductCategories();
   useEffect(() => {
     const fetchInitialData = async () => {
       const [userList, storeList] = await Promise.all([
@@ -42,6 +43,22 @@ const ReportHeader = () => {
 
   const filterConfigs = [
     {
+      key: "business_unit",
+      options: businessUnits.map((unit) => ({
+        value: unit,
+        label: unit,
+      })),
+      placeholder: "Zgjedh njësi biznesi",
+    },
+    {
+      key: "categories",
+      options: productCategories.map((category) => ({
+        value: category,
+        label: category,
+      })),
+      placeholder: "Zgjedh kategorinë",
+    },
+    {
       key: "user_ids",
       options: userOptions,
       placeholder: "Zgjedh raportuesin",
@@ -51,14 +68,6 @@ const ReportHeader = () => {
       options: storeOptions,
       placeholder: "Zgjedh marketet",
       className: "md:w-1/2 w-full",
-    },
-    {
-      key: "categories",
-      options: productCategories.map((category) => ({
-        value: category,
-        label: category,
-      })),
-      placeholder: "Zgjedh kategorinë",
     },
   ];
 
@@ -81,6 +90,7 @@ const ReportHeader = () => {
         start_date,
         end_date,
         report_month,
+        business_unit,
       } = filters;
 
       const query: Record<string, string | string[]> = {};
@@ -88,6 +98,9 @@ const ReportHeader = () => {
       if (user_ids?.length > 0) query.user_id = user_ids;
       if (store_ids?.length > 0) query.store_id = store_ids;
       if (categories?.length > 0) query.category = categories;
+      if (business_unit?.length > 0) {
+        query.business_unit = business_unit[0];
+      }
 
       if (start_date && end_date) {
         query.start_date = start_date;
@@ -121,24 +134,35 @@ const ReportHeader = () => {
 
   const handleExportExcel = () => {
     const dataToExport = facings.map((row) => {
+      const podravka = Number(row.total_facings);
+      const competitor = Object.values(row.competitors || {}).reduce(
+        (sum, val) => sum + Number(val),
+        0
+      );
+      const total = podravka + competitor;
+      const podravkaPercent = total === 0 ? 0 : (podravka / total) * 100;
+
       const competitors = competitorColumns.reduce((acc, brand) => {
-        acc[brand] = row.competitors[brand] ?? 0;
+        const count = row.competitors?.[brand] ?? 0;
+        const percent = total === 0 ? 0 : (count / total) * 100;
+        acc[brand] = `${count} (${percent.toFixed(1)}%)`;
         return acc;
-      }, {} as Record<string, number>);
+      }, {} as Record<string, string>);
 
       return {
         User: row.user,
         Store: row.store_name,
         Category: row.category,
-        "Podravka Facings": row.total_facings,
+        "Podravka Facings": `${podravka} (${podravkaPercent.toFixed(1)}%)`,
         ...competitors,
-        "Total Competitor Facings": Object.values(row.competitors).reduce(
-          (sum, val) => sum + Number(val),
-          0
-        ),
+        "Total Facings Konkurrenca": `${competitor} (${(total === 0
+          ? 0
+          : (competitor / total) * 100
+        ).toFixed(1)}%)`,
         Date: new Date(row.created_at).toLocaleDateString(),
       };
     });
+
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Facings Report");
