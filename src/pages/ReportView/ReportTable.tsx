@@ -25,14 +25,48 @@ const columnHelper = createColumnHelper<FacingTable>();
 const FacingsTable = ({ data, competitorColumns }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<FacingTable, any>[] = useMemo(() => {
-    return [
-      columnHelper.accessor("business_unit", {
-        header: "Business Unit",
-        cell: (info) => info.getValue() || "—",
-      }),
-      columnHelper.accessor("category", { header: "Category" }),
-      columnHelper.accessor("user", { header: "User" }),
-      columnHelper.accessor("store_name", { header: "Store" }),
+    const hasData = (key: keyof FacingTable) =>
+      data.some(
+        (f) => f[key] !== null && f[key] !== undefined && f[key] !== ""
+      );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cols: ColumnDef<FacingTable, any>[] = [];
+
+    if (hasData("business_unit")) {
+      cols.push(
+        columnHelper.accessor("business_unit", {
+          header: "Business Unit",
+          cell: (info) => info.getValue() || "",
+        })
+      );
+    }
+
+    if (hasData("category")) {
+      cols.push(
+        columnHelper.accessor("category", {
+          header: "Kategorija",
+        })
+      );
+    }
+
+    if (hasData("user")) {
+      cols.push(
+        columnHelper.accessor("user", {
+          header: "Reporter",
+        })
+      );
+    }
+
+    if (hasData("store_name")) {
+      cols.push(
+        columnHelper.accessor("store_name", {
+          header: "Store",
+        })
+      );
+    }
+
+    cols.push(
       columnHelper.accessor("total_facings", {
         id: "total_facings",
         header: "Podravka Facings",
@@ -47,7 +81,10 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
           const percent = total === 0 ? 0 : (podravka / total) * 100;
           return `${podravka} (${percent.toFixed(1)}%)`;
         },
-      }),
+      })
+    );
+
+    cols.push(
       ...competitorColumns.map((comp) =>
         columnHelper.accessor((row) => row.competitors?.[comp] ?? 0, {
           header: comp,
@@ -66,8 +103,10 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
             return `${compCount} (${percent.toFixed(1)}%)`;
           },
         })
-      ),
+      )
+    );
 
+    cols.push(
       columnHelper.display({
         id: "total_competitor_facings",
         header: "Konkurrenca Total",
@@ -80,26 +119,33 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
           const percent = total === 0 ? 0 : (competitor / total) * 100;
           return `${competitor} (${percent.toFixed(1)}%)`;
         },
-      }),
-      columnHelper.accessor("created_at", {
-        header: "Date & Time",
-        cell: (info) => {
-          const date = new Date(info.getValue());
-          return isNaN(date.getTime())
-            ? "—"
-            : date.toLocaleString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
-              });
-        },
-      }),
-    ];
-  }, [competitorColumns]);
+      })
+    );
+
+    if (hasData("created_at")) {
+      cols.push(
+        columnHelper.accessor("created_at", {
+          header: "Date & Time",
+          cell: (info) => {
+            const date = new Date(info.getValue());
+            return isNaN(date.getTime())
+              ? "—"
+              : date.toLocaleString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
+                });
+          },
+        })
+      );
+    }
+
+    return cols;
+  }, [competitorColumns, data]);
 
   const customFooter = (rows: FacingTable[]) => {
     const { podravka, competitor, total } = getFacingTotals(rows);
