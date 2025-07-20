@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import photoService from "../../services/photoService";
 import { PhotoInput } from "../../types/photoInterface";
@@ -10,6 +10,7 @@ import { isOnline } from "../../utils/cacheManager";
 import { queuePhoto } from "../../db/db";
 import imageCompression from "browser-image-compression";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { useUser } from "../../hooks/useUser";
 
 interface Props {
   photoType: PhotoInput["photo_type"];
@@ -19,14 +20,15 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   const storeInfo = useSelectedStore();
   const storeId = storeInfo?.store_id || 0;
   const location = useLocation();
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [photoDescription, setPhotoDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const category = new URLSearchParams(location.search).get("category");
   const { company } = useParams<{ company: string }>();
-  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const userId = user.id;
+  const { user } = useUser();
+  const userId = user?.user_id;
   const [storeName, setStoreName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     formData.append("photo_type", photoType);
     formData.append("category", category || photoType);
     formData.append("company", company || "podravka");
-    formData.append("user_id", userId);
+    formData.append("user_id", String(userId));
     formData.append("store_id", storeId.toString());
     formData.append("photo_description", photoDescription);
 
@@ -69,6 +71,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
         await queuePhoto(formData);
         alert("Nuk ka internet. Fotoja u ruajt për ngarkim më vonë.");
       }
+      navigate(-1);
       clearState();
     } catch (e) {
       alert("Fotoja nuk u ngarkua, provo perseri.");

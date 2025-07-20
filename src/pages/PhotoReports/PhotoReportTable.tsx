@@ -1,5 +1,5 @@
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { BaseTable } from "../../components/BaseTable/BaseTable";
 import { PhotoSchema } from "../../types/photoInterface";
 import photoService from "../../services/photoService";
@@ -10,6 +10,11 @@ const columnHelper = createColumnHelper<PhotoSchema>();
 const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
+  const [tableData, setTableData] = useState<PhotoSchema[]>(data);
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
 
   const togglePhoto = useCallback((url: string) => {
     setSelectedPhotos((prev) => {
@@ -21,10 +26,10 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
   }, []);
 
   const toggleAllPhotos = useCallback(() => {
-    const all = data.map((d) => d.photo_url);
+    const all = tableData.map((d) => d.photo_url);
     const allSelected = all.every((url) => selectedPhotos.has(url));
     setSelectedPhotos(allSelected ? new Set() : new Set(all));
-  }, [data, selectedPhotos]);
+  }, [tableData, selectedPhotos]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns = useMemo<ColumnDef<PhotoSchema, any>[]>(
@@ -35,8 +40,8 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
           <input
             type="checkbox"
             checked={
-              data.length > 0 &&
-              data.every((d) => selectedPhotos.has(d.photo_url))
+              tableData.length > 0 &&
+              tableData.every((d) => selectedPhotos.has(d.photo_url))
             }
             onChange={toggleAllPhotos}
             className="w-4 h-4 appearance-none rounded border border-neutral-700 bg-neutral-900 checked:bg-blue-600 checked:border-blue-600 focus:outline-none cursor-pointer transition-colors"
@@ -90,12 +95,12 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         ),
       }),
     ],
-    [data, selectedPhotos, toggleAllPhotos, togglePhoto]
+    [tableData, selectedPhotos, toggleAllPhotos, togglePhoto]
   );
 
   return (
     <div className="space-y-4">
-      <BaseTable data={data} columns={columns} />
+      <BaseTable data={tableData} columns={columns} />
 
       {selectedPhotos.size > 0 && (
         <div className="pt-2 flex gap-2">
@@ -137,7 +142,10 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
 
               const photoUrls = Array.from(selectedPhotos);
               await photoService.bulkDeletePhotos(photoUrls);
-              alert("Selected photos deleted successfully");
+              alert("Fotot u fshinë me sukses.");
+              setTableData((prev) =>
+                prev.filter((photo) => !selectedPhotos.has(photo.photo_url))
+              );
               setSelectedPhotos(new Set());
             }}
           >

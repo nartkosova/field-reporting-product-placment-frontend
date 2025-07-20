@@ -4,6 +4,7 @@ import competitorServices from "../../../services/competitorServices";
 import { AxiosError } from "axios";
 import competitorFacingsService from "../../../services/competitorFacingsService";
 import { useSelectedStore } from "../../../hooks/useSelectStore";
+import { useUser } from "../../../hooks/useUser";
 import { isOnline } from "../../../utils/cacheManager";
 import {
   getCachedBrandsByCategory,
@@ -19,13 +20,13 @@ interface CompetitorEntry {
 }
 
 const PPLCompetitor = () => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const { user } = useUser();
   const storeInfo = useSelectedStore();
   const storeId = storeInfo?.store_id || 0;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
-  const userId = userInfo?.id;
+  const userId = user?.user_id;
 
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([
     { name: "", facings: 0 },
@@ -102,6 +103,12 @@ const PPLCompetitor = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    if (!userId) {
+      alert("User not authenticated");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const facingData = competitors
         .filter((comp) => comp.name.trim())
@@ -113,7 +120,7 @@ const PPLCompetitor = () => {
           );
 
           return {
-            user_id: userId,
+            user_id: Number(userId),
             store_id: Number(storeId),
             category: selectedCategory,
             facings_count: competitor.facings,

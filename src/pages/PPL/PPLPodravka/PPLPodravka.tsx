@@ -7,6 +7,7 @@ import { useSelectedStore } from "../../../hooks/useSelectStore";
 import { queueFacings } from "../../../db/db";
 import { isOnline } from "../../../utils/cacheManager";
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
+import { useUser } from "../../../hooks/useUser";
 
 import Select from "react-select";
 import darkSelectStyles from "../../../utils/darkSelectStyles";
@@ -26,8 +27,8 @@ const PodravkaFacingsFormPage = () => {
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id.toString()) : NaN;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const userId = userInfo?.id;
+  const { user } = useUser();
+  const userId = user?.user_id;
   const combinedProducts = useMemo(
     () => [...products, ...customProducts],
     [products, customProducts]
@@ -94,12 +95,18 @@ const PodravkaFacingsFormPage = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (!userId) {
+      alert("User not authenticated");
+      setLoading(false);
+      return;
+    }
+
     const allProducts = [...products, ...customProducts];
 
     const facingData = allProducts
       .filter((product) => product.product_id !== undefined)
       .map((product) => ({
-        user_id: userId,
+        user_id: Number(userId),
         store_id: Number(storeId),
         product_id: product.product_id!,
         category: product.category,

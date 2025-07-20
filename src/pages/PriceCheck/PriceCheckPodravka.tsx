@@ -10,18 +10,19 @@ import { AxiosError } from "axios";
 import productServices from "../../services/productServices";
 import SubmitButton from "../../components/Buttons/SubmitButton";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { useUser } from "../../hooks/useUser";
 
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [prices, setPrices] = useState<{ [key: number]: PriceCheckInput }>({});
   const [loading, setLoading] = useState(false);
   const [productsLoading, setProductsLoading] = useState(true);
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const { user } = useUser();
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
-  const userId = userInfo?.id;
+  const userId = user?.user_id;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -60,6 +61,11 @@ const PriceCheckPodravka = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    if (!userId) {
+      alert("User not authenticated");
+      setLoading(false);
+      return;
+    }
     try {
       const payload: PodravkaPriceCheckInput[] = products.map((product) => ({
         user_id: userId,

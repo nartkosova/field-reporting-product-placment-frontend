@@ -6,6 +6,7 @@ import { Store } from "../../types/storeInterface";
 import productServices from "../../services/productServices";
 import { clearApiCache } from "../../utils/cacheManager";
 import { useSelectedStore } from "../../hooks/useSelectStore";
+import { useUser } from "../../hooks/useUser";
 
 interface StoreOption {
   value: number;
@@ -18,18 +19,16 @@ export const StoreDropdown = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const storeInfo = useSelectedStore();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const { user } = useUser();
   useEffect(() => {
-    setUserId(userInfo?.id ?? null);
-  }, [userInfo]);
+    setUserId(user?.user_id ?? null);
+  }, [user]);
 
   useEffect(() => {
     const fetchStores = async () => {
       if (!userId) return;
       try {
-        const userStores: Store[] = await storeServices.getStoresByUserId(
-          userId
-        );
+        const userStores: Store[] = await storeServices.getStoresByUserId(userId);
         setStores(
           userStores.sort((a, b) => a.store_name.localeCompare(b.store_name))
         );

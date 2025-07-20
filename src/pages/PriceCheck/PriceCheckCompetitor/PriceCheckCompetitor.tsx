@@ -9,14 +9,15 @@ import { CompetitorProduct } from "../../../types/productInterface";
 import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
 import SubmitButton from "../../../components/Buttons/SubmitButton";
+import { useUser } from "../../../hooks/useUser";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const storeId = id ? parseInt(id) : NaN;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const userId = userInfo?.id;
+  const { user } = useUser();
+  const userId = user?.user_id;
   const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
   const [products, setProducts] = useState<CompetitorProduct[]>([]);
   const [prices, setPrices] = useState<{
@@ -52,12 +53,15 @@ const PriceCheckCompetitor = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    if (!userId) {
+      alert("User not authenticated");
+      return;
+    }
     setLoading(true);
     try {
       const payload: CompetitorPriceCheckInput[] = products.map((p) => ({
-        user_id: userId,
+        user_id: Number(userId),
         store_id: storeId,
         product_type: "competitor",
         competitor_product_id: p.competitor_product_id,
@@ -90,11 +94,11 @@ const PriceCheckCompetitor = () => {
         onBrandSelect={setSelectedBrandId}
       />
 
-      {selectedBrandId && (
+      {selectedBrandId && userId && (
         <AddProductForm
           competitor_id={selectedBrandId}
           category={selectedCategory}
-          user_id={userId}
+          user_id={userId as number}
           onProductAdded={fetchProducts}
         />
       )}

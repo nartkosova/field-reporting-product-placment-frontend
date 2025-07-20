@@ -44,6 +44,7 @@ const PhotoReportHeader = () => {
   const photoTypeOptions = [
     { value: "regular_shelf", label: "Pozita Primare" },
     { value: "secondary_position", label: "Pozita Sekondare" },
+    { value: "new_product", label: "Produkt i Ri" },
     { value: "sale", label: "Aksion" },
     { value: "fletushka", label: "Fletushka" },
     { value: "korporative", label: "Korporative" },
@@ -103,7 +104,7 @@ const PhotoReportHeader = () => {
   return (
     <div className="py-4">
       <GenericReportHeader
-        title="Raportet e Fotove"
+        title="Raporti i Fotove"
         filtersConfig={filterConfigs}
         fetchData={fetchData}
         renderTable={(data) => <PhotoTable data={data} />}

@@ -5,10 +5,10 @@ import { NavButton } from "../../components/NavButton/NavButton";
 import { getInitials } from "../../utils/utils";
 import { useEffect } from "react";
 import { fetchAndCacheCompetitorCategories } from "../../db/db";
+import { useUser } from "../../hooks/useUser";
 
 const HomePage: React.FC = () => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const userRole = userInfo?.role;
+  const { user, userRole } = useUser();
   const isAdmin = userRole === "admin";
   const selectedStore = useSelectedStore();
 
@@ -34,11 +34,11 @@ const HomePage: React.FC = () => {
         <div className="w-full flex justify-center mb-10">
           <div className="flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-br from-neutral-900 to-neutral-800 border border-neutral-700 rounded-2xl px-6 py-6 w-full max-w-md shadow-xl backdrop-blur-sm">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 flex items-center justify-center text-gray-100 font-semibold text-xl border border-neutral-600 shadow-inner">
-              {getInitials(userInfo.user || userInfo.name || "")}
+              {getInitials(user?.user || "")}
             </div>
             <div className="flex flex-col items-center sm:items-start">
               <span className="text-xl font-bold text-white">
-                {userInfo.user || userInfo.name || "User"}
+                {user?.user || "User"}
               </span>
               <span className="text-sm text-gray-400 mt-1 capitalize">
                 {userRole || "user"}
@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
 
         {!isAdmin && (
           <>
-            <div className="w-full max-w-md mb-10">
+            <div className="w-full max-w-4xl mb-10">
               <StoreDropdown />
             </div>
 

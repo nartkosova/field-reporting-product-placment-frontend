@@ -1,12 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useUser } from "../hooks/useUser";
 
 interface RouteGuardProps {
   requiredRole?: "admin" | "employee";
 }
 
 const RouteGuard = ({ requiredRole }: RouteGuardProps) => {
-  const { isAuthenticated, userRole } = useAuth();
+  const { isAuthenticated, userRole } = useUser();
 
   if (isAuthenticated === null) {
     return null;

@@ -14,7 +14,6 @@ const LoginPage = () => {
     try {
       const response = await userService.loginUser({ user, password });
       window.localStorage.setItem("authToken", response.token);
-      window.localStorage.setItem("userInfo", JSON.stringify(response.user));
       setToken(response.token);
       setUser("");
       setPassword("");

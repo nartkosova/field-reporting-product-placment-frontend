@@ -10,6 +10,7 @@ import storeService from "../../services/storeServices";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import ProductFacingsReportTable from "./ProductFacingsReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
+import { useUser } from "../../hooks/useUser";
 
 const ProductFacingsReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,6 +22,7 @@ const ProductFacingsReportHeader = () => {
     getCategoriesForBusinessUnit,
   } = useProductCategories();
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
+  const { user, userRole } = useUser();
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -190,6 +192,8 @@ const ProductFacingsReportHeader = () => {
           />
         )}
         exportExcel={handleExportExcel}
+        user={user}
+        userRole={userRole}
       />
     </div>
   );

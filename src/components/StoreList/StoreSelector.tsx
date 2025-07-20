@@ -1,36 +1,26 @@
-import { useEffect, useState } from "react";
 import storeServices from "../../services/storeServices";
 import StoreList from "./StoreList";
+import { useUser } from "../../hooks/useUser";
+import { useEffect, useState } from "react";
+
 const StoreSelector = () => {
   const [stores, setStores] = useState([]);
-  const [userId, setUserId] = useState<number | null>(null);
-  const [user, setUser] = useState<string | null>(null);
-
-  useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      const paredUserInfo = JSON.parse(userInfo);
-      setUserId(paredUserInfo.id);
-      setUser(paredUserInfo.user);
-    }
-  }, []);
+  const { user } = useUser();
 
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        if (!userId) return;
-
-        const userStores = await storeServices.getStoresByUserId(userId);
+        if (!user?.user_id) return;
+        const userStores = await storeServices.getStoresByUserId(user.user_id);
         setStores(userStores);
       } catch (error) {
         console.error("Failed to fetch stores:", error);
       }
     };
-
     fetchStores();
-  }, [userId]);
+  }, [user?.user_id]);
 
-  return <StoreList stores={stores} user={user} showLocation={true} />;
+  return <StoreList stores={stores} user={user?.user || null} showLocation={true} />;
 };
 
 export default StoreSelector;

@@ -3,9 +3,10 @@ import { CreateUpdateForm } from "../../../components/CreateBaseForm/CreateUpdat
 import competitorServices from "../../../services/competitorServices";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
+import { useUser } from "../../../hooks/useUser";
 
 const CreateCompetitorProductPage = () => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const { user: userInfo } = useUser();
   const { categories } = useProductCategories();
   const [competitorOptions, setCompetitorOptions] = useState<
     { label: string; value: number }[]
@@ -27,12 +28,16 @@ const CreateCompetitorProductPage = () => {
   const handleSubmit = async (
     data: Record<string, string | number | (string | number)[]>
   ) => {
+    if (!userInfo?.user_id) {
+      alert("User not authenticated");
+      return;
+    }
     const payload = {
       name: data.name as string,
       category: data.category as string,
       weight: data.weight ? Number(data.weight) : undefined,
       competitor_id: Number(data.competitor_id),
-      created_by: userInfo?.id,
+      created_by: userInfo.user_id,
     };
 
     await productServices.createCompetitorProduct(payload);
