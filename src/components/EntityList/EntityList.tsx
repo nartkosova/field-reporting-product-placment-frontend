@@ -14,7 +14,7 @@ export interface Entity extends BaseEntity {
 
 interface EntityListProps<T extends Entity> {
   title: string;
-  fetchAll: () => Promise<T[]>;
+  fetchAll: (offset: number, limit: number) => Promise<T[]>;
   onDelete?: (id: number) => Promise<void>;
   editPath: string;
   itemLabel?: string;
@@ -33,13 +33,49 @@ export const EntityList = <T extends Entity>({
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { handleError } = useErrorHandler();
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const LIMIT = 20;
 
-  const fetchItems = useCallback(async () => {
+  const loadMore = useCallback(async () => {
+    if (loading || isFetchingMore || !hasMore) return;
+    setIsFetchingMore(true);
     try {
-      const data = await fetchAll();
-      setItems(data);
+      const nextOffset = offset + LIMIT;
+      const data = await fetchAll(nextOffset, LIMIT);
+      setItems((prev) => [...prev, ...data]);
+      setOffset(nextOffset);
+      setHasMore(data.length === LIMIT);
     } catch (err) {
-      console.error(`Failed to fetch ${title.toLowerCase()}:`, err);
+      const axiosError = err as AxiosError<{ error: string }>;
+      const backendMessage =
+        axiosError.response?.data?.error ||
+        `Gabim gjatë ngarkimit të ${title.toLowerCase()}.`;
+      handleError(backendMessage);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [
+    offset,
+    fetchAll,
+    LIMIT,
+    loading,
+    isFetchingMore,
+    hasMore,
+    handleError,
+    title,
+  ]);
+
+  const reset = useCallback(async () => {
+    setOffset(0);
+    setHasMore(true);
+    setLoading(true);
+    try {
+      const data = await fetchAll(0, LIMIT);
+      setItems(data);
+      setHasMore(data.length === LIMIT);
+    } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error ||
@@ -48,11 +84,26 @@ export const EntityList = <T extends Entity>({
     } finally {
       setLoading(false);
     }
-  }, [fetchAll, title, handleError]);
+  }, [fetchAll, LIMIT, handleError, title]);
 
   useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+    reset();
+  }, [reset]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loading || isFetchingMore || !hasMore) return;
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.body.offsetHeight - 100;
+      if (scrollPosition >= threshold) {
+        loadMore();
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [loading, isFetchingMore, hasMore, loadMore]);
 
   const handleEdit = (id: number) => {
     navigate(`${editPath}/${id}`);
@@ -68,7 +119,7 @@ export const EntityList = <T extends Entity>({
 
       try {
         await onDelete(id);
-        fetchItems();
+        setItems((prev) => prev.filter((item) => item.id !== id));
         alert(
           `${itemLabel[0].toUpperCase() + itemLabel.slice(1)} u fshi me sukses.`
         );
@@ -81,7 +132,7 @@ export const EntityList = <T extends Entity>({
         handleError(backendMessage);
       }
     },
-    [onDelete, itemLabel, fetchItems, handleError]
+    [onDelete, itemLabel, handleError, reset]
   );
 
   return (
@@ -136,6 +187,7 @@ export const EntityList = <T extends Entity>({
           ))}
         </ul>
       )}
+      {isFetchingMore && <LoadingSpinner />}
     </div>
   );
 };

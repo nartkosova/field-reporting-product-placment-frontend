@@ -27,7 +27,10 @@ type GenericReportHeaderProps<T> = {
       string | number | boolean | string[] | number[] | boolean[]
     >
   ) => Promise<{ data: T[]; total: number }>;
-  renderTable: (data: T[]) => React.ReactNode;
+  renderTable: (
+    data: T[],
+    filters: Record<string, string | string[]>
+  ) => React.ReactNode;
   exportExcel?: (data: T[]) => void;
   dateNeeded?: boolean;
   user?: { user?: string; user_id?: number } | null;
@@ -156,15 +159,23 @@ export default function GenericReportHeader<T>({
         </div>
       </div>
 
-      {renderTable(data)}
+      {renderTable(data, {
+        ...debouncedFilters,
+        ...(startDate
+          ? { start_date: startDate.toISOString().split("T")[0] }
+          : {}),
+        ...(endDate ? { end_date: endDate.toISOString().split("T")[0] } : {}),
+      })}
 
-      {exportExcel && userRole === "admin" && (user?.user === "Ilir" || user?.user === "Arjeta") && (
-        <div className="pt-6 flex gap-2">
-          <ActionButton onClick={() => exportExcel(data)} variant="primary">
-            Exporto në Excel
-          </ActionButton>
-        </div>
-      )}
+      {exportExcel &&
+        userRole === "admin" &&
+        (user?.user === "Ilir" || user?.user === "Arjeta") && (
+          <div className="pt-6 flex gap-2">
+            <ActionButton onClick={() => exportExcel(data)} variant="primary">
+              Exporto në Excel
+            </ActionButton>
+          </div>
+        )}
     </div>
   );
 }

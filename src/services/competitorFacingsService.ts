@@ -29,12 +29,13 @@ const getCompetitorFacingByBatchId = async (bachtId: string) => {
   return response.data;
 };
 
-const getCompetitorFacingByUserId = async () => {
+const getCompetitorFacingByUserId = async (offset = 0, limit = 20) => {
   const token = getToken();
   const response = await axios.get(
     `${baseUrl}/api/facings/competitor-facing/user`,
     {
       headers: { Authorization: `Bearer ${token}` },
+      params: { offset, limit },
     }
   );
   return response.data;

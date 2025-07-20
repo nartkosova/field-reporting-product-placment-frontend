@@ -147,7 +147,9 @@ const getProductsByStoreId = async (storeId: number) => {
     if (cached) {
       return cached;
     }
-    throw new Error("No cached data available for offline mode");
+    throw new Error(
+      "Nuk ka të dhëna të ruajtura për këtë dyqan, lidhuni me internetin për të marrë të dhënat."
+    );
   }
   const response = await axios.get(
     `${baseUrl}/api/stores/${storeId}/products`,

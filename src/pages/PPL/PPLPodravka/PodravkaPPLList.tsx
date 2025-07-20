@@ -9,8 +9,8 @@ const PodravkaPPLEditor = () => {
       <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
         <EntityList
           title="Raportet PPL"
-          fetchAll={async () => {
-            const data = await podravkaFacingsService.getUserPPLBatches();
+          fetchAll={async (offset = 0, limit = 20) => {
+            const data = await podravkaFacingsService.getUserPPLBatches(offset, limit);
             return data.map((batch: Batch) => ({
               id: batch.batch_id,
               name: batch.store_name,
