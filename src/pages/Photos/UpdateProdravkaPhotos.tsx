@@ -18,6 +18,8 @@ const UpdatePhotoPage = () => {
     category: "",
     store_id: "",
     photo_description: "",
+    photo_url: "",
+    company: "",
   });
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +38,8 @@ const UpdatePhotoPage = () => {
           category: photoData.category,
           store_id: String(photoData.store_id),
           photo_description: photoData.photo_description || "",
+          photo_url: photoData.photo_url || "",
+          company: photoData.company || "",
         });
 
         const stores = await storeServices.getStoresByUserId(photoData.user_id);
@@ -78,7 +82,7 @@ const UpdatePhotoPage = () => {
 
       await photoService.updateReportPhoto(id!, data);
       alert("Foto u përditësua me sukses!");
-      navigate("/photos");
+      navigate("/photos/edit");
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
       alert(axiosError.response?.data?.error || "Gabim gjatë përditësimit.");
@@ -98,8 +102,10 @@ const UpdatePhotoPage = () => {
       label: "Tipi i fotos",
       type: "select",
       options: [
-        { value: "regular_shelf", label: "Regular Shelf" },
-        { value: "secondary_position", label: "Secondary Position" },
+        { value: "regular_shelf", label: "Primare" },
+        { value: "secondary_position", label: "Sekondare" },
+        { value: "new_product", label: "Produkt i Ri" },
+        { value: "sale", label: "Aksion" },
         { value: "fletushka", label: "Fletushka" },
         { value: "korporative", label: "Korporative" },
       ],
@@ -115,6 +121,15 @@ const UpdatePhotoPage = () => {
       label: "Dyqani",
       type: "select",
       options: storeOptions,
+    },
+    {
+      name: "company",
+      label: "Kompania",
+      type: "select",
+      options: [
+        { value: "podravka", label: "Podravka" },
+        { value: "competitor", label: "Konkurrenca" },
+      ],
     },
     {
       name: "photo_description",
@@ -173,19 +188,17 @@ const UpdatePhotoPage = () => {
               <label className="block mb-2 font-medium text-gray-200">
                 Zëvendëso foton (opsionale)
               </label>
+              <img
+                src={file ? URL.createObjectURL(file) : formState.photo_url}
+                alt="Preview"
+                className="w-full h-full object-cover rounded border border-neutral-800 mb-4"
+              />
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
                 className="w-full border border-dashed border-neutral-700 rounded px-3 py-2 bg-neutral-900 text-white cursor-pointer"
               />
-              {file && (
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="Preview"
-                  className="rounded border mt-2 object-cover max-h-64"
-                />
-              )}
             </div>
 
             <SubmitButton

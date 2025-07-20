@@ -10,6 +10,7 @@ import { User, Store } from "../../types/reportInterface";
 import ReportChart from "./ReportChart";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import { useProductCategories } from "../../hooks/useProductCategories";
+import { useUser } from "../../hooks/useUser";
 
 const ReportHeader = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,6 +22,7 @@ const ReportHeader = () => {
     getCategoriesForBusinessUnit,
   } = useProductCategories();
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
+  const { user, userRole } = useUser();
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -218,10 +220,12 @@ const ReportHeader = () => {
         renderTable={(data) => (
           <>
             <ReportTable data={data} competitorColumns={competitorColumns} />
-            <ReportChart data={data} />
+            {userRole === "admin" && <ReportChart data={data} />}
           </>
         )}
         exportExcel={handleExportExcel}
+        user={user}
+        userRole={userRole}
       />
     </div>
   );

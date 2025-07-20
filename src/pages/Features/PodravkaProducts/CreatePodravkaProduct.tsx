@@ -3,7 +3,6 @@ import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
 
 const CreatePodravkaProduct = () => {
-  // const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const { categories, businessUnits } = useProductCategories();
 
   const handleSubmit = async (

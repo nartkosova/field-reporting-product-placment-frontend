@@ -1,7 +1,27 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
-import { createLinks, editLinks } from "./selectCreateUpdateFields";
+import { useUser } from "../../hooks/useUser";
+import {
+  createLinks as baseCreateLinks,
+  editLinks as baseEditLinks,
+} from "./selectCreateUpdateFields";
 
 const SelectCreateEdit = () => {
+  const { user } = useUser();
+
+  const createLinks = baseCreateLinks.filter((link) => {
+    if (link.label === "Krijo User Te Ri") {
+      return user?.user === "Ilir";
+    }
+    return true;
+  });
+
+  const editLinks = baseEditLinks.filter((link) => {
+    if (link.label === "Edito Userat") {
+      return user?.user === "Ilir";
+    }
+    return true;
+  });
+
   return (
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
@@ -19,7 +39,7 @@ const SelectCreateEdit = () => {
           storeRequired={false}
         />
 
-        <div className="max-w-2xl h-[1px] w-full bg-neutral-700 rounded-full my-6" />
+        <div className="max-w-4xl h-[1px] w-full bg-neutral-700 rounded-full my-6" />
 
         <CategorySelector
           routeBase="/settings"

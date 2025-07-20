@@ -30,6 +30,8 @@ type GenericReportHeaderProps<T> = {
   renderTable: (data: T[]) => React.ReactNode;
   exportExcel?: (data: T[]) => void;
   dateNeeded?: boolean;
+  user?: { user?: string; user_id?: number } | null;
+  userRole?: string | null;
 };
 
 export default function GenericReportHeader<T>({
@@ -39,6 +41,8 @@ export default function GenericReportHeader<T>({
   renderTable,
   exportExcel,
   dateNeeded = true,
+  user,
+  userRole,
 }: GenericReportHeaderProps<T>) {
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -154,7 +158,7 @@ export default function GenericReportHeader<T>({
 
       {renderTable(data)}
 
-      {exportExcel && (
+      {exportExcel && userRole === "admin" && (user?.user === "Ilir" || user?.user === "Arjeta") && (
         <div className="pt-6 flex gap-2">
           <ActionButton onClick={() => exportExcel(data)} variant="primary">
             Exporto në Excel

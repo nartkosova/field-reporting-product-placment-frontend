@@ -7,7 +7,7 @@ import { syncAllIfNeeded } from "../../db/db";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 const Header: React.FC = () => {
-  const { user, clearUser } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
   const [syncing, setSyncing] = useState(false);
 
@@ -30,7 +30,6 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    clearUser();
     localStorage.removeItem("selectedCategory");
     localStorage.removeItem("selectedStore");
     navigate("/login");
@@ -70,10 +69,10 @@ const Header: React.FC = () => {
             <span>{syncing ? "Duke ruajtur..." : "Dërgo"}</span>
           </ActionButton>
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 flex items-center justify-center text-gray-100 font-semibold text-sm border border-neutral-600 shadow-inner">
-            {getInitials(user?.user || user?.name || "")}
+            {getInitials(user?.user || "")}
           </div>
           <span className="hidden sm:block text-md font-medium text-gray-200 truncate max-w-[120px]">
-            {user?.user || user?.name || "User"}
+            {user?.user || "User"}
           </span>
 
           <ActionButton

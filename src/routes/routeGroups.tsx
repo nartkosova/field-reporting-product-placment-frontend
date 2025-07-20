@@ -34,6 +34,7 @@ import CreatePodravkaProduct from "../pages/Features/PodravkaProducts/CreatePodr
 import UpdatePodravkaProduct from "../pages/Features/PodravkaProducts/UpdatePodravkaProducts";
 import PodravkaProductList from "../pages/Features/PodravkaProducts/PodravkaProductList";
 import ProductFacingsReportHeader from "../pages/ProductFacingsReport/ProductFacingsReportHeader";
+import { AdminGuard } from "./AminGuard";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -111,6 +112,10 @@ export const photoRoutes: RouteObject[] = [
     element: <PhotoUploadPage photoType="secondary_position" />,
   },
   {
+    path: `/photos/:storeId/:company/produkt-i-ri`,
+    element: <PhotoUploadPage photoType="new_product" />,
+  },
+  {
     path: `/photos/:storeId/:company/aksion`,
     element: <PhotoUploadPage photoType="sale" />,
   },
@@ -143,7 +148,11 @@ export const settingsRoutes: RouteObject[] = [
   },
   {
     path: "/settings/create/user",
-    element: <CreateUser />,
+    element: (
+      <AdminGuard>
+        <CreateUser />
+      </AdminGuard>
+    ),
   },
   {
     path: "/settings/edit/store",
@@ -175,11 +184,19 @@ export const settingsRoutes: RouteObject[] = [
   },
   {
     path: "/settings/edit/users",
-    element: <UserList />,
+    element: (
+      <AdminGuard>
+        <UserList />
+      </AdminGuard>
+    ),
   },
   {
     path: "/settings/edit/users/:id",
-    element: <UpdateUser />,
+    element: (
+      <AdminGuard>
+        <UpdateUser />
+      </AdminGuard>
+    ),
   },
   {
     path: "/settings/edit/competitor-products",

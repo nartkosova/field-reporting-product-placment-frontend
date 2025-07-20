@@ -1,54 +1,52 @@
 import { useEffect, useState } from "react";
-import { UserRole } from "../types/common";
+import { jwtDecode } from "jwt-decode";
 
 interface UserInfo {
-  id: number;
+  user_id: number;
   user: string;
-  name?: string;
-  role: UserRole;
+  role: string;
+}
+
+interface DecodedToken {
+  user_id: number;
+  user: string;
+  role: string;
+}
+
+function getUserFromToken(token: string | null): UserInfo | null {
+  if (!token) return null;
+  try {
+    const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
+    return {
+      user_id: decoded.user_id,
+      user: decoded.user,
+      role: decoded.role,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export const useUser = () => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(() => {
-    try {
-      const stored = localStorage.getItem("userInfo");
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
+  const [user, setUser] = useState<UserInfo | null>(() => {
+    const token = localStorage.getItem("authToken");
+    return getUserFromToken(token);
   });
 
   useEffect(() => {
     const handleStorageChange = () => {
-      try {
-        const stored = localStorage.getItem("userInfo");
-        setUserInfo(stored ? JSON.parse(stored) : null);
-      } catch {
-        setUserInfo(null);
-      }
+      const token = localStorage.getItem("authToken");
+      setUser(getUserFromToken(token));
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const updateUser = (user: UserInfo) => {
-    localStorage.setItem("userInfo", JSON.stringify(user));
-    setUserInfo(user);
-  };
-
-  const clearUser = () => {
-    localStorage.removeItem("userInfo");
-    setUserInfo(null);
-  };
-
   return {
-    user: userInfo,
-    updateUser,
-    clearUser,
-    isAuthenticated: !!userInfo,
-    userId: userInfo?.id,
-    userName: userInfo?.user || userInfo?.name,
-    userRole: userInfo?.role,
+    user,
+    isAuthenticated: !!user,
+    userId: user?.user_id,
+    userName: user?.user,
+    userRole: user?.role,
   };
-}; 
+};

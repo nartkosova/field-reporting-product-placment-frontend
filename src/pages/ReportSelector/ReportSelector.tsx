@@ -1,9 +1,10 @@
 import CategorySelector from "../../components/CategorySelector/CategorySelector";
 import { reportSelectorFields } from "./reportSelectorFields";
+import { useUser } from "../../hooks/useUser";
 
 const ReportSelector = () => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const isAdmin = userInfo?.role === "admin";
+  const { userRole } = useUser();
+  const isAdmin = userRole === "admin";
 
   const filteredFields = isAdmin
     ? reportSelectorFields
