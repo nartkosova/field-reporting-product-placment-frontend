@@ -43,11 +43,12 @@ const getPodravkaFacingsByBatchId = async (batchId: string) => {
   return response.data;
 };
 
-const getUserPPLBatches = async () => {
+const getUserPPLBatches = async (offset = 0, limit = 20) => {
   const token = getToken();
   const response = await axios.get(
     `${baseUrl}/api/facings/podravka-facing/user-batches`,
     {
+      params: { offset, limit },
       headers: { Authorization: `Bearer ${token}` },
     }
   );

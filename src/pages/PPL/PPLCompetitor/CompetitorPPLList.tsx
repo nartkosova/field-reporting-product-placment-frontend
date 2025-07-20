@@ -9,9 +9,12 @@ const CompetitorPPLEditor = () => {
       <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
         <EntityList
           title="Raportet PPL"
-          fetchAll={async () => {
+          fetchAll={async (offset = 0, limit = 20) => {
             const data =
-              await competitorFacingsService.getCompetitorFacingByUserId();
+              await competitorFacingsService.getCompetitorFacingByUserId(
+                offset,
+                limit
+              );
             return data.map((batch: Batch) => ({
               id: batch.batch_id,
               name: batch.store_name,
@@ -37,4 +40,5 @@ const CompetitorPPLEditor = () => {
     </div>
   );
 };
+
 export default CompetitorPPLEditor;

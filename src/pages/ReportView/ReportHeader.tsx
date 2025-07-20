@@ -81,18 +81,26 @@ const ReportHeader = () => {
       },
       {
         key: "categories",
-        options: [{ value: "all", label: "Zgjidh të gjitha" }, ...filteredCategories.map((c) => ({ value: c, label: c }))],
+        options: [
+          { value: "all", label: "Zgjidh të gjitha" },
+          ...filteredCategories.map((c) => ({ value: c, label: c })),
+        ],
         placeholder: "Zgjedh kategorinë",
       },
       {
         key: "business_unit",
-        options: [{ value: "all", label: "Zgjidh të gjitha" }, ...businessUnits.map((unit) => ({
-          value: unit,
-          label: unit,
-        }))],
+        options: [
+          { value: "all", label: "Zgjidh të gjitha" },
+          ...businessUnits.map((unit) => ({
+            value: unit,
+            label: unit,
+          })),
+        ],
         placeholder: "Zgjedh njesinë e biznesit",
         onChange: (selected) => {
-          setSelectedBU(selected[0]?.value === "all" ? null : selected[0]?.value ?? null);
+          setSelectedBU(
+            selected[0]?.value === "all" ? null : selected[0]?.value ?? null
+          );
         },
       },
     ] as FilterConfig[];
@@ -217,12 +225,38 @@ const ReportHeader = () => {
         title="Raportet PPL"
         filtersConfig={filterConfigs}
         fetchData={fetchData}
-        renderTable={(data) => (
-          <>
-            <ReportTable data={data} competitorColumns={competitorColumns} />
-            {userRole === "admin" && <ReportChart data={data} />}
-          </>
-        )}
+        renderTable={(data, filters) => {
+          const activeFilters: (
+            | "user"
+            | "store_name"
+            | "category"
+            | "business_unit"
+            | "created_at"
+          )[] = [];
+
+          if (filters.user_ids?.length) activeFilters.push("user");
+
+          if (filters.store_ids?.length) activeFilters.push("store_name");
+
+          if (filters.categories?.length) activeFilters.push("category");
+
+          if (filters.business_unit?.length)
+            activeFilters.push("business_unit");
+
+          if (filters.start_date && filters.end_date)
+            activeFilters.push("created_at");
+
+          return (
+            <>
+              <ReportTable
+                data={data}
+                competitorColumns={competitorColumns}
+                activeFilters={activeFilters}
+              />
+              {userRole === "admin" && <ReportChart data={data} />}
+            </>
+          );
+        }}
         exportExcel={handleExportExcel}
         user={user}
         userRole={userRole}

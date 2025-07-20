@@ -18,22 +18,29 @@ export interface FacingTable {
 interface Props {
   data: FacingTable[];
   competitorColumns: string[];
+  activeFilters: (
+    | "business_unit"
+    | "category"
+    | "user"
+    | "store_name"
+    | "created_at"
+  )[];
 }
 
 const columnHelper = createColumnHelper<FacingTable>();
 
-const FacingsTable = ({ data, competitorColumns }: Props) => {
+const FacingsTable = ({ data, competitorColumns, activeFilters }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<FacingTable, any>[] = useMemo(() => {
-    const hasData = (key: keyof FacingTable) =>
-      data.some(
-        (f) => f[key] !== null && f[key] !== undefined && f[key] !== ""
-      );
+    // const hasData = (key: keyof FacingTable) =>
+    //   data.some(
+    //     (f) => f[key] !== null && f[key] !== undefined && f[key] !== ""
+    //   );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cols: ColumnDef<FacingTable, any>[] = [];
 
-    if (hasData("business_unit")) {
+    if (activeFilters.includes("business_unit")) {
       cols.push(
         columnHelper.accessor("business_unit", {
           header: "Business Unit",
@@ -42,7 +49,7 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
       );
     }
 
-    if (hasData("category")) {
+    if (activeFilters.includes("category")) {
       cols.push(
         columnHelper.accessor("category", {
           header: "Kategorija",
@@ -50,15 +57,15 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
       );
     }
 
-    if (hasData("user")) {
+    if (activeFilters.includes("user")) {
       cols.push(
         columnHelper.accessor("user", {
-          header: "Reporter",
+          header: "Raportuesi",
         })
       );
     }
 
-    if (hasData("store_name")) {
+    if (activeFilters.includes("store_name")) {
       cols.push(
         columnHelper.accessor("store_name", {
           header: "Store",
@@ -122,10 +129,10 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
       })
     );
 
-    if (hasData("created_at")) {
+    if (activeFilters.includes("created_at")) {
       cols.push(
         columnHelper.accessor("created_at", {
-          header: "Date & Time",
+          header: "Data",
           cell: (info) => {
             const date = new Date(info.getValue());
             return isNaN(date.getTime())
@@ -145,7 +152,7 @@ const FacingsTable = ({ data, competitorColumns }: Props) => {
     }
 
     return cols;
-  }, [competitorColumns, data]);
+  }, [competitorColumns, activeFilters]);
 
   const customFooter = (rows: FacingTable[]) => {
     const { podravka, competitor, total } = getFacingTotals(rows);
