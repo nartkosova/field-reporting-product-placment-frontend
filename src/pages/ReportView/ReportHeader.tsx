@@ -23,6 +23,7 @@ const ReportHeader = () => {
   } = useProductCategories();
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
   const { user, userRole } = useUser();
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -43,10 +44,13 @@ const ReportHeader = () => {
     label: u.user,
   }));
 
-  const storeOptions = stores.map((s) => ({
-    value: String(s.store_id),
-    label: s.store_name,
-  }));
+  const filteredStores = useMemo(() => {
+    if (selectedUsers.includes("all") || selectedUsers.length === 0) {
+      return stores;
+    }
+
+    return stores.filter((s) => selectedUsers.includes(String(s.user_id)));
+  }, [stores, selectedUsers]);
 
   const filteredCategories = useMemo(() => {
     const cleanBU = selectedBU?.trim();
@@ -69,25 +73,6 @@ const ReportHeader = () => {
 
     return [
       {
-        key: "user_ids",
-        options: [{ value: "all", label: "Zgjidh të gjitha" }, ...userOptions],
-        placeholder: "Zgjidh përdoruesin",
-      },
-      {
-        key: "store_ids",
-        options: [{ value: "all", label: "Zgjidh të gjitha" }, ...storeOptions],
-        placeholder: "Zgjidh dyqanin",
-        className: "md:w-1/2 w-full",
-      },
-      {
-        key: "categories",
-        options: [
-          { value: "all", label: "Zgjidh të gjitha" },
-          ...filteredCategories.map((c) => ({ value: c, label: c })),
-        ],
-        placeholder: "Zgjedh kategorinë",
-      },
-      {
         key: "business_unit",
         options: [
           { value: "all", label: "Zgjidh të gjitha" },
@@ -103,8 +88,37 @@ const ReportHeader = () => {
           );
         },
       },
+      {
+        key: "categories",
+        options: [
+          { value: "all", label: "Zgjidh të gjitha" },
+          ...filteredCategories.map((c) => ({ value: c, label: c })),
+        ],
+        placeholder: "Zgjedh kategorinë",
+      },
+      {
+        key: "user_ids",
+        options: [{ value: "all", label: "Zgjidh të gjitha" }, ...userOptions],
+        placeholder: "Zgjidh përdoruesin",
+        onChange: (selected) => {
+          const values = selected?.map((s) => s.value) ?? [];
+          setSelectedUsers(values.includes("all") ? [] : values);
+        },
+      },
+      {
+        key: "store_ids",
+        options: [
+          { value: "all", label: "Zgjidh të gjitha" },
+          ...filteredStores.map((s) => ({
+            value: String(s.store_id),
+            label: s.store_name,
+          })),
+        ],
+        placeholder: "Zgjidh dyqanin",
+        className: "md:w-1/2 w-full",
+      },
     ] as FilterConfig[];
-  }, [userOptions, storeOptions, filteredCategories, businessUnits]);
+  }, [userOptions, filteredStores, filteredCategories, businessUnits]);
 
   const competitorColumns = useMemo(() => {
     const names = new Set<string>();

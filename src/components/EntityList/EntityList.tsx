@@ -132,7 +132,7 @@ export const EntityList = <T extends Entity>({
         handleError(backendMessage);
       }
     },
-    [onDelete, itemLabel, handleError, reset]
+    [onDelete, itemLabel, handleError]
   );
 
   return (

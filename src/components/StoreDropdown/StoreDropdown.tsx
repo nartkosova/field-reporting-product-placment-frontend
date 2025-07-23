@@ -28,7 +28,9 @@ export const StoreDropdown = () => {
     const fetchStores = async () => {
       if (!userId) return;
       try {
-        const userStores: Store[] = await storeServices.getStoresByUserId(userId);
+        const userStores: Store[] = await storeServices.getStoresByUserId(
+          userId
+        );
         setStores(
           userStores.sort((a, b) => a.store_name.localeCompare(b.store_name))
         );
@@ -51,6 +53,7 @@ export const StoreDropdown = () => {
       localStorage.removeItem("selectedStore");
       localStorage.removeItem(`store_${storeInfo?.store_id}_products`);
       window.dispatchEvent(new Event("selectedStoreChanged"));
+      window.dispatchEvent(new Event("otherStoreProductsChanged")); // Also clear other products
       return;
     }
 
@@ -62,6 +65,15 @@ export const StoreDropdown = () => {
     try {
       const products = await productServices.getProductsByStoreId(s.store_id);
       console.log("Loaded products:", products);
+
+      const otherProducts = await storeServices.getOtherStoreProducts(
+        s.store_id
+      );
+      localStorage.setItem(
+        `store_${s.store_id}_other_products`,
+        JSON.stringify(otherProducts)
+      );
+      window.dispatchEvent(new Event("otherStoreProductsChanged"));
     } catch (err) {
       console.error(err);
     }

@@ -16,6 +16,8 @@ const columnHelper = createColumnHelper<PodravkaFacingReport>();
 const ProductFacingsReportTable = ({ data }: Props) => {
   const columns: ColumnDef<PodravkaFacingReport, any>[] = useMemo(() => {
     return [
+      columnHelper.accessor("business_unit", { header: "Business Unit" }),
+      columnHelper.accessor("product_category", { header: "Kategoria" }),
       columnHelper.accessor("product_name", {
         header: "Produkti",
         cell: (info) => {
@@ -52,8 +54,6 @@ const ProductFacingsReportTable = ({ data }: Props) => {
           return `${count} (${percentage.toFixed(1)}%)`;
         },
       }),
-      columnHelper.accessor("product_category", { header: "Kategoria" }),
-      columnHelper.accessor("business_unit", { header: "Business Unit" }),
     ];
   }, []);
 

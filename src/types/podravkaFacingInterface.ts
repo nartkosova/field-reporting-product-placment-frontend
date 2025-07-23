@@ -4,6 +4,7 @@ export interface PodravkaFacingInput {
   product_id: number;
   category: string;
   facings_count: number;
+  is_listed: boolean;
 }
 export interface PodravkaFacingWithMeta extends PodravkaFacingInput {
   batch_id: string;

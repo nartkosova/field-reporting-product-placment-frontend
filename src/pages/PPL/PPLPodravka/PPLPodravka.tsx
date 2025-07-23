@@ -8,57 +8,39 @@ import { queueFacings } from "../../../db/db";
 import { isOnline } from "../../../utils/cacheManager";
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
 import { useUser } from "../../../hooks/useUser";
-
 import Select from "react-select";
 import darkSelectStyles from "../../../utils/darkSelectStyles";
+import storeServices from "../../../services/storeServices";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [otherStoreProducts, setOtherStoreProducts] = useState<
+    PodravkaProduct[]
+  >([]);
+  const [customProducts, setCustomProducts] = useState<PodravkaProduct[]>([]);
   const [facings, setFacings] = useState<{ [key: number]: number }>({});
   const [loading, setLoading] = useState(false);
   const [productsLoading, setProductsLoading] = useState(true);
-  const [customProducts, setCustomProducts] = useState<PodravkaProduct[]>([]);
-  const [allCategoryProducts, setAllCategoryProducts] = useState<
-    PodravkaProduct[]
+  const [searchOptions, setSearchOptions] = useState<
+    { label: string; value: number }[]
   >([]);
+  const [unlistedProducts, setUnlistedProducts] = useState<number[]>([]);
+
   const storeInfo = useSelectedStore();
   const id = storeInfo?.store_id || 0;
+  const storeId = id ? parseInt(id.toString()) : NaN;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
-  const storeId = id ? parseInt(id.toString()) : NaN;
   const { user } = useUser();
   const userId = user?.user_id;
+
   const combinedProducts = useMemo(
     () => [...products, ...customProducts],
     [products, customProducts]
   );
-  const [searchOptions, setSearchOptions] = useState<
-    { label: string; value: number }[]
-  >([]);
 
-  useEffect(() => {
-    const fetchCategoryProducts = async () => {
-      if (!selectedCategory) return;
-      const all = await productServices.getProductsByCategory(selectedCategory);
-      setAllCategoryProducts(all);
-    };
-
-    fetchCategoryProducts();
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    const options = allCategoryProducts
-      .filter(
-        (p) => !combinedProducts.find((cp) => cp.product_id === p.product_id)
-      )
-      .map((p) => ({
-        label: `${p.name} - ${p.product_category}`,
-        value: p.product_id!,
-      }));
-    setSearchOptions(options);
-  }, [combinedProducts, allCategoryProducts]);
-
+  // Get products listed for current store
   useEffect(() => {
     const fetchProducts = async () => {
       setProductsLoading(true);
@@ -71,24 +53,80 @@ const PodravkaFacingsFormPage = () => {
           );
         setProducts(filtered);
       } catch (err) {
-        console.error("Error fetching products:", err);
+        console.error("Error fetching store products:", err);
       } finally {
         setProductsLoading(false);
       }
     };
-
-    fetchProducts();
+    if (storeId && selectedCategory) fetchProducts();
   }, [storeId, selectedCategory]);
 
+  // Get products listed in other stores
+  useEffect(() => {
+    const fetchOthers = async () => {
+      try {
+        const other = await storeServices.getOtherStoreProducts(storeId);
+        setOtherStoreProducts(other);
+      } catch (err) {
+        console.error("Error fetching other-store products:", err);
+      }
+    };
+    if (storeId && selectedCategory) fetchOthers();
+  }, [storeId, selectedCategory]);
+
+  // Build search dropdown
+  useEffect(() => {
+    const unique = [...products, ...otherStoreProducts].filter(
+      (p, i, arr) => arr.findIndex((x) => x.product_id === p.product_id) === i
+    );
+
+    const filtered = unique
+      .filter((p) => p.category === selectedCategory)
+      .filter((p) => {
+        const isSelected = combinedProducts.some(
+          (cp) => cp.product_id === p.product_id
+        );
+        const isUnlisted = unlistedProducts.includes(p.product_id!);
+        return !isSelected || isUnlisted;
+      });
+
+    const options = filtered.map((p) => ({
+      label: `${p.name} - ${p.product_category}`,
+      value: p.product_id!,
+    }));
+
+    setSearchOptions(options);
+  }, [
+    products,
+    otherStoreProducts,
+    combinedProducts,
+    unlistedProducts,
+    selectedCategory,
+  ]);
+
   const handleAddProduct = (productId: number) => {
-    const product = allCategoryProducts.find((p) => p.product_id === productId);
-    if (product && !customProducts.some((p) => p.product_id === productId)) {
-      setCustomProducts((prev) => [...prev, product]);
+    const allAvailable = [...products, ...otherStoreProducts];
+    const product = allAvailable.find((p) => p.product_id === productId);
+    if (product) {
+      setCustomProducts((prev) => [...prev, product as PodravkaProduct]);
+      setUnlistedProducts((prev) => prev.filter((id) => id !== productId));
     }
   };
 
+  const handleRemoveProduct = (productId: string | number) => {
+    const id = typeof productId === "string" ? parseInt(productId) : productId;
+    setUnlistedProducts((prev) => [...new Set([...prev, id])]);
+    setCustomProducts((prev) => prev.filter((p) => p.product_id !== id));
+    setProducts((prev) => prev.filter((p) => p.product_id !== id));
+    setFacings((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
+  };
+
   const handleFacingChange = (productId: number, value: number) => {
-    setFacings({ ...facings, [productId]: value });
+    setFacings((prev) => ({ ...prev, [productId]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,15 +141,32 @@ const PodravkaFacingsFormPage = () => {
 
     const allProducts = [...products, ...customProducts];
 
-    const facingData = allProducts
-      .filter((product) => product.product_id !== undefined)
-      .map((product) => ({
+    const listedFacings = allProducts
+      .filter((p) => p.product_id !== undefined)
+      .map((p) => ({
         user_id: Number(userId),
         store_id: Number(storeId),
-        product_id: product.product_id!,
-        category: product.category,
-        facings_count: facings[product.product_id!] || 0,
+        product_id: p.product_id!,
+        category: p.category,
+        facings_count: facings[p.product_id!] || 0,
+        is_listed: true,
       }));
+
+    const unlistedFacings = unlistedProducts.map((id) => {
+      const product = [...products, ...otherStoreProducts].find(
+        (p) => p.product_id === id
+      );
+      return {
+        user_id: Number(userId),
+        store_id: Number(storeId),
+        product_id: id,
+        category: product?.category || selectedCategory,
+        facings_count: 0,
+        is_listed: false,
+      };
+    });
+
+    const facingData = [...listedFacings, ...unlistedFacings];
 
     try {
       if (!isOnline()) {
@@ -121,7 +176,6 @@ const PodravkaFacingsFormPage = () => {
         await podravkaFacingsService.batchCreatePodravkaFacings(facingData);
         alert("Facings u ngarkuan me sukses!");
       }
-
       setFacings({});
       navigate(-1);
     } catch (err) {
@@ -132,42 +186,24 @@ const PodravkaFacingsFormPage = () => {
     }
   };
 
-  const handleRemoveProduct = (productId: string | number) => {
-    const numericProductId =
-      typeof productId === "string" ? parseInt(productId, 10) : productId;
-
-    setCustomProducts((prev) =>
-      prev.filter((p) => p.product_id !== numericProductId)
-    );
-
-    setProducts((prev) =>
-      prev.filter((p) => p.product_id !== numericProductId)
-    );
-
-    setFacings((prev) => {
-      const updated = { ...prev };
-      delete updated[numericProductId];
-      return updated;
-    });
-  };
-
   const entries = combinedProducts
-    .filter((p) => p.product_id !== undefined)
+    .filter((p) => !unlistedProducts.includes(p.product_id!))
     .map((p) => ({
-      id: p.product_id as number,
+      id: p.product_id!,
       label: `${p.name} - ${p.product_category}`,
       value: facings[p.product_id!] || 0,
       isCustom: customProducts.some((cp) => cp.product_id === p.product_id),
     }));
+
   return (
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
         <div className="w-full max-w-2xl mb-6">
           <Select
             options={searchOptions}
-            onChange={(selected) => {
-              if (selected) handleAddProduct(selected.value);
-            }}
+            onChange={(selected) =>
+              selected && handleAddProduct(selected.value)
+            }
             styles={darkSelectStyles}
             placeholder="Shto produkt"
             isClearable

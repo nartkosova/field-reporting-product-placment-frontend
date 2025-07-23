@@ -52,6 +52,39 @@ const getStoresWithUserId = async () => {
   return response.data;
 };
 
+export const getOtherStoreProducts = async (storeId: number) => {
+  const token = getToken();
+  const localKey = `store_${storeId}_other_products`;
+
+  if (!isOnline() || localStorage.getItem(localKey)) {
+    try {
+      const cached = localStorage.getItem(localKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (err) {
+      console.warn("Corrupt or unreadable cache:", err);
+    }
+
+    throw new Error(
+      "Nuk ka të dhëna të ruajtura për produktet shtesë, lidhuni me internetin."
+    );
+  }
+
+  const response = await axios.get(
+    `${baseUrl}/api/stores/${storeId}/other-products`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const products = response.data;
+  localStorage.setItem(localKey, JSON.stringify(products));
+  return products;
+};
+
 const createStore = async (storeData: StoreInput) => {
   const token = getToken();
   const response = await axios.post(`${baseUrl}/api/stores`, storeData, {
@@ -85,6 +118,7 @@ export default {
   getStoreById,
   getAllStores,
   getStoresWithUserId,
+  getOtherStoreProducts,
   createStore,
   updateStore,
   deleteStore,

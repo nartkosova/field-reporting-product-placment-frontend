@@ -6,6 +6,7 @@ export interface User {
 export interface Store {
   store_id: string | number;
   store_name: string;
+  user_id: string | number;
 }
 
 export interface Facing {

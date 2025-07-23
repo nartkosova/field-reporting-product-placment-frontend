@@ -51,7 +51,7 @@ const DateRangePicker = ({
           setOpen((prev) => !prev);
           setTimeout(() => update(), 0);
         }}
-        className="flex items-center justify-center w-12 h-12 border border-neutral-700 cursor-pointer bg-neutral-900 text-white rounded-xl hover:bg-neutral-800"
+        className="flex items-center justify-center w-12 h-12 border border-neutral-800 cursor-pointer bg-neutral-900 text-white rounded-xl hover:border-white transition-colors"
         title="Pick date range"
       >
         📅

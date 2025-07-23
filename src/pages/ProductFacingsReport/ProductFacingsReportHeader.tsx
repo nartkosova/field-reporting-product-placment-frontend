@@ -68,22 +68,6 @@ const ProductFacingsReportHeader = () => {
 
     return [
       {
-        key: "user_ids",
-        options: userOptions,
-        placeholder: "Zgjidh përdoruesin",
-      },
-      {
-        key: "store_ids",
-        options: storeOptions,
-        placeholder: "Zgjidh dyqanin",
-        className: "md:w-1/2 w-full",
-      },
-      {
-        key: "categories",
-        options: filteredCategories.map((c) => ({ value: c, label: c })),
-        placeholder: "Zgjedh kategorinë",
-      },
-      {
         key: "business_unit",
         options: businessUnits.map((unit) => ({
           value: unit,
@@ -93,6 +77,22 @@ const ProductFacingsReportHeader = () => {
         onChange: (selected) => {
           setSelectedBU(selected[0]?.value ?? null);
         },
+      },
+      {
+        key: "categories",
+        options: filteredCategories.map((c) => ({ value: c, label: c })),
+        placeholder: "Zgjedh kategorinë",
+      },
+      {
+        key: "user_ids",
+        options: userOptions,
+        placeholder: "Zgjidh përdoruesin",
+      },
+      {
+        key: "store_ids",
+        options: storeOptions,
+        placeholder: "Zgjidh dyqanin",
+        className: "md:w-1/2 w-full",
       },
     ] as FilterConfig[];
   }, [userOptions, storeOptions, filteredCategories, businessUnits]);
