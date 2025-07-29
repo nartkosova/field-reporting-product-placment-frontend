@@ -33,6 +33,7 @@ const UpdatePodravkaFacingsPage = () => {
         product_id: m.product_id,
         category: m.category,
         facings_count: count,
+        is_listed: m.is_listed,
       }),
       submitBatch: (id: string, facings: PodravkaFacingInput[]) =>
         podravkaFacingsService.updatePodravkaBatch({ batchId: id, facings }),

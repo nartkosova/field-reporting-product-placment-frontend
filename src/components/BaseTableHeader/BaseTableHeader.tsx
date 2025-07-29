@@ -79,7 +79,6 @@ export default function GenericReportHeader<T>({
   return (
     <div className="py-4">
       <h2 className="text-2xl font-bold mb-4 text-white">{title}</h2>
-
       <div className="flex gap-2 mb-4 flex-wrap">
         {filtersConfig.map(
           ({ key, options, placeholder, className, onChange }) => (
@@ -116,7 +115,6 @@ export default function GenericReportHeader<T>({
           />
         )}
       </div>
-
       <div className="flex justify-between items-center mt-4 text-sm mb-4 text-white">
         <div className="flex items-center gap-2">
           <span>
@@ -158,7 +156,6 @@ export default function GenericReportHeader<T>({
           </select>
         </div>
       </div>
-
       {renderTable(data, {
         ...debouncedFilters,
         ...(startDate
@@ -166,7 +163,7 @@ export default function GenericReportHeader<T>({
           : {}),
         ...(endDate ? { end_date: endDate.toISOString().split("T")[0] } : {}),
       })}
-
+      user
       {exportExcel &&
         userRole === "admin" &&
         (user?.user === "Ilir" || user?.user === "Arjeta") && (

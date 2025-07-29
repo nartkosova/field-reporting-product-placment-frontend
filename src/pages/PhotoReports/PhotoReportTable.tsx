@@ -11,7 +11,6 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
   const [tableData, setTableData] = useState<PhotoSchema[]>(data);
-
   useEffect(() => {
     setTableData(data);
   }, [data]);
