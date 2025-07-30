@@ -166,7 +166,9 @@ export default function GenericReportHeader<T>({
       user
       {exportExcel &&
         userRole === "admin" &&
-        (user?.user === "Ilir" || user?.user === "Arjeta") && (
+        (user?.user === "Ilir" ||
+          user?.user === "Arjeta" ||
+          user?.user === "Kushtrim") && (
           <div className="pt-6 flex gap-2">
             <ActionButton onClick={() => exportExcel(data)} variant="primary">
               Exporto në Excel

@@ -63,6 +63,11 @@ const PhotoReportHeader = () => {
 
   const filterConfigs = [
     {
+      key: "photo_types",
+      options: photoTypeOptions,
+      placeholder: "Zgjidh llojin e fotos",
+    },
+    {
       key: "user_ids",
       options: userOptions,
       placeholder: "Zgjidh përdoruesin",
@@ -77,11 +82,6 @@ const PhotoReportHeader = () => {
       key: "categories",
       options: categoryOptions,
       placeholder: "Zgjidh kategorinë",
-    },
-    {
-      key: "photo_types",
-      options: photoTypeOptions,
-      placeholder: "Zgjidh llojin e fotos",
     },
     {
       key: "company",
@@ -145,11 +145,12 @@ const PhotoReportHeader = () => {
           extension: "jpeg",
         });
 
-        worksheet.getRow(excelRow.number).height = 100;
+        worksheet.getRow(excelRow.number).height = 120;
+        worksheet.getColumn(7).width = 16;
 
         worksheet.addImage(imageId, {
           tl: { col: 6, row: excelRow.number - 1 },
-          ext: { width: 120, height: 100 },
+          ext: { width: 80, height: 120 },
         });
       } catch {
         console.warn("Could not load image:", row.photo_url);

@@ -11,7 +11,7 @@ import { queuePhoto } from "../../db/db";
 import imageCompression from "browser-image-compression";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { useUser } from "../../hooks/useUser";
-
+import { v4 as uuidv4 } from "uuid";
 interface Props {
   photoType: PhotoInput["photo_type"];
 }
@@ -39,14 +39,14 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   }, [storeId]);
 
   const handleSubmit = async () => {
+    if (isLoading) return;
     setIsLoading(true);
     if (!file || !storeId || !userId)
       return alert("Ju lutem plotësoni të gjitha fushat.");
     const safeName = sanitizeFilename(String(storeName));
-    const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
     const customName = `${safeName}-${
       category || photoType
-    }-${company}-${timestamp}`.toLowerCase();
+    }-${company}-${uuidv4()}`.toLowerCase();
 
     const compressedFile = await imageCompression(file, {
       maxSizeMB: 0.2,

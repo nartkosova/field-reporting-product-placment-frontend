@@ -9,7 +9,7 @@ const UserList = () => {
         <EntityList
           title="Përdoruesit"
           fetchAll={async () => {
-            const users = await userService.getAllUsers();
+            const users = await userService.getAllUsersWithAdmin();
             return users.map((u: UserInput) => ({
               id: u.user_id,
               name: u.user,

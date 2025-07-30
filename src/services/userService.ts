@@ -12,6 +12,15 @@ const getAllUsers = async () => {
   return response.data;
 };
 
+const getAllUsersWithAdmin = async () => {
+  const token = getToken();
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  const response = await axios.get(`${baseUrl}/api/users/all`, config);
+  return response.data;
+};
+
 const getUserById = async (id: number) => {
   const token = getToken();
   const config = {
@@ -61,6 +70,7 @@ const updateUser = async (
 export default {
   getAllUsers,
   getUserById,
+  getAllUsersWithAdmin,
   createUser,
   loginUser,
   deleteUser,
