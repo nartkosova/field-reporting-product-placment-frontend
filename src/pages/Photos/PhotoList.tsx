@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EntityList } from "../../components/EntityList/EntityList";
 import photoService from "../../services/photoService";
 import { formattedDate } from "../../utils/utils";
@@ -19,25 +20,28 @@ const PhotoList = () => {
       <div className="w-full max-w-4xl flex flex-col items-center justify-center flex-1 py-8">
         <EntityList<PhotoEntity>
           title="Fotot nga raportet"
-          fetchAll={async () => {
+          fetchAll={async (offset = 0, limit = 20): Promise<PhotoEntity[]> => {
             const photos: PhotoSchema[] =
-              await photoService.getReportPhotosByUserId();
-            return photos.map((photo) => ({
-              id: photo.photo_id,
-              name: photo.store_name,
-              created_at: photo.created_at,
-              category: photo.category,
-              photo_type: photo.photo_type,
-              photo_description: photo.photo_description,
-              photo_url: photo.photo_url,
-            }));
+              await photoService.getReportPhotosByUserId(offset, limit);
+
+            return photos.map(
+              (photo): PhotoEntity => ({
+                id: photo.photo_id,
+                name: photo.store_name,
+                created_at: photo.created_at,
+                category: photo.category,
+                photo_type: photo.photo_type,
+                photo_description: photo.photo_description,
+                photo_url: photo.photo_url,
+              })
+            );
           }}
-          onDelete={async (photoId: number) => {
+          onDelete={async (photoId: number | string) => {
             await photoService.deleteReportPhoto(photoId.toString());
           }}
           editPath="/photos/edit"
           itemLabel="fotografi"
-          renderDetails={(item) => (
+          renderDetails={(item: PhotoEntity) => (
             <div className="text-sm text-gray-600 space-y-1">
               <div>Tipi: {item.photo_type}</div>
               <div>Kategoria: {item.category}</div>

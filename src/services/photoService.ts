@@ -4,15 +4,17 @@ import { PaginatedPhotoResponse, PhotoSchema } from "../types/photoInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
-const getReportPhotosByUserId = async (): Promise<PhotoSchema[]> => {
-  const token = getToken();
+const getReportPhotosByUserId = async (offset = 0, limit = 20): Promise<PhotoSchema[]> => {
+  const token = getToken()
   const res = await axios.get(`${baseUrl}/api/photos/user`, {
+    params: { offset, limit },
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  });
-  return res.data;
-};
+  })
+  return res.data
+}
+
 
 export const getReportPhotosByPhotoId = async (
   photoId: string
