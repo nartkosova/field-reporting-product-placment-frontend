@@ -29,9 +29,7 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("selectedCategory");
-    localStorage.removeItem("selectedStore");
+    localStorage.clear();
     navigate("/login");
   };
 
