@@ -199,16 +199,20 @@ const ReportHeader = () => {
       }, {} as Record<string, string>);
 
       return {
-        User: row.user,
-        Store: row.store_name,
-        Category: row.category,
-        "Podravka Facings": `${podravka} (${podravkaPercent.toFixed(1)}%)`,
+        ...(row.user && { Raportuesi: row.user }),
+        ...(row.store_name && { Dyqani: row.store_name }),
+        ...(row.category && { Kategoria: row.category }),
+        "Podravka Facings": `${podravka}`,
+        "Total Facings Podravka %": `${podravkaPercent.toFixed(1)}%`,
         ...competitors,
-        "Total Facings Konkurrenca": `${competitor} (${(total === 0
+        "Total Facings Konkurrenca": `${competitor}`,
+        "Total Facings Konkurrenca %": `${(total === 0
           ? 0
           : (competitor / total) * 100
-        ).toFixed(1)}%)`,
-        Date: new Date(row.created_at).toLocaleDateString(),
+        ).toFixed(1)}%`,
+        ...(row.created_at && {
+          Data: new Date(row.created_at).toLocaleDateString(),
+        }),
       };
     });
 

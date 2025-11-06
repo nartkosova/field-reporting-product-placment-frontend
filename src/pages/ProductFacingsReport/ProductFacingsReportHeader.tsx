@@ -151,10 +151,8 @@ const ProductFacingsReportHeader = () => {
       Product: row.product_name,
       Category: row.product_category,
       "Business Unit": row.business_unit,
-      "Podravka Facings": row.facings_count,
-      Date: new Date(row.created_at).toLocaleDateString(),
-      Store: row.store_name,
-      Reporter: row.reported_by,
+      "Podravka Facings": row.total_facings,
+      "Facing % in Category": row.facing_percentage_in_category,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);

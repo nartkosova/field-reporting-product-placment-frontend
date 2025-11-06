@@ -49,7 +49,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     }-${company}-${uuidv4()}`.toLowerCase();
 
     const compressedFile = await imageCompression(file, {
-      maxSizeMB: 0.2,
+      maxSizeMB: 0.4,
       maxWidthOrHeight: 1280,
       useWebWorker: true,
     });
