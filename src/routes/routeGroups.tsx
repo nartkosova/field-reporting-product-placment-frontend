@@ -35,6 +35,10 @@ import UpdatePodravkaProduct from "../pages/Features/PodravkaProducts/UpdatePodr
 import PodravkaProductList from "../pages/Features/PodravkaProducts/PodravkaProductList";
 import ProductFacingsReportHeader from "../pages/ProductFacingsReport/ProductFacingsReportHeader";
 import { AdminGuard } from "./AminGuard";
+import ProexVFSSelector from "../pages/ProexVFSSelector/ProexVFSSelector";
+import ProexStoreSelector from "../pages/ProexVFSSelector/ProexStoreSelector";
+import VFSStoreSelector from "../pages/ProexVFSSelector/VFSStoreSelector";
+import PresenceReport from "../pages/PresenceReports/PresenceReport";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -224,5 +228,28 @@ export const reportRoutes: RouteObject[] = [
   {
     path: "/reports/product-facings",
     element: <ProductFacingsReportHeader />,
+  },
+  {
+    path: "/reports/presence",
+    element: (
+      <AdminGuard>
+        <PresenceReport />
+      </AdminGuard>
+    ),
+  },
+];
+
+export const proexVfsRoutes: RouteObject[] = [
+  {
+    path: "/proex-vfs",
+    element: <ProexVFSSelector />,
+  },
+  {
+    path: "/proex-vfs/vfs",
+    element: <VFSStoreSelector />,
+  },
+  {
+    path: "/proex-vfs/proex",
+    element: <ProexStoreSelector />,
   },
 ];

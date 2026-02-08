@@ -83,6 +83,30 @@ const getPodravkaFacingsReport = async (
   return response.data;
 };
 
+const getPodravkaPresenceReport = async (
+  page: number = 1,
+  limit: number = 50,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filters: Record<string, any> = {}
+) => {
+  const token = getToken();
+
+  const params = {
+    page,
+    limit,
+    ...filters,
+  };
+
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/presence-report`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: params,
+    }
+  );
+  return response.data;
+};
+
 const batchCreatePodravkaFacings = async (
   facingDataArray: PodravkaFacingInput[]
 ) => {
@@ -134,6 +158,7 @@ export default {
   getPodravkaFacingsByBatchId,
   getUserPPLBatches,
   getPodravkaFacingsReport,
+  getPodravkaPresenceReport,
   batchCreatePodravkaFacings,
   updatePodravkaBatch,
   deletePodravkaFacingBatch,

@@ -7,6 +7,7 @@ import {
   photoRoutes,
   settingsRoutes,
   reportRoutes,
+  proexVfsRoutes,
 } from "./routeGroups";
 
 const userRoutes: RouteObject[] = [
@@ -17,6 +18,7 @@ const userRoutes: RouteObject[] = [
   ...pplRoutes,
   ...photoRoutes,
   ...reportRoutes,
+  ...proexVfsRoutes,
 ];
 
 const adminRoutes: RouteObject[] = [...reportRoutes, ...settingsRoutes];

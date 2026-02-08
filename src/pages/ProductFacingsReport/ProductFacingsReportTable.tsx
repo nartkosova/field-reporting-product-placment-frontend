@@ -16,6 +16,8 @@ const columnHelper = createColumnHelper<PodravkaFacingReport>();
 const ProductFacingsReportTable = ({ data }: Props) => {
   const columns: ColumnDef<PodravkaFacingReport, any>[] = useMemo(() => {
     return [
+      columnHelper.accessor("podravka_code", { header: "Podravka Code" }),
+      columnHelper.accessor("elkos_code", { header: "Elkos Code" }),
       columnHelper.accessor("business_unit", { header: "Business Unit" }),
       columnHelper.accessor("product_category", { header: "Kategoria" }),
       columnHelper.accessor("product_name", {
@@ -33,15 +35,14 @@ const ProductFacingsReportTable = ({ data }: Props) => {
           let percentText = "";
 
           if (hasPercentage) {
-            const percentValue = (percentage * 100).toFixed(2);
-            percentText = hasRank
-              ? ` - ${percentValue}%`
-              : ` (${percentValue}%`;
-          }
+          const percentValue = (percentage * 100).toFixed(2);
+          percentText = hasRank
+            ? ` - ${percentValue}%`
+            : ` (${percentValue}%`;
+        }
 
-          const suffix = hasRank || hasPercentage ? ")" : "";
-
-          return `${name}${rankText}${percentText}${suffix}`;
+        const suffix = hasRank || hasPercentage ? ")" : "";
+        return `${name}${rankText}${percentText}${suffix}`;
         },
       }),
       columnHelper.accessor("total_facings", {

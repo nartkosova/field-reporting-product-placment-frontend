@@ -8,7 +8,7 @@ const ReportSelector = () => {
 
   const filteredFields = isAdmin
     ? reportSelectorFields
-    : reportSelectorFields.filter((_, index) => index !== 1);
+    : reportSelectorFields.filter((field) => !field.adminOnly);
 
   return (
     <div className="w-full flex flex-col items-center justify-center">

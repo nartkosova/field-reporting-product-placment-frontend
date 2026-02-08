@@ -131,14 +131,20 @@ const createCompetitorProduct = async (data: {
   return response.data;
 };
 
-const getProducts = async () => {
+const getProducts = async (page?: number, limit?: number) => {
   const token = getToken();
+
+  const params: Record<string, number> = {};
+  if (page) params.page = page;
+  if (limit) params.limit = limit;
+
   const response = await axios.get(`${baseUrl}/api/products`, {
     headers: { Authorization: `Bearer ${token}` },
+    params: params,
   });
+
   return response.data;
 };
-
 const getProductsByStoreId = async (storeId: number) => {
   const token = getToken();
 

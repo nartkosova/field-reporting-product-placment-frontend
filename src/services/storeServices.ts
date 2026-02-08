@@ -52,6 +52,22 @@ const getStoresWithUserId = async () => {
   return response.data;
 };
 
+const getVFSStores = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/api/stores/single/vfs`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+const getProexStores = async () => {
+  const token = getToken();
+  const response = await axios.get(`${baseUrl}/api/stores/single/proex`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 export const getOtherStoreProducts = async (storeId: number) => {
   const token = getToken();
   const localKey = `store_${storeId}_other_products`;
@@ -118,6 +134,8 @@ export default {
   getStoreById,
   getAllStores,
   getStoresWithUserId,
+  getVFSStores,
+  getProexStores,
   getOtherStoreProducts,
   createStore,
   updateStore,

@@ -4,7 +4,8 @@ export interface PodravkaFacingInput {
   product_id: number;
   category: string;
   facings_count: number;
-  is_listed: boolean;
+  is_listed?: boolean;
+  record_type?: string;
 }
 export interface PodravkaFacingWithMeta extends PodravkaFacingInput {
   batch_id: string;
@@ -62,4 +63,6 @@ export interface PodravkaFacingReport {
   reported_by: string;
   facing_percentage_in_category: number;
   total_facings: number;
+  podravka_code: string;
+  elkos_code: string;
 }

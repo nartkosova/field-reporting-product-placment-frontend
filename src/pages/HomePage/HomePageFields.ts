@@ -13,6 +13,7 @@ export const userNavItems = (storeInfo: Store | null) => [
     label: "Krijo Foto",
     disabled: !storeInfo,
   },
+  { to: "/proex-vfs", label: "Proex/VFS" },
   { to: "/photos/edit", label: "Edito Fotot" },
   { to: "/reports", label: "Raporte" },
 ];

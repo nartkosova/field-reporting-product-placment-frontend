@@ -148,6 +148,8 @@ const ProductFacingsReportHeader = () => {
 
   const handleExportExcel = () => {
     const dataToExport = facings.map((row) => ({
+      "Podravka Code": row.podravka_code,
+      "Elkos Code": row.elkos_code,
       Product: row.product_name,
       Category: row.product_category,
       "Business Unit": row.business_unit,
