@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select, { SingleValue } from "react-select";
 import { Store } from "../../types/storeInterface";
 import productServices from "../../services/productServices";
@@ -13,6 +13,11 @@ interface StoreOption {
   value: number;
   label: string;
   data: Store;
+}
+
+interface CategoryOption {
+  value: string;
+  label: string;
 }
 
 type FetchStores = () => Promise<Store[]>;
@@ -31,10 +36,9 @@ const PresencePage = ({
   const [stores, setStores] = useState<Store[]>([]);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-  // Products & Pagination State
+  // Products State
   const [products, setProducts] = useState<PodravkaProduct[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [listedMap, setListedMap] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(false);
@@ -47,25 +51,7 @@ const PresencePage = ({
   const storeInfo = useSelectedStore();
   const { user } = useUser();
 
-  // Observer for Infinite Scroll
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastElementRef = useCallback(
-    (node: HTMLTableRowElement) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
-
-  // Load Stores
+  // 1. Load Stores
   useEffect(() => {
     const loadStores = async () => {
       try {
@@ -79,46 +65,35 @@ const PresencePage = ({
     loadStores();
   }, [fetchStores]);
 
-  useEffect(() => {
-    if (selectedStore?.store_id) {
-      setProducts([]);
-      setPage(1);
-      setHasMore(true);
-      setListedMap({});
-    }
-  }, [selectedStore?.store_id]);
-
+  // 2. Load ALL Products when store changes
   useEffect(() => {
     const loadProducts = async () => {
-      if (!selectedStore?.store_id) return;
+      if (!selectedStore?.store_id) {
+        setProducts([]);
+        setListedMap({});
+        return;
+      }
 
       setLoading(true);
       try {
-        const limit = 20;
-        const res = await productServices.getProducts(page, limit);
+        // Fetch ALL products (no arguments = default fetch all in your updated service)
+        const res = await productServices.getProducts();
 
-        if (res.length === 0) {
-          setHasMore(false);
-        } else {
-          setProducts((prev) => {
-            return page === 1 ? res : [...prev, ...res];
+        setProducts(res);
+
+        // Initialize listedMap
+        setListedMap((prev) => {
+          const newMap = { ...prev };
+          res.forEach((p: PodravkaProduct) => {
+            if (
+              p.product_id !== undefined &&
+              newMap[p.product_id] === undefined
+            ) {
+              newMap[p.product_id] = false;
+            }
           });
-
-          setListedMap((prev) => {
-            const newMap = { ...prev };
-            res.forEach((p: PodravkaProduct) => {
-              if (
-                p.product_id !== undefined &&
-                newMap[p.product_id] === undefined
-              ) {
-                newMap[p.product_id] = false;
-              }
-            });
-            return newMap;
-          });
-
-          if (res.length < limit) setHasMore(false);
-        }
+          return newMap;
+        });
       } catch (error) {
         console.error("Failed to fetch products:", error);
         setToast({ type: "err", text: "Gabim në ngarkimin e produkteve." });
@@ -128,9 +103,9 @@ const PresencePage = ({
     };
 
     loadProducts();
-  }, [selectedStore?.store_id, page]);
+  }, [selectedStore?.store_id]);
 
-  // Auto-select store from context
+  // 3. Auto-select store from context
   useEffect(() => {
     if (!selectedStore && storeInfo?.store_id && stores.length) {
       const match = stores.find((s) => s.store_id === storeInfo.store_id);
@@ -138,12 +113,14 @@ const PresencePage = ({
     }
   }, [selectedStore, storeInfo?.store_id, stores]);
 
-  // Toast Timer
+  // 4. Toast Timer
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => setToast(null), 3000);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  // --- Derived Data & Memos ---
 
   const storeOptions: StoreOption[] = useMemo(
     () =>
@@ -158,6 +135,25 @@ const PresencePage = ({
     [stores]
   );
 
+  // Extract unique categories for the filter dropdown
+  const categoryOptions: CategoryOption[] = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(products.map((p) => p.category).filter(Boolean))
+    );
+    return uniqueCategories.sort().map((c) => ({
+      value: c,
+      label: c,
+    }));
+  }, [products]);
+
+  // Filter products based on selection
+  const filteredProducts = useMemo(() => {
+    if (!selectedCategory) return products;
+    return products.filter((p) => p.category === selectedCategory);
+  }, [products, selectedCategory]);
+
+  // --- Handlers ---
+
   const handleStoreChange = async (selected: SingleValue<StoreOption>) => {
     if (!selected) {
       setSelectedStore(null);
@@ -169,6 +165,10 @@ const PresencePage = ({
     setSelectedStore(s);
     localStorage.setItem("selectedStore", JSON.stringify(s));
     await clearApiCache();
+  };
+
+  const handleCategoryChange = (selected: SingleValue<CategoryOption>) => {
+    setSelectedCategory(selected ? selected.value : null);
   };
 
   const handleToggleListed = (productId: number, checked: boolean) => {
@@ -186,13 +186,15 @@ const PresencePage = ({
 
     setSaving(true);
     try {
+      // NOTE: We map over 'products' (ALL items), not 'filteredProducts'.
+      // This ensures we save checks even for categories currently hidden by the filter.
       const payload = products
         .filter((p) => p.product_id !== undefined)
         .map((p) => ({
           user_id: Number(user.user_id),
           store_id: Number(selectedStore.store_id),
           product_id: p.product_id!,
-          category: p.category,
+          category: p.category || "Uncategorized",
           facings_count: listedMap[p.product_id!] ? 1 : 0,
           record_type: recordType,
         }));
@@ -207,72 +209,97 @@ const PresencePage = ({
     }
   };
 
+  // Shared Select Styles
+  const selectStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#18181b",
+      borderColor: "#27272a",
+      color: "#fff",
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#18181b",
+      color: "#fff",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? "#27272a" : "#18181b",
+      color: "#fff",
+    }),
+    singleValue: (provided: any) => ({ ...provided, color: "#fff" }),
+    input: (provided: any) => ({ ...provided, color: "#fff" }),
+    placeholder: (provided: any) => ({ ...provided, color: "#9ca3af" }),
+  };
+
   return (
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-5xl flex flex-col items-center justify-center flex-1 py-8">
-        <div className="w-full max-w-4xl mb-8">
+        <div className="w-full max-w-4xl mb-4">
           <h2 className="font-extrabold text-white mb-6 tracking-tight text-center drop-shadowtext-lg">
             {title}
           </h2>
-          <Select<StoreOption>
-            options={storeOptions}
-            onChange={handleStoreChange}
-            placeholder="Zgjedh një market..."
-            value={
-              selectedStore
-                ? {
-                    value: selectedStore.store_id,
-                    label: `${selectedStore.store_name} (${selectedStore.store_code}) - ${selectedStore.store_category}`,
-                    data: selectedStore,
-                  }
-                : null
-            }
-            isClearable
-            styles={{
-              control: (provided: any) => ({
-                ...provided,
-                backgroundColor: "#18181b",
-                borderColor: "#27272a",
-                color: "#fff",
-              }),
-              menu: (provided: any) => ({
-                ...provided,
-                backgroundColor: "#18181b",
-                color: "#fff",
-              }),
-              option: (provided: any, state: any) => ({
-                ...provided,
-                backgroundColor: state.isSelected ? "#27272a" : "#18181b",
-                color: "#fff",
-              }),
-              singleValue: (provided: any) => ({ ...provided, color: "#fff" }),
-              input: (provided: any) => ({ ...provided, color: "#fff" }),
-            }}
-          />
+
+          <div className="flex gap-4 flex-col sm:flex-row">
+            {/* Store Select */}
+            <div className="flex-1">
+              <label className="text-xs text-neutral-400 mb-1 block pl-1">
+                Marketi
+              </label>
+              <Select<StoreOption>
+                options={storeOptions}
+                onChange={handleStoreChange}
+                placeholder="Zgjedh një market..."
+                value={
+                  selectedStore
+                    ? {
+                        value: selectedStore.store_id,
+                        label: `${selectedStore.store_name} (${selectedStore.store_code}) - ${selectedStore.store_category}`,
+                        data: selectedStore,
+                      }
+                    : null
+                }
+                isClearable
+                styles={selectStyles}
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div className="w-full sm:w-64">
+              <label className="text-xs text-neutral-400 mb-1 block pl-1">
+                Filtro Kategorinë
+              </label>
+              <Select<CategoryOption>
+                options={categoryOptions}
+                onChange={handleCategoryChange}
+                placeholder="Të gjitha kategoritë"
+                isClearable
+                styles={selectStyles}
+                isDisabled={!selectedStore}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl shadow-lg overflow-hidden flex flex-col h-[600px]">
+        <div className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl shadow-lg overflow-hidden flex flex-col h-auto max-h-[600px] relative z-0">
           <div className="w-full overflow-y-auto flex-1">
             <table className="min-w-full text-sm text-left text-neutral-200 relative">
               <thead className="bg-neutral-900 text-neutral-400 uppercase text-xs sticky top-0 z-10 shadow-md">
                 <tr>
                   <th className="px-4 py-3 bg-neutral-900">Produkti</th>
+                  <th className="px-4 py-3 bg-neutral-900">Kategoria</th>
                   <th className="px-4 py-3 bg-neutral-900 text-center">
                     E Listuar
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-800">
-                {products.map((p, index) => {
-                  const isLastElement = index === products.length - 1;
-                  const isChecked = !!(p.product_id && listedMap[p.product_id]); // Helper boolean
+                {filteredProducts.map((p) => {
+                  const isChecked = !!(p.product_id && listedMap[p.product_id]);
                   return (
                     <tr
                       key={p.product_id}
-                      // 1. Add cursor-pointer
                       className="hover:bg-neutral-900/40 cursor-pointer select-none"
-                      ref={isLastElement ? lastElementRef : null}
-                      // 2. Add Row Click Handler
                       onClick={() =>
                         p.product_id &&
                         handleToggleListed(p.product_id, !isChecked)
@@ -281,11 +308,15 @@ const PresencePage = ({
                       <td className="px-4 py-3 font-medium text-white">
                         {p.name}
                       </td>
+                      <td className="px-4 py-3 text-neutral-400">
+                        {p.category}
+                      </td>
                       <td className="px-4 py-3 text-center">
                         <input
                           type="checkbox"
                           className="w-5 h-5 accent-blue-600 cursor-pointer"
-                          checked={!!(p.product_id && listedMap[p.product_id])}
+                          checked={isChecked}
+                          onClick={(e) => e.stopPropagation()}
                           onChange={(e) =>
                             p.product_id &&
                             handleToggleListed(p.product_id, e.target.checked)
@@ -296,26 +327,26 @@ const PresencePage = ({
                   );
                 })}
 
-                {/* Loading Indicator at bottom */}
+                {/* Empty / Loading States */}
                 {loading && (
                   <tr>
                     <td
                       colSpan={3}
-                      className="px-4 py-4 text-center text-neutral-500"
+                      className="px-4 py-12 text-center text-neutral-500"
                     >
-                      Duke ngarkuar më shumë produkte...
+                      Duke ngarkuar produktet...
                     </td>
                   </tr>
                 )}
 
-                {!loading && products.length === 0 && (
+                {!loading && filteredProducts.length === 0 && (
                   <tr>
                     <td
                       colSpan={3}
-                      className="px-4 py-6 text-center text-neutral-500"
+                      className="px-4 py-12 text-center text-neutral-500"
                     >
                       {selectedStore
-                        ? "Nuk u gjetën produkte."
+                        ? "Nuk u gjetën produkte në këtë kategori."
                         : "Zgjidhni një market për të parë produktet."}
                     </td>
                   </tr>
@@ -325,7 +356,15 @@ const PresencePage = ({
           </div>
         </div>
 
-        <div className="w-full flex justify-end mt-6">
+        <div className="w-full flex justify-between items-center mt-6">
+          <div className="text-neutral-500 text-sm">
+            {selectedStore && !loading && (
+              <span>
+                Po shfaqen {filteredProducts.length} nga {products.length}{" "}
+                produkte
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={handleSave}
