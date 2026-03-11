@@ -5,9 +5,11 @@ export const userFields = [
     name: "role",
     label: "Role",
     type: "select",
+    required: true,
     options: [
       { label: "Admin", value: "admin" },
       { label: "Employee", value: "employee" },
+      { label: "View Only", value: "viewer" },
     ],
   },
 ];
@@ -19,9 +21,11 @@ export const updateUserFields = [
     name: "role",
     label: "Roli",
     type: "select",
+    required: true,
     options: [
       { label: "Admin", value: "admin" },
       { label: "Employee", value: "employee" },
+      { label: "View Only", value: "viewer" },
     ],
   },
 ];

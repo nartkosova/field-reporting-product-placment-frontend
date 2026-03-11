@@ -12,6 +12,7 @@ interface Field {
   options?: { label: string; value: string | number }[];
   isMulti?: boolean;
   step?: string;
+  required?: boolean;
 }
 
 interface CreateUpdateFormProps {
@@ -95,10 +96,11 @@ export function CreateUpdateForm({
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {fields.map(
-          ({ name, label, type = "text", options, isMulti, step }) => (
+          ({ name, label, type = "text", options, isMulti, step, required }) => (
             <div key={name} className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-300">
                 {label}
+                {required ? " *" : ""}
               </label>
               {type === "select" && options ? (
                 <Select
@@ -134,7 +136,7 @@ export function CreateUpdateForm({
                   }}
                   className="react-select-container"
                   classNamePrefix="react-select"
-                  isClearable
+                  isClearable={!required}
                   styles={darkSelectStyles}
                 />
               ) : (
@@ -143,6 +145,7 @@ export function CreateUpdateForm({
                   className="border border-neutral-700 bg-neutral-900 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-neutral-600 placeholder-gray-500"
                   placeholder={label}
                   step={step}
+                  required={required}
                   value={
                     Array.isArray(formState[name])
                       ? formState[name].join(", ")

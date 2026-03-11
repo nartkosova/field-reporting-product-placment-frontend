@@ -1,6 +1,6 @@
 export const reportSelectorFields = [
   { path: "/ppl-reports", label: "Raportet PPL" },
-  { path: "/photo-reports", label: "Raportet e Fotove", adminOnly: true },
+  { path: "/photo-reports", label: "Raportet e Fotove" },
   { path: "/product-facings", label: "Raportet e Produkteve" },
-  { path: "/presence", label: "Raport Presence", adminOnly: true },
+  { path: "/presence", label: "Raport Presence" },
 ];

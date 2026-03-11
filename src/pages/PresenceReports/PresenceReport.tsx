@@ -8,6 +8,7 @@ import { Store } from "../../types/storeInterface";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import { useUser } from "../../hooks/useUser";
 import { useProductCategories } from "../../hooks/useProductCategories"; // Import the hook
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 interface PresenceReportResponse {
   stores: Store[];
@@ -38,9 +39,11 @@ const PresenceReport = () => {
   const [matrix, setMatrix] = useState<Record<string, Record<string, string>>>(
     {}
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = useCallback(
     async (pageSize: number, offset: number, filters: Record<string, any>) => {
+      setIsLoading(true);
       try {
         const page = Math.floor(offset / pageSize) + 1;
 
@@ -60,6 +63,8 @@ const PresenceReport = () => {
       } catch (error) {
         console.error("Error fetching report", error);
         return { data: [], total: 0 };
+      } finally {
+        setIsLoading(false);
       }
     },
     []
@@ -74,115 +79,127 @@ const PresenceReport = () => {
     [stores]
   );
 
-  const renderTable = (products: PodravkaProduct[]) => (
-    <div className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl shadow-lg overflow-hidden z-0 relative">
-      <div className="w-full overflow-x-auto">
-        <table className="min-w-full text-sm text-left text-neutral-200 border-separate border-spacing-0">
-          <thead className="bg-neutral-900 text-neutral-400 uppercase text-xs">
-            <tr>
-              <th
-                className="px-4 py-3 sticky left-0 bg-neutral-900 z-30 border-b border-neutral-800"
-                style={{ width: "120px", minWidth: "120px" }}
-              >
-                Podravka Code
-              </th>
-              <th
-                className="px-4 py-3 sticky bg-neutral-900 z-30 border-b border-neutral-800"
-                style={{ left: "120px", width: "100px", minWidth: "100px" }}
-              >
-                Elkos Code
-              </th>
-              <th
-                className="px-4 py-3 sticky bg-neutral-900 z-30 border-b border-r border-neutral-800 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.5)]"
-                style={{ left: "220px", width: "220px", minWidth: "220px" }}
-              >
-                Produkti
-              </th>
-              <th className="px-4 py-3 border-b border-neutral-800 whitespace-nowrap bg-neutral-900">
-                Kategoria
-              </th>
-              {storeColumns.map((store) => (
+  const renderTable = (products: PodravkaProduct[]) => {
+    if (isLoading) {
+      return (
+        <div className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl shadow-lg overflow-hidden z-0 relative">
+          <div className="w-full py-16 flex items-center justify-center">
+            <LoadingSpinner />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl shadow-lg overflow-hidden z-0 relative">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-full text-sm text-left text-neutral-200 border-separate border-spacing-0">
+            <thead className="bg-neutral-900 text-neutral-400 uppercase text-xs">
+              <tr>
                 <th
-                  key={store.key}
-                  className="px-4 py-3 whitespace-nowrap border-b border-neutral-800 bg-neutral-900"
-                >
-                  {store.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-800">
-            {products.map((p) => (
-              <tr
-                key={p.product_id}
-                className="group hover:bg-neutral-900/40 transition-colors"
-              >
-                <td
-                  className="px-4 py-3 sticky left-0 bg-neutral-900/95 group-hover:bg-neutral-900 transition-colors z-20 border-b border-neutral-800"
+                  className="px-4 py-3 sticky left-0 bg-neutral-900 z-30 border-b border-neutral-800"
                   style={{ width: "120px", minWidth: "120px" }}
                 >
-                  {p.podravka_code}
-                </td>
-                <td
-                  className="px-4 py-3 sticky bg-neutral-900/95 group-hover:bg-neutral-900 transition-colors z-20 border-b border-neutral-800"
+                  Podravka Code
+                </th>
+                <th
+                  className="px-4 py-3 sticky bg-neutral-900 z-30 border-b border-neutral-800"
                   style={{ left: "120px", width: "100px", minWidth: "100px" }}
                 >
-                  {p.elkos_code}
-                </td>
-                <td
-                  className="px-4 py-3 font-medium text-white sticky bg-neutral-900/95 group-hover:bg-neutral-900 transition-colors z-20 border-b border-r border-neutral-800 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.5)]"
+                  Elkos Code
+                </th>
+                <th
+                  className="px-4 py-3 sticky bg-neutral-900 z-30 border-b border-r border-neutral-800 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.5)]"
                   style={{ left: "220px", width: "220px", minWidth: "220px" }}
                 >
-                  <div className="truncate" title={p.name}>
-                    {p.name}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-neutral-400 whitespace-nowrap border-b border-neutral-800">
-                  {p.category}
-                </td>
-                {storeColumns.map((store) => {
-                  const row = matrix[String(p.product_id)] || {};
-                  const rawValue = row[store.key] || "-";
-                  let displayValue = rawValue;
-                  let colorClass = "text-neutral-500";
-                  if (rawValue === "Listed") {
-                    displayValue = "1";
-                    colorClass =
-                      "text-emerald-400 font-bold bg-emerald-400/10 rounded px-3 py-0.5 inline-block";
-                  } else if (rawValue === "Not listed") {
-                    displayValue = "0";
-                    colorClass =
-                      "text-red-400 font-bold bg-red-400/10 rounded px-3 py-0.5 inline-block";
-                  } else if (rawValue === "Product not in store") {
-                    colorClass = "text-neutral-600 italic text-xs";
-                    displayValue = "Nuk është në market";
-                  }
-                  return (
-                    <td
-                      key={store.key}
-                      className="px-4 py-3 whitespace-nowrap border-b border-neutral-800 text-center"
-                    >
-                      <span className={colorClass}>{displayValue}</span>
-                    </td>
-                  );
-                })}
+                  Produkti
+                </th>
+                <th className="px-4 py-3 border-b border-neutral-800 whitespace-nowrap bg-neutral-900">
+                  Kategoria
+                </th>
+                {storeColumns.map((store) => (
+                  <th
+                    key={store.key}
+                    className="px-4 py-3 whitespace-nowrap border-b border-neutral-800 bg-neutral-900"
+                  >
+                    {store.label}
+                  </th>
+                ))}
               </tr>
-            ))}
-            {products.length === 0 && (
-              <tr>
-                <td
-                  colSpan={4 + storeColumns.length}
-                  className="px-4 py-12 text-center text-neutral-500 italic"
+            </thead>
+            <tbody className="divide-y divide-neutral-800">
+              {products.map((p) => (
+                <tr
+                  key={p.product_id}
+                  className="group hover:bg-neutral-900/40 transition-colors"
                 >
-                  Nuk ka të dhëna për raportin.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                  <td
+                    className="px-4 py-3 sticky left-0 bg-neutral-900/95 group-hover:bg-neutral-900 transition-colors z-20 border-b border-neutral-800"
+                    style={{ width: "120px", minWidth: "120px" }}
+                  >
+                    {p.podravka_code}
+                  </td>
+                  <td
+                    className="px-4 py-3 sticky bg-neutral-900/95 group-hover:bg-neutral-900 transition-colors z-20 border-b border-neutral-800"
+                    style={{ left: "120px", width: "100px", minWidth: "100px" }}
+                  >
+                    {p.elkos_code}
+                  </td>
+                  <td
+                    className="px-4 py-3 font-medium text-white sticky bg-neutral-900/95 group-hover:bg-neutral-900 transition-colors z-20 border-b border-r border-neutral-800 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.5)]"
+                    style={{ left: "220px", width: "220px", minWidth: "220px" }}
+                  >
+                    <div className="truncate" title={p.name}>
+                      {p.name}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-neutral-400 whitespace-nowrap border-b border-neutral-800">
+                    {p.category}
+                  </td>
+                  {storeColumns.map((store) => {
+                    const row = matrix[String(p.product_id)] || {};
+                    const rawValue = row[store.key] || "-";
+                    let displayValue = rawValue;
+                    let colorClass = "text-neutral-500";
+                    if (rawValue === "Listed") {
+                      displayValue = "1";
+                      colorClass =
+                        "text-emerald-400 font-bold bg-emerald-400/10 rounded px-3 py-0.5 inline-block";
+                    } else if (rawValue === "Not listed") {
+                      displayValue = "0";
+                      colorClass =
+                        "text-red-400 font-bold bg-red-400/10 rounded px-3 py-0.5 inline-block";
+                    } else if (rawValue === "Product not in store") {
+                      colorClass = "text-neutral-600 italic text-xs";
+                      displayValue = "Nuk është në market";
+                    }
+                    return (
+                      <td
+                        key={store.key}
+                        className="px-4 py-3 whitespace-nowrap border-b border-neutral-800 text-center"
+                      >
+                        <span className={colorClass}>{displayValue}</span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+              {products.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={4 + storeColumns.length}
+                    className="px-4 py-12 text-center text-neutral-500 italic"
+                  >
+                    Nuk ka të dhëna për raportin.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="w-full flex flex-col items-center justify-center bg-black min-h-screen">

@@ -231,11 +231,7 @@ export const reportRoutes: RouteObject[] = [
   },
   {
     path: "/reports/presence",
-    element: (
-      <AdminGuard>
-        <PresenceReport />
-      </AdminGuard>
-    ),
+    element: <PresenceReport />,
   },
 ];
 

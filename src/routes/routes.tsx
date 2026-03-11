@@ -10,17 +10,16 @@ import {
   proexVfsRoutes,
 } from "./routeGroups";
 
-const userRoutes: RouteObject[] = [
+const employeeRoutes: RouteObject[] = [
   {
     path: "/",
     element: <HomePage />,
   },
   ...pplRoutes,
   ...photoRoutes,
-  ...reportRoutes,
   ...proexVfsRoutes,
 ];
 
-const adminRoutes: RouteObject[] = [...reportRoutes, ...settingsRoutes];
+const adminRoutes: RouteObject[] = [...settingsRoutes];
 
-export { publicRoutes, userRoutes, adminRoutes };
+export { publicRoutes, reportRoutes, employeeRoutes, adminRoutes };

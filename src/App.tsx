@@ -1,5 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import { publicRoutes, userRoutes, adminRoutes } from "./routes/routes";
+import {
+  publicRoutes,
+  reportRoutes,
+  employeeRoutes,
+  adminRoutes,
+} from "./routes/routes";
 import RouteGuard from "./routes/RouteGuard";
 import Layout from "./routes/Layout";
 import { fetchAndCacheCompetitorCategories, syncAllIfNeeded } from "./db/db";
@@ -34,15 +39,25 @@ const App = () => {
         <Route key={route.path} path={route.path} element={route.element} />
       ))}
 
-      <Route element={<RouteGuard requiredRole="employee" />}>
+      <Route
+        element={<RouteGuard allowedRoles={["admin", "employee", "viewer"]} />}
+      >
         <Route element={<Layout />}>
-          {userRoutes.map((route) => (
+          {reportRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
       </Route>
 
-      <Route element={<RouteGuard requiredRole="admin" />}>
+      <Route element={<RouteGuard allowedRoles={["admin", "employee"]} />}>
+        <Route element={<Layout />}>
+          {employeeRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+      </Route>
+
+      <Route element={<RouteGuard allowedRoles={["admin"]} />}>
         <Route element={<Layout />}>
           {adminRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />

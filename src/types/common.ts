@@ -40,4 +40,4 @@ export interface FormField {
 
 export type Size = "sm" | "md" | "lg";
 export type ButtonVariant = "primary" | "secondary" | "danger" | "success";
-export type UserRole = "admin" | "employee" | "user";
+export type UserRole = "admin" | "employee" | "viewer" | "user";

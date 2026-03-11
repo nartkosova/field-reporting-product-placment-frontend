@@ -2,10 +2,10 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 
 interface RouteGuardProps {
-  requiredRole?: "admin" | "employee";
+  allowedRoles?: Array<"admin" | "employee" | "viewer">;
 }
 
-const RouteGuard = ({ requiredRole }: RouteGuardProps) => {
+const RouteGuard = ({ allowedRoles }: RouteGuardProps) => {
   const { isAuthenticated, userRole } = useUser();
 
   if (isAuthenticated === null) {
@@ -16,8 +16,11 @@ const RouteGuard = ({ requiredRole }: RouteGuardProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole === "admin" && userRole !== "admin") {
-    return <Navigate to="/" replace />;
+  if (
+    allowedRoles &&
+    !allowedRoles.includes(userRole as "admin" | "employee" | "viewer")
+  ) {
+    return <Navigate to="/reports" replace />;
   }
 
   return <Outlet />;
