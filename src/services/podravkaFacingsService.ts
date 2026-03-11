@@ -43,10 +43,33 @@ const getPodravkaFacingsByBatchId = async (batchId: string) => {
   return response.data;
 };
 
+const getPodravkaPresenceByBatchId = async (batchId: string) => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/presence-batch/${batchId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const getUserPPLBatches = async (offset = 0, limit = 20) => {
   const token = getToken();
   const response = await axios.get(
     `${baseUrl}/api/facings/podravka-facing/user-batches`,
+    {
+      params: { offset, limit },
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
+const getUserPresenceBatches = async (offset = 0, limit = 20) => {
+  const token = getToken();
+  const response = await axios.get(
+    `${baseUrl}/api/facings/podravka-facing/user-presence-batches`,
     {
       params: { offset, limit },
       headers: { Authorization: `Bearer ${token}` },
@@ -156,7 +179,9 @@ export default {
   getPodravkaFacings,
   getPodravkaFacingsWithCompetitors,
   getPodravkaFacingsByBatchId,
+  getPodravkaPresenceByBatchId,
   getUserPPLBatches,
+  getUserPresenceBatches,
   getPodravkaFacingsReport,
   getPodravkaPresenceReport,
   batchCreatePodravkaFacings,

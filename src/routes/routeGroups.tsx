@@ -8,6 +8,8 @@ import PodravkaPPLEditor from "../pages/PPL/PPLPodravka/PodravkaPPLList";
 import UpdatePodravkaFacingsPage from "../pages/PPL/PPLPodravka/UpdatePodravkaFacings";
 import CompetitorPPLEditor from "../pages/PPL/PPLCompetitor/CompetitorPPLList";
 import UpdateCompetitorFacings from "../pages/PPL/PPLCompetitor/UpdateCompetitorFacings";
+import PresenceBatchList from "../pages/PresenceEditor/PresenceBatchList";
+import UpdatePresenceBatch from "../pages/PresenceEditor/UpdatePresenceBatch";
 import PhotoCompanySelector from "../pages/Photos/PhotoCompanySelector";
 import PhotoSelector from "../pages/Photos/PhotosSelector";
 import PhotoUploadPage from "../pages/Photos/PhotoUploadPage";
@@ -83,6 +85,14 @@ export const pplRoutes: RouteObject[] = [
   {
     path: "/ppl-konkurrenca/edit/:batchId",
     element: <UpdateCompetitorFacings />,
+  },
+  {
+    path: "/edit-ppl/presence",
+    element: <PresenceBatchList />,
+  },
+  {
+    path: "/edit-ppl/presence/edit/:batchId",
+    element: <UpdatePresenceBatch />,
   },
 ];
 
