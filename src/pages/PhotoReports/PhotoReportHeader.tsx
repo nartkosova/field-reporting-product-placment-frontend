@@ -3,7 +3,7 @@ import photoService from "../../services/photoService";
 import userService from "../../services/userService";
 import storeService from "../../services/storeServices";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
-import { PhotoSchema } from "../../types/photoInterface";
+import { PhotoSchema, PHOTO_TYPE_OPTIONS } from "../../types/photoInterface";
 import { User, Store } from "../../types/reportInterface";
 import PhotoTable from "./PhotoReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
@@ -47,14 +47,7 @@ const PhotoReportHeader = () => {
     label: c,
   }));
 
-  const photoTypeOptions = [
-    { value: "regular_shelf", label: "Pozita Primare" },
-    { value: "secondary_position", label: "Pozita Sekondare" },
-    { value: "new_product", label: "Produkt i Ri" },
-    { value: "sale", label: "Aksion" },
-    { value: "fletushka", label: "Fletushka" },
-    { value: "korporative", label: "Korporative" },
-  ];
+  const photoTypeOptions = [...PHOTO_TYPE_OPTIONS];
 
   const companyOptions = [
     { value: "podravka", label: "Podravka" },
@@ -64,7 +57,7 @@ const PhotoReportHeader = () => {
   const filterConfigs = [
     {
       key: "photo_types",
-      options: photoTypeOptions,
+      options: [...photoTypeOptions],
       placeholder: "Zgjidh llojin e fotos",
     },
     {
@@ -119,6 +112,7 @@ const PhotoReportHeader = () => {
     worksheet.columns = [
       { header: "User", key: "user" },
       { header: "Store", key: "store_name" },
+      { header: "Shifra e bleresit", key: "store_code" },
       { header: "Category", key: "category" },
       { header: "Description", key: "photo_description" },
       { header: "Company", key: "company" },
@@ -131,6 +125,7 @@ const PhotoReportHeader = () => {
       const excelRow = worksheet.addRow({
         user: row.user,
         store_name: row.store_name,
+        store_code: row.store_code ?? "-",
         category: row.category,
         photo_description: row.photo_description,
         company: row.company,
@@ -146,10 +141,10 @@ const PhotoReportHeader = () => {
         });
 
         worksheet.getRow(excelRow.number).height = 120;
-        worksheet.getColumn(7).width = 16;
+        worksheet.getColumn(8).width = 16;
 
         worksheet.addImage(imageId, {
-          tl: { col: 6, row: excelRow.number - 1 },
+          tl: { col: 7, row: excelRow.number - 1 },
           ext: { width: 80, height: 120 },
         });
       } catch {

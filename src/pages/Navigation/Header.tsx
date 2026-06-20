@@ -5,6 +5,7 @@ import { useUser } from "../../hooks/useUser";
 import { useState } from "react";
 import { syncAllIfNeeded } from "../../db/db";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { setToken } from "../../services/authService";
 
 const Header: React.FC = () => {
   const { user } = useUser();
@@ -29,7 +30,9 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    setToken(null);
+    localStorage.removeItem("selectedStore");
+    localStorage.removeItem("selectedCategory");
     navigate("/login");
   };
 

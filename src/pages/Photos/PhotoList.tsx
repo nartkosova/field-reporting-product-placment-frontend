@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EntityList } from "../../components/EntityList/EntityList";
 import photoService from "../../services/photoService";
 import { formattedDate } from "../../utils/utils";
-import { PhotoSchema } from "../../types/photoInterface";
+import { PhotoSchema, PHOTO_TYPE_LABELS } from "../../types/photoInterface";
 
 interface PhotoEntity {
   id: number;
   name: string;
   created_at: string;
   category: string;
-  photo_type: string;
+  photo_type: PhotoSchema["photo_type"];
   photo_description?: string;
   photo_url: string;
 }
@@ -43,7 +42,7 @@ const PhotoList = () => {
           itemLabel="fotografi"
           renderDetails={(item: PhotoEntity) => (
             <div className="text-sm text-gray-600 space-y-1">
-              <div>Tipi: {item.photo_type}</div>
+              <div>Tipi: {PHOTO_TYPE_LABELS[item.photo_type]}</div>
               <div>Kategoria: {item.category}</div>
               <div>Përshkrimi: {item.photo_description || "Pa përshkrim"}</div>
               <div>Data: {formattedDate(item.created_at)}</div>

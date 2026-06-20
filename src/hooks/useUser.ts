@@ -34,12 +34,18 @@ export const useUser = () => {
   });
 
   useEffect(() => {
-    const handleStorageChange = () => {
+    const refreshUserFromToken = () => {
       const token = localStorage.getItem("authToken");
       setUser(getUserFromToken(token));
     };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+
+    window.addEventListener("storage", refreshUserFromToken);
+    window.addEventListener("authTokenChanged", refreshUserFromToken);
+
+    return () => {
+      window.removeEventListener("storage", refreshUserFromToken);
+      window.removeEventListener("authTokenChanged", refreshUserFromToken);
+    };
   }, []);
 
   return {

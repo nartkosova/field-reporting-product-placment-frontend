@@ -2,9 +2,9 @@ import { Navigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 
 export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useUser();
+  const { userRole } = useUser();
 
-  if (user?.user !== "Ilir") {
+  if (userRole !== "admin") {
     return <Navigate to="/settings" replace />;
   }
 

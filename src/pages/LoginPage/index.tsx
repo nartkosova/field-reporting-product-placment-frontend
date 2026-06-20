@@ -13,7 +13,6 @@ const LoginPage = () => {
   const handleLogin = async () => {
     try {
       const response = await userService.loginUser({ user, password });
-      window.localStorage.setItem("authToken", response.token);
       setToken(response.token);
       setUser("");
       setPassword("");

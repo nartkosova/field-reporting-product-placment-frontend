@@ -141,6 +141,30 @@ export const photoRoutes: RouteObject[] = [
     path: `/photos/:storeId/:company/korporative`,
     element: <PhotoUploadPage photoType="korporative" />,
   },
+  {
+    path: `/photos/:storeId/:company/afer-afatit`,
+    element: <PhotoUploadPage photoType="staleness" />,
+  },
+  {
+    path: `/photos/:storeId/:company/loje-shperblyese`,
+    element: <PhotoUploadPage photoType="reward_game" />,
+  },
+  {
+    path: `/photos/:storeId/:company/raport-dimenzionime`,
+    element: <PhotoUploadPage photoType="dimensioning_report" />,
+  },
+  {
+    path: `/photos/:storeId/:company/pozita-sekondare-kvartal`,
+    element: <PhotoUploadPage photoType="secondary_position_quarter" />,
+  },
+  {
+    path: `/photos/:storeId/:company/tjeter1`,
+    element: <PhotoUploadPage photoType="other1" />,
+  },
+  {
+    path: `/photos/:storeId/:company/tjeter2`,
+    element: <PhotoUploadPage photoType="other2" />,
+  },
 ];
 
 export const settingsRoutes: RouteObject[] = [

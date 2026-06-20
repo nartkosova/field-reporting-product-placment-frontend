@@ -1,7 +1,7 @@
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { BaseTable } from "../../components/BaseTable/BaseTable";
-import { PhotoSchema } from "../../types/photoInterface";
+import { PhotoSchema, PHOTO_TYPE_LABELS } from "../../types/photoInterface";
 import photoService from "../../services/photoService";
 import ActionButton from "../../components/Buttons/ActionButtons";
 
@@ -57,8 +57,16 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
       }),
       columnHelper.accessor("user", { header: "User" }),
       columnHelper.accessor("store_name", { header: "Shitorja" }),
+      columnHelper.accessor("store_code", {
+        header: "Shifra e bleresit",
+        cell: (info) => info.getValue() ?? "-",
+      }),
       columnHelper.accessor("category", { header: "Kategoria" }),
-      columnHelper.accessor("photo_type", { header: "Lloji i Fotos" }),
+      columnHelper.accessor("photo_type", {
+        header: "Lloji i Fotos",
+        cell: (info) =>
+          PHOTO_TYPE_LABELS[info.getValue() as keyof typeof PHOTO_TYPE_LABELS],
+      }),
       columnHelper.accessor("photo_description", {
         header: "Përshkrimi",
         cell: (info) => info.getValue() || "-",

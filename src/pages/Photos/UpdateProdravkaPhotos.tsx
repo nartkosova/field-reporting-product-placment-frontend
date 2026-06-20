@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import photoService from "../../services/photoService";
 import storeServices from "../../services/storeServices";
 import { useProductCategories } from "../../hooks/useProductCategories";
-import { PhotoSchema } from "../../types/photoInterface";
+import { PhotoSchema, PHOTO_TYPE_OPTIONS } from "../../types/photoInterface";
 import { AxiosError } from "axios";
 import { Store } from "../../types/storeInterface";
 import SubmitButton from "../../components/Buttons/SubmitButton";
@@ -101,14 +101,7 @@ const UpdatePhotoPage = () => {
       name: "photo_type",
       label: "Tipi i fotos",
       type: "select",
-      options: [
-        { value: "regular_shelf", label: "Primare" },
-        { value: "secondary_position", label: "Sekondare" },
-        { value: "new_product", label: "Produkt i Ri" },
-        { value: "sale", label: "Aksion" },
-        { value: "fletushka", label: "Fletushka" },
-        { value: "korporative", label: "Korporative" },
-      ],
+      options: [...PHOTO_TYPE_OPTIONS],
     },
     {
       name: "category",

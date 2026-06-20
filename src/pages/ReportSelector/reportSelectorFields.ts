@@ -1,4 +1,10 @@
-export const reportSelectorFields = [
+export type ReportSelectorField = {
+  path: string;
+  label: string;
+  adminOnly?: boolean;
+};
+
+export const reportSelectorFields: ReportSelectorField[] = [
   { path: "/ppl-reports", label: "Raportet PPL" },
   { path: "/photo-reports", label: "Raportet e Fotove" },
   { path: "/product-facings", label: "Raportet e Produkteve" },

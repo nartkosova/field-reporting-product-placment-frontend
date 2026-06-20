@@ -13,6 +13,15 @@ const PhotoSelector = () => {
             { label: "Aksion", path: "/aksion" },
             { label: "Fletushka", path: "/fletushka" },
             { label: "Korporative", path: "/korporative" },
+            { label: "Afer afatit", path: "/afer-afatit" },
+            { label: "Loje shperblyese", path: "/loje-shperblyese" },
+            { label: "Raport dimenzionime", path: "/raport-dimenzionime" },
+            {
+              label: "Pozita sekondare kvartal",
+              path: "/pozita-sekondare-kvartal",
+            },
+            { label: "Tjeter1", path: "/tjeter1" },
+            { label: "Tjeter2", path: "/tjeter2" },
           ]}
           categoryRequired={true}
         />

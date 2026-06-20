@@ -1,7 +1,10 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import photoService from "../../services/photoService";
-import { PhotoInput } from "../../types/photoInterface";
+import {
+  PhotoInput,
+  PHOTO_TYPE_LABELS,
+} from "../../types/photoInterface";
 import storeServices from "../../services/storeServices";
 import { sanitizeFilename } from "../../utils/utils";
 import { useSelectedStore } from "../../hooks/useSelectStore";
@@ -96,7 +99,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
         )}{" "}
         {!category && (
           <div className="text-lg font-medium pb-2 text-white">
-            Fotografia Korporative
+            Fotografia {PHOTO_TYPE_LABELS[photoType] ?? photoType}
           </div>
         )}
         <label className="block bg-neutral-800 text-center py-3 rounded border border-dashed border-neutral-700 cursor-pointer hover:bg-neutral-700 transition text-white">
@@ -135,7 +138,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
               {isLoading ? (
                 <LoadingSpinner size="sm" text="" />
               ) : (
-                `Dërgo ${photoType}`
+                `Dërgo ${PHOTO_TYPE_LABELS[photoType] ?? photoType}`
               )}
             </ActionButton>
             <ActionButton onClick={clearState} fullWidth>
