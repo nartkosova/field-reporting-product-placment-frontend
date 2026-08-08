@@ -43,6 +43,7 @@ import VFSStoreSelector from "../pages/ProexVFSSelector/VFSStoreSelector";
 import PresenceReport from "../pages/PresenceReports/PresenceReport";
 import WorkDayPage from "../pages/WorkDay/WorkDayPage";
 import WorkDayReportHeader from "../pages/WorkDayReports/WorkDayReportHeader";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -252,6 +253,10 @@ export const reportRoutes: RouteObject[] = [
   {
     path: "/reports",
     element: <ReportSelector />,
+  },
+  {
+    path: "/reports/dashboard",
+    element: <Dashboard />,
   },
   {
     path: "/reports/photo-reports",

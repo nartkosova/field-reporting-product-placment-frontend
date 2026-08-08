@@ -1,10 +1,16 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import photoService from "../../services/photoService";
 import {
   PhotoInput,
   PHOTO_TYPE_LABELS,
+  getCurrentQuarter,
+  getQuarterOptions,
+  getQuarterValue,
+  isQuarterPhotoType,
 } from "../../types/photoInterface";
+import Select from "react-select";
+import darkSelectStyles from "../../utils/darkSelectStyles";
 import storeServices from "../../services/storeServices";
 import { sanitizeFilename } from "../../utils/utils";
 import { useSelectedStore } from "../../hooks/useSelectStore";
@@ -37,6 +43,19 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   const activeWorkDay = useActiveWorkDay();
   const [storeName, setStoreName] = useState<string | null>(null);
 
+  const isQuarterPhoto = isQuarterPhotoType(photoType);
+  const quarterOptions = useMemo(() => getQuarterOptions(), []);
+  const [selectedQuarter, setSelectedQuarter] = useState(() => {
+    const { year, quarter } = getCurrentQuarter();
+    return getQuarterValue(year, quarter);
+  });
+
+  // Quarterly photos carry the reporting quarter in place of a product
+  // category, which the route does not supply for this type.
+  const resolvedCategory = isQuarterPhoto
+    ? selectedQuarter
+    : category || photoType;
+
   useEffect(() => {
     if (!storeId) return;
     storeServices.getStoreById(Number(storeId)).then((res) => {
@@ -53,7 +72,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     setIsLoading(true);
     const safeName = sanitizeFilename(String(storeName));
     const customName = `${safeName}-${
-      category || photoType
+      resolvedCategory
     }-${company}-${uuidv4()}`.toLowerCase();
 
     const compressedFile = await imageCompression(file, {
@@ -65,7 +84,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     const formData = new FormData();
     formData.append("photo", compressedFile, customName);
     formData.append("photo_type", photoType);
-    formData.append("category", category || photoType);
+    formData.append("category", resolvedCategory);
     formData.append("company", company || "podravka");
     formData.append("user_id", String(userId));
     formData.append("store_id", storeId.toString());
@@ -110,6 +129,29 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
         {!category && (
           <div className="text-lg font-medium pb-2 text-white">
             Fotografia {PHOTO_TYPE_LABELS[photoType] ?? photoType}
+          </div>
+        )}
+        {isQuarterPhoto && (
+          <div className="space-y-2">
+            <label className="block font-medium text-gray-200">
+              Kvartali
+            </label>
+            <Select
+              options={quarterOptions}
+              value={
+                quarterOptions.find(
+                  (option) => option.value === selectedQuarter
+                ) ?? null
+              }
+              onChange={(selected) =>
+                setSelectedQuarter(selected?.value ?? selectedQuarter)
+              }
+              isClearable={false}
+              isSearchable={false}
+              className="react-select-container"
+              classNamePrefix="react-select"
+              styles={darkSelectStyles}
+            />
           </div>
         )}
         <label className="block bg-neutral-800 text-center py-3 rounded border border-dashed border-neutral-700 cursor-pointer hover:bg-neutral-700 transition text-white">

@@ -24,6 +24,43 @@ export const PHOTO_TYPE_LABELS: Record<PhotoType, string> =
     {} as Record<PhotoType, string>
   );
 
+// Photo types whose "category" carries the reporting quarter instead of a
+// product category.
+export const QUARTER_PHOTO_TYPES: PhotoType[] = ["secondary_position_quarter"];
+
+export const isQuarterPhotoType = (photoType: PhotoType) =>
+  QUARTER_PHOTO_TYPES.includes(photoType);
+
+export const getQuarterValue = (year: number, quarter: number) =>
+  `Q${quarter}-${year}`;
+
+export const getCurrentQuarter = (date: Date = new Date()) => ({
+  year: date.getFullYear(),
+  quarter: Math.floor(date.getMonth() / 3) + 1,
+});
+
+/**
+ * Quarters offered in the upload form, newest first: the current quarter, the
+ * previous `back` quarters, and the next one (for work logged just ahead of a
+ * quarter rollover).
+ */
+export const getQuarterOptions = (date: Date = new Date(), back = 5) => {
+  const { year, quarter } = getCurrentQuarter(date);
+  const options: { value: string; label: string }[] = [];
+
+  for (let offset = 1; offset >= -back; offset -= 1) {
+    const absolute = year * 4 + (quarter - 1) + offset;
+    const optionYear = Math.floor(absolute / 4);
+    const optionQuarter = (absolute % 4) + 1;
+    options.push({
+      value: getQuarterValue(optionYear, optionQuarter),
+      label: `Kvartali ${optionQuarter} - ${optionYear}`,
+    });
+  }
+
+  return options;
+};
+
 export interface PhotoInput {
   photo_type: PhotoType;
   photo_url: string;

@@ -5,6 +5,7 @@ export type ReportSelectorField = {
 };
 
 export const reportSelectorFields: ReportSelectorField[] = [
+  { path: "/dashboard", label: "Paneli Analitik" },
   { path: "/ppl-reports", label: "Raportet PPL" },
   { path: "/photo-reports", label: "Raportet e Fotove" },
   { path: "/product-facings", label: "Raportet e Produkteve" },

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { isTokenExpired } from "../services/authService";
 
 interface UserInfo {
   user_id: number;
@@ -14,7 +15,9 @@ interface DecodedToken {
 }
 
 function getUserFromToken(token: string | null): UserInfo | null {
-  if (!token) return null;
+  // An expired token is not a session: without this the route guard admits the
+  // user and every subsequent request fails with a 401.
+  if (!token || isTokenExpired(token)) return null;
   try {
     const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
     return {

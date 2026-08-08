@@ -107,9 +107,9 @@ export default function GenericReportHeader<T>({
       > = {
         ...debouncedFilters,
         ...(startDate
-          ? { start_date: startDate.toISOString().split("T")[0] }
+          ? { start_date: toDateInputValue(startDate) }
           : {}),
-        ...(endDate ? { end_date: endDate.toISOString().split("T")[0] } : {}),
+        ...(endDate ? { end_date: toDateInputValue(endDate) } : {}),
       };
       try {
         const res = await fetchData(pageSize, page * pageSize, query);
@@ -318,9 +318,9 @@ export default function GenericReportHeader<T>({
       {renderTable(data, {
         ...debouncedFilters,
         ...(startDate
-          ? { start_date: startDate.toISOString().split("T")[0] }
+          ? { start_date: toDateInputValue(startDate) }
           : {}),
-        ...(endDate ? { end_date: endDate.toISOString().split("T")[0] } : {}),
+        ...(endDate ? { end_date: toDateInputValue(endDate) } : {}),
       })}
       {exportExcel &&
         userRole === "admin" &&

@@ -3,7 +3,12 @@ import photoService from "../../services/photoService";
 import userService from "../../services/userService";
 import storeService from "../../services/storeServices";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
-import { PhotoSchema, PHOTO_TYPE_OPTIONS } from "../../types/photoInterface";
+import {
+  PhotoSchema,
+  PHOTO_TYPE_OPTIONS,
+  PHOTO_TYPE_LABELS,
+  getQuarterOptions,
+} from "../../types/photoInterface";
 import { User, Store } from "../../types/reportInterface";
 import PhotoTable from "./PhotoReportTable";
 import { useProductCategories } from "../../hooks/useProductCategories";
@@ -53,10 +58,16 @@ const PhotoReportHeader = () => {
     label: s.store_name,
   }));
 
-  const categoryOptions = categories.map((c) => ({
-    value: c,
-    label: c,
-  }));
+  // Quarterly photos store their reporting quarter in the category column, so
+  // the quarters have to be selectable here alongside the product categories —
+  // otherwise those photos are unreachable through this filter.
+  const categoryOptions = useMemo(
+    () => [
+      ...categories.map((c) => ({ value: c, label: c })),
+      ...getQuarterOptions(),
+    ],
+    [categories]
+  );
 
   const photoTypeOptions = [...PHOTO_TYPE_OPTIONS];
 
@@ -127,6 +138,7 @@ const PhotoReportHeader = () => {
       { header: "User", key: "user" },
       { header: "Store", key: "store_name" },
       { header: "Shifra e bleresit", key: "store_code" },
+      { header: "Lloji i fotos", key: "photo_type" },
       { header: "Category", key: "category" },
       { header: "Description", key: "photo_description" },
       { header: "Company", key: "company" },
@@ -140,6 +152,7 @@ const PhotoReportHeader = () => {
         user: row.user,
         store_name: row.store_name,
         store_code: row.store_code ?? "-",
+        photo_type: PHOTO_TYPE_LABELS[row.photo_type] ?? row.photo_type,
         category: row.category,
         photo_description: row.photo_description,
         company: row.company,
@@ -154,11 +167,17 @@ const PhotoReportHeader = () => {
           extension: "jpeg",
         });
 
+        // Keep the image anchored to the "Photo" column: adding a column to the
+        // list above shifts this index.
+        const photoColumnIndex = worksheet.columns.findIndex(
+          (column) => column.key === "photo"
+        );
+
         worksheet.getRow(excelRow.number).height = 120;
-        worksheet.getColumn(8).width = 16;
+        worksheet.getColumn(photoColumnIndex + 1).width = 16;
 
         worksheet.addImage(imageId, {
-          tl: { col: 7, row: excelRow.number - 1 },
+          tl: { col: photoColumnIndex, row: excelRow.number - 1 },
           ext: { width: 80, height: 120 },
         });
       } catch {
