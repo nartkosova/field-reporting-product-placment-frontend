@@ -27,6 +27,57 @@ type QueuedCompetitorBatchPayload =
       work_date?: string;
     };
 
+export interface DrainResult {
+  synced: number;
+  failed: number;
+}
+
+/**
+ * Sends every queued entry in a store and deletes each one immediately after
+ * its OWN upload succeeds.
+ *
+ * This per-entry delete is the whole point: clearing the store once at the end
+ * means a failure halfway through leaves already-uploaded entries queued, and
+ * the next sync uploads them a second time — duplicate facings and photos in
+ * the audit data. A failed entry stays queued and is retried later; it never
+ * blocks the entries behind it.
+ */
+const drainStore = async <T>(
+  storeName: "pendingFacings" | "pendingCompetitorFacings" | "pendingPhotos" | "pendingWorkDays",
+  send: (payload: T) => Promise<unknown>
+): Promise<DrainResult> => {
+  const db = await getDB();
+
+  // Read keys and values together so each payload can be deleted by its own key.
+  const [keys, values] = await Promise.all([
+    db.getAllKeys(storeName),
+    db.getAll(storeName),
+  ]);
+
+  let synced = 0;
+  let failed = 0;
+
+  for (let index = 0; index < values.length; index += 1) {
+    const key = keys[index];
+    const payload = values[index] as T;
+
+    try {
+      await send(payload);
+      await db.delete(storeName, key);
+      synced += 1;
+    } catch (err) {
+      failed += 1;
+      console.error(`Failed to sync entry in ${storeName}:`, key, err);
+    }
+  }
+
+  if (synced || failed) {
+    console.log(`${storeName}: ${synced} synced, ${failed} still queued`);
+  }
+
+  return { synced, failed };
+};
+
 export const getDB = () => {
   return openDB("p-app", 5, {
     upgrade(db) {
@@ -74,37 +125,24 @@ export const clearQueuedWorkDay = async (workDate: string) => {
   await db.delete("pendingWorkDays", workDate);
 };
 
-export const syncQueuedWorkDays = async () => {
-  const queued = await getAllQueuedWorkDays();
-  if (queued.length === 0) return;
+export const syncQueuedWorkDays = () =>
+  drainStore<WorkLogDayInput>("pendingWorkDays", async (payload) => {
+    // Upsert by date: a day created online before the queue drains must be
+    // updated, not duplicated (the server also enforces one row per user/date).
+    const existingDays = await workDayService.listWorkDays({
+      start_date: payload.work_date,
+      end_date: payload.work_date,
+    });
 
-  for (const payload of queued) {
-    try {
-      const existingDays = await workDayService.listWorkDays({
-        start_date: payload.work_date,
-        end_date: payload.work_date,
-      });
-
-      let syncedDay: WorkLogDay;
-      if (existingDays[0]) {
-        syncedDay = await workDayService.updateWorkDay(
+    const syncedDay: WorkLogDay = existingDays[0]
+      ? await workDayService.updateWorkDay(
           existingDays[0].work_log_day_id,
           payload
-        );
-      } else {
-        syncedDay = await workDayService.createWorkDay(payload);
-      }
+        )
+      : await workDayService.createWorkDay(payload);
 
-      await clearQueuedWorkDay(payload.work_date);
-      console.log("✅ Synced work day:", syncedDay.work_date);
-    } catch (err) {
-      // Keep going: one unsyncable day must not block every other queued day.
-      // The failed entry stays in the queue for the next sync attempt.
-      console.error("Error syncing work day:", payload.work_date, err);
-      continue;
-    }
-  }
-};
+    return syncedDay;
+  });
 export const queueFacings = async (payload: QueuedPodravkaBatchPayload) => {
   const db = await getDB();
   await db.add("pendingFacings", payload);
@@ -122,22 +160,10 @@ export const clearQueuedFacings = async () => {
   await db.clear("pendingFacings");
 };
 
-export const syncQueuedFacings = async () => {
-  const queued = await getAllQueuedFacings();
-  if (queued.length === 0) return;
-
-  for (const batch of queued) {
-    try {
-      await podravkaFacingsService.batchCreatePodravkaFacings(batch);
-    } catch (err) {
-      console.error("Error syncing batch:", err);
-      return;
-    }
-  }
-
-  await clearQueuedFacings();
-  console.log("Synced all pending facings");
-};
+export const syncQueuedFacings = () =>
+  drainStore<QueuedPodravkaBatchPayload>("pendingFacings", (batch) =>
+    podravkaFacingsService.batchCreatePodravkaFacings(batch)
+  );
 
 export const cacheCompetitorCategories = async (
   categories: BrandCategory[]
@@ -206,21 +232,11 @@ export const clearQueuedCompetitorFacings = async () => {
   await db.clear("pendingCompetitorFacings");
 };
 
-export const syncQueuedCompetitorFacings = async () => {
-  const queued = await getAllQueuedCompetitorFacings();
-  if (queued.length === 0) return;
-
-  for (const batch of queued) {
-    try {
-      await competitorFacingsService.batchCreateCompetitorFacings(batch);
-    } catch (err) {
-      console.error("Error syncing competitor batch:", err);
-      return;
-    }
-  }
-
-  await clearQueuedCompetitorFacings();
-};
+export const syncQueuedCompetitorFacings = () =>
+  drainStore<QueuedCompetitorBatchPayload>(
+    "pendingCompetitorFacings",
+    (batch) => competitorFacingsService.batchCreateCompetitorFacings(batch)
+  );
 
 export const queuePhoto = async (formData: FormData) => {
   const db = await getDB();
@@ -246,15 +262,24 @@ export const queuePhoto = async (formData: FormData) => {
   console.log("✅ Photo saved to IndexedDB queue");
 };
 
-export const syncQueuedPhotos = async () => {
-  const db = await getDB();
-  const all = await db.getAll("pendingPhotos");
+interface QueuedPhoto {
+  photo: ArrayBuffer;
+  photo_name: string;
+  photo_type: string;
+  category: string;
+  company: string;
+  user_id: string;
+  store_id: string;
+  photo_description: string;
+  work_log_day_id?: string | null;
+  work_date?: string | null;
+}
 
-  for (const item of all) {
-    const blob = new Blob([item.photo]);
+export const syncQueuedPhotos = () =>
+  drainStore<QueuedPhoto>("pendingPhotos", (item) => {
     const formData = new FormData();
 
-    formData.append("photo", blob, item.photo_name);
+    formData.append("photo", new Blob([item.photo]), item.photo_name);
     formData.append("photo_type", item.photo_type);
     formData.append("category", item.category);
     formData.append("company", item.company);
@@ -262,25 +287,21 @@ export const syncQueuedPhotos = async () => {
     formData.append("store_id", item.store_id);
     formData.append("photo_description", item.photo_description);
     if (item.work_log_day_id) {
-      formData.append("work_log_day_id", item.work_log_day_id);
+      formData.append("work_log_day_id", String(item.work_log_day_id));
     }
     if (item.work_date) {
-      formData.append("work_date", item.work_date);
+      formData.append("work_date", String(item.work_date));
     }
 
-    try {
-      await photoService.createPhoto(formData);
-    } catch (err) {
-      console.error("❌ Failed to sync photo:", err);
-      return;
-    }
-  }
+    return photoService.createPhoto(formData);
+  });
 
-  await db.clear("pendingPhotos");
-  console.log("✅ Synced all queued photos");
-};
+// syncAllIfNeeded is triggered from app start, the browser "online" event and
+// the header. Two overlapping runs would read the same queue and upload every
+// entry twice, so concurrent callers share one in-flight run.
+let inFlightSync: Promise<boolean> | null = null;
 
-export const syncAllIfNeeded = async (): Promise<boolean> => {
+const runSyncAll = async (): Promise<boolean> => {
   const [queuedWorkDays, queuedFacings, queuedCompetitorFacings, queuedPhotos] =
     await Promise.all([
       getAllQueuedWorkDays(),
@@ -301,10 +322,32 @@ export const syncAllIfNeeded = async (): Promise<boolean> => {
   }
 
   console.log("🔁 Syncing all pending data...");
-  await syncQueuedWorkDays();
-  await syncQueuedFacings();
-  await syncQueuedCompetitorFacings();
-  await syncQueuedPhotos();
+
+  // Work days first: facings and photos link to a work-log day, so syncing the
+  // day first lets the server attach the evidence to the right record.
+  const results = [
+    await syncQueuedWorkDays(),
+    await syncQueuedFacings(),
+    await syncQueuedCompetitorFacings(),
+    await syncQueuedPhotos(),
+  ];
+
+  const stillQueued = results.reduce((total, r) => total + r.failed, 0);
+  if (stillQueued) {
+    console.warn(`${stillQueued} entr(ies) remain queued and will be retried.`);
+  }
 
   return true;
+};
+
+export const syncAllIfNeeded = (): Promise<boolean> => {
+  if (inFlightSync) {
+    return inFlightSync;
+  }
+
+  inFlightSync = runSyncAll().finally(() => {
+    inFlightSync = null;
+  });
+
+  return inFlightSync;
 };
