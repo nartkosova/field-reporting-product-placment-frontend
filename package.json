@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "deploy": "wrangler pages deploy dist --project-name=ppl",
+    "deploy": "npx wrangler pages deploy dist --project-name=ppl",
     "build:deploy": "npm run build && npm run deploy",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -52,6 +52,7 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
-    "vite-plugin-pwa": "^1.0.0"
+    "vite-plugin-pwa": "^1.0.0",
+    "wrangler": "^4.104.0"
   }
 }

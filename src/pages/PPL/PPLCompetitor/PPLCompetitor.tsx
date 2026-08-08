@@ -12,6 +12,7 @@ import {
 } from "../../../db/db";
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
 import { CompetitorBrand } from "../../../types/competitorBrandsInterface";
+import { useActiveWorkDay } from "../../../hooks/useActiveWorkDay";
 
 interface CompetitorEntry {
   id?: number;
@@ -27,6 +28,7 @@ const PPLCompetitor = () => {
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   const userId = user?.user_id;
+  const activeWorkDay = useActiveWorkDay();
 
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([
     { name: "", facings: 0 },
@@ -128,11 +130,17 @@ const PPLCompetitor = () => {
           };
         });
 
+      const workDayPayload = {
+        facings: facingData,
+        work_log_day_id: activeWorkDay?.work_log_day_id || undefined,
+        work_date: activeWorkDay?.work_date || undefined,
+      };
+
       if (!isOnline()) {
-        await queueCompetitorFacings(facingData);
+        await queueCompetitorFacings(workDayPayload);
         alert("Jeni offline – të dhënat janë ruajtur dhe do dërgohen më vonë.");
       } else {
-        await competitorFacingsService.batchCreateCompetitorFacings(facingData);
+        await competitorFacingsService.batchCreateCompetitorFacings(workDayPayload);
         alert("Facings te konkurencës janë dërguar me sukses.");
       }
 

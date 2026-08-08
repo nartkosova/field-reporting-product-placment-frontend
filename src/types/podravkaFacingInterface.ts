@@ -6,6 +6,8 @@ export interface PodravkaFacingInput {
   facings_count: number;
   is_listed?: boolean;
   record_type?: string;
+  work_log_day_id?: number;
+  work_date?: string;
 }
 export interface PodravkaFacingWithMeta extends PodravkaFacingInput {
   batch_id: string;
@@ -21,6 +23,8 @@ export interface CompetitorFacingInput {
   facings_count: number;
   competitor_id?: number;
   name?: string;
+  work_log_day_id?: number;
+  work_date?: string;
 }
 
 export interface CompetitorFacingWithMeta extends CompetitorFacingInput {

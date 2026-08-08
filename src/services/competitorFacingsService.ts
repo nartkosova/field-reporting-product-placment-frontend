@@ -4,13 +4,21 @@ import { CompetitorFacingInput } from "../types/podravkaFacingInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
+type CompetitorBatchCreatePayload =
+  | CompetitorFacingInput[]
+  | {
+      facings: CompetitorFacingInput[];
+      work_log_day_id?: number;
+      work_date?: string;
+    };
+
 const batchCreateCompetitorFacings = async (
-  facingDataArray: CompetitorFacingInput[]
+  payload: CompetitorBatchCreatePayload
 ) => {
   const token = getToken();
   const response = await axios.post(
     `${baseUrl}/api/facings/competitor-facing/batch`,
-    facingDataArray,
+    payload,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

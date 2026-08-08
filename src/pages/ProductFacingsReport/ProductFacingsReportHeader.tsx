@@ -22,6 +22,7 @@ const ProductFacingsReportHeader = () => {
     getCategoriesForBusinessUnit,
   } = useProductCategories();
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const { user, userRole } = useUser();
 
   useEffect(() => {
@@ -42,7 +43,17 @@ const ProductFacingsReportHeader = () => {
     label: u.user,
   }));
 
-  const storeOptions = stores.map((s) => ({
+  const filteredStores = useMemo(() => {
+    if (selectedUsers.length === 0) {
+      return stores;
+    }
+
+    return stores.filter((store) =>
+      selectedUsers.includes(String(store.user_id))
+    );
+  }, [stores, selectedUsers]);
+
+  const storeOptions = filteredStores.map((s) => ({
     value: String(s.store_id),
     label: s.store_name,
   }));
@@ -74,6 +85,7 @@ const ProductFacingsReportHeader = () => {
           label: unit,
         })),
         placeholder: "Zgjedh njesinë e biznesit",
+        isMulti: false,
         onChange: (selected) => {
           setSelectedBU(selected[0]?.value ?? null);
         },
@@ -87,6 +99,9 @@ const ProductFacingsReportHeader = () => {
         key: "user_ids",
         options: userOptions,
         placeholder: "Zgjidh përdoruesin",
+        onChange: (selected) => {
+          setSelectedUsers(selected.map((option) => option.value));
+        },
       },
       {
         key: "store_ids",

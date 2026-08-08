@@ -15,6 +15,8 @@ import imageCompression from "browser-image-compression";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { useUser } from "../../hooks/useUser";
 import { v4 as uuidv4 } from "uuid";
+import { useActiveWorkDay } from "../../hooks/useActiveWorkDay";
+
 interface Props {
   photoType: PhotoInput["photo_type"];
 }
@@ -32,6 +34,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   const { company } = useParams<{ company: string }>();
   const { user } = useUser();
   const userId = user?.user_id;
+  const activeWorkDay = useActiveWorkDay();
   const [storeName, setStoreName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,9 +46,11 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
 
   const handleSubmit = async () => {
     if (isLoading) return;
+    if (!file || !storeId || !userId) {
+      alert("Ju lutem plotësoni të gjitha fushat.");
+      return;
+    }
     setIsLoading(true);
-    if (!file || !storeId || !userId)
-      return alert("Ju lutem plotësoni të gjitha fushat.");
     const safeName = sanitizeFilename(String(storeName));
     const customName = `${safeName}-${
       category || photoType
@@ -65,6 +70,11 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     formData.append("user_id", String(userId));
     formData.append("store_id", storeId.toString());
     formData.append("photo_description", photoDescription);
+    if (activeWorkDay?.work_log_day_id) {
+      formData.append("work_log_day_id", String(activeWorkDay.work_log_day_id));
+    } else if (activeWorkDay?.work_date) {
+      formData.append("work_date", activeWorkDay.work_date);
+    }
 
     try {
       if (isOnline()) {

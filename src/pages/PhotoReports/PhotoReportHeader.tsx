@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import photoService from "../../services/photoService";
 import userService from "../../services/userService";
 import storeService from "../../services/storeServices";
@@ -17,6 +17,7 @@ const PhotoReportHeader = () => {
   const [photoReport, setPhotoReport] = useState<PhotoSchema[]>([]);
   const { categories } = useProductCategories();
   const { user, userRole } = useUser();
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -37,7 +38,17 @@ const PhotoReportHeader = () => {
     label: u.user,
   }));
 
-  const storeOptions = stores.map((s) => ({
+  const filteredStores = useMemo(() => {
+    if (selectedUsers.length === 0) {
+      return stores;
+    }
+
+    return stores.filter((store) =>
+      selectedUsers.includes(String(store.user_id))
+    );
+  }, [stores, selectedUsers]);
+
+  const storeOptions = filteredStores.map((s) => ({
     value: String(s.store_id),
     label: s.store_name,
   }));
@@ -64,6 +75,9 @@ const PhotoReportHeader = () => {
       key: "user_ids",
       options: userOptions,
       placeholder: "Zgjidh përdoruesin",
+      onChange: (selected: { value: string; label: string }[]) => {
+        setSelectedUsers(selected.map((option) => option.value));
+      },
     },
     {
       key: "store_ids",

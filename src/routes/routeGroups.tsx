@@ -41,6 +41,8 @@ import ProexVFSSelector from "../pages/ProexVFSSelector/ProexVFSSelector";
 import ProexStoreSelector from "../pages/ProexVFSSelector/ProexStoreSelector";
 import VFSStoreSelector from "../pages/ProexVFSSelector/VFSStoreSelector";
 import PresenceReport from "../pages/PresenceReports/PresenceReport";
+import WorkDayPage from "../pages/WorkDay/WorkDayPage";
+import WorkDayReportHeader from "../pages/WorkDayReports/WorkDayReportHeader";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -267,9 +269,17 @@ export const reportRoutes: RouteObject[] = [
     path: "/reports/presence",
     element: <PresenceReport />,
   },
+  {
+    path: "/reports/work-days",
+    element: <WorkDayReportHeader />,
+  },
 ];
 
 export const proexVfsRoutes: RouteObject[] = [
+  {
+    path: "/work-day",
+    element: <WorkDayPage />,
+  },
   {
     path: "/proex-vfs",
     element: <ProexVFSSelector />,

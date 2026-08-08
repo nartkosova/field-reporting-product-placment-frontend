@@ -30,6 +30,8 @@ export interface PhotoInput {
   category: string;
   user_id: number;
   store_id: number;
+  work_log_day_id?: number;
+  work_date?: string;
 }
 
 export interface PhotoSchema {

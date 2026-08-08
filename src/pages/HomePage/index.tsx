@@ -6,11 +6,16 @@ import { getInitials } from "../../utils/utils";
 import { useEffect } from "react";
 import { fetchAndCacheCompetitorCategories } from "../../db/db";
 import { useUser } from "../../hooks/useUser";
+import { EmployeeWorkDayCard } from "./EmployeeWorkDayCard";
+import { useActiveWorkDay } from "../../hooks/useActiveWorkDay";
 
 const HomePage: React.FC = () => {
   const { user, userRole } = useUser();
   const isAdmin = userRole === "admin";
   const selectedStore = useSelectedStore();
+  const activeWorkDay = useActiveWorkDay();
+  const hasActiveWorkingDay =
+    activeWorkDay?.work_date && activeWorkDay.status === "planned_work";
 
   useEffect(() => {
     fetchAndCacheCompetitorCategories();
@@ -50,21 +55,34 @@ const HomePage: React.FC = () => {
         {!isAdmin && (
           <>
             <div className="w-full max-w-4xl mb-10">
-              <StoreDropdown />
+              <EmployeeWorkDayCard />
             </div>
 
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {userNavItems(selectedStore).map((item) => (
-                <NavButton
-                  key={item.to}
-                  to={item.to}
-                  disabled={item.disabled}
-                  variant="card"
-                >
-                  {item.label}
-                </NavButton>
-              ))}
-            </div>
+            {hasActiveWorkingDay ? (
+              <>
+                <div className="w-full max-w-4xl mb-10">
+                  <StoreDropdown />
+                </div>
+
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 pb-12">
+                  {userNavItems(selectedStore).map((item) => (
+                    <NavButton
+                      key={item.to}
+                      to={item.to}
+                      disabled={item.disabled}
+                      variant="card"
+                    >
+                      {item.label}
+                    </NavButton>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="w-full max-w-4xl border border-neutral-800 bg-neutral-900 rounded-2xl p-6 text-center text-neutral-300">
+                Pasi dita të jetë vendosur si ditë pune, këtu do shfaqen marketi
+                dhe aktivitetet si PPL, foto dhe raportet e tjera.
+              </div>
+            )}
           </>
         )}
 

@@ -1,7 +1,16 @@
 import axios from "axios";
 import { PodravkaFacingInput } from "../types/podravkaFacingInterface";
+
 const baseUrl = import.meta.env.VITE_BASE_URL;
 const getToken = () => localStorage.getItem("authToken");
+
+type PodravkaBatchCreatePayload =
+  | PodravkaFacingInput[]
+  | {
+      facings: PodravkaFacingInput[];
+      work_log_day_id?: number;
+      work_date?: string;
+    };
 
 const getPodravkaFacings = async () => {
   const token = getToken();
@@ -131,12 +140,12 @@ const getPodravkaPresenceReport = async (
 };
 
 const batchCreatePodravkaFacings = async (
-  facingDataArray: PodravkaFacingInput[]
+  payload: PodravkaBatchCreatePayload
 ) => {
   const token = getToken();
   const response = await axios.post(
     `${baseUrl}/api/facings/podravka-facing/batch`,
-    facingDataArray,
+    payload,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

@@ -11,7 +11,7 @@ import { useState } from "react";
 
 interface Props<T> {
   data: T[];
-  columns: ColumnDef<T, unknown>[];
+  columns: ColumnDef<T, any>[];
   customFooter?: (rows: T[]) => React.ReactNode;
   rowClassName?: string;
   cellClassName?: (colId: string) => string;

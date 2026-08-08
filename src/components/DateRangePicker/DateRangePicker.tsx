@@ -12,6 +12,7 @@ interface DateRangePickerProps {
   startDate: Date | null;
   endDate: Date | null;
   onChange: (range: [Date | null, Date | null]) => void;
+  mode?: "range" | "single";
 }
 
 const formatInputDate = (date: Date | null) =>
@@ -21,6 +22,7 @@ const DateRangePicker = ({
   startDate,
   endDate,
   onChange,
+  mode = "range",
 }: DateRangePickerProps) => {
   const [open, setOpen] = useState(false);
   const [tempStart, setTempStart] = useState(startDate);
@@ -32,7 +34,11 @@ const DateRangePicker = ({
   });
 
   const handleConfirm = () => {
-    onChange([tempStart, tempEnd]);
+    if (mode === "single") {
+      onChange([tempStart, tempStart]);
+    } else {
+      onChange([tempStart, tempEnd]);
+    }
     setOpen(false);
   };
 
@@ -69,26 +75,36 @@ const DateRangePicker = ({
           className="w-72 max-w-[90vw] bg-neutral-900 border border-neutral-700 rounded-xl shadow-lg p-4 text-white space-y-4"
         >
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Nga Data</label>
+            <label className="text-sm">
+              {mode === "single" ? "Data" : "Nga Data"}
+            </label>
             <input
               type="date"
               value={formatInputDate(tempStart)}
-              onChange={(e) =>
-                setTempStart(e.target.value ? new Date(e.target.value) : null)
-              }
+              onChange={(e) => {
+                const value = e.target.value ? new Date(e.target.value) : null;
+                setTempStart(value);
+                if (mode === "single") {
+                  setTempEnd(value);
+                }
+              }}
               className="bg-neutral-800 border border-neutral-600 rounded px-3 py-2 text-sm text-white"
             />
 
-            <label className="text-sm">Deri më</label>
-            <input
-              type="date"
-              value={formatInputDate(tempEnd)}
-              min={formatInputDate(tempStart) || undefined}
-              onChange={(e) =>
-                setTempEnd(e.target.value ? new Date(e.target.value) : null)
-              }
-              className="bg-neutral-800 border border-neutral-600 rounded px-3 py-2 text-sm text-white"
-            />
+            {mode === "range" && (
+              <>
+                <label className="text-sm">Deri më</label>
+                <input
+                  type="date"
+                  value={formatInputDate(tempEnd)}
+                  min={formatInputDate(tempStart) || undefined}
+                  onChange={(e) =>
+                    setTempEnd(e.target.value ? new Date(e.target.value) : null)
+                  }
+                  className="bg-neutral-800 border border-neutral-600 rounded px-3 py-2 text-sm text-white"
+                />
+              </>
+            )}
           </div>
 
           <div className="flex justify-between gap-2 pt-2">
@@ -103,7 +119,7 @@ const DateRangePicker = ({
               onClick={handleConfirm}
               variant="primary"
               className="text-sm px-4 py-2"
-              disabled={!tempStart || !tempEnd}
+              disabled={!tempStart || (mode === "range" && !tempEnd)}
             >
               Zgjidhni
             </ActionButton>

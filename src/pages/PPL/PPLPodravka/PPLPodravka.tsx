@@ -11,6 +11,7 @@ import { useUser } from "../../../hooks/useUser";
 import Select from "react-select";
 import darkSelectStyles from "../../../utils/darkSelectStyles";
 import storeServices from "../../../services/storeServices";
+import { useActiveWorkDay } from "../../../hooks/useActiveWorkDay";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -34,6 +35,7 @@ const PodravkaFacingsFormPage = () => {
   const selectedCategory = searchParams.get("category") || "";
   const { user } = useUser();
   const userId = user?.user_id;
+  const activeWorkDay = useActiveWorkDay();
 
   const combinedProducts = useMemo(
     () => [...products, ...customProducts],
@@ -167,13 +169,18 @@ const PodravkaFacingsFormPage = () => {
     });
 
     const facingData = [...listedFacings, ...unlistedFacings];
+    const workDayPayload = {
+      facings: facingData,
+      work_log_day_id: activeWorkDay?.work_log_day_id || undefined,
+      work_date: activeWorkDay?.work_date || undefined,
+    };
 
     try {
       if (!isOnline()) {
-        await queueFacings(facingData);
+        await queueFacings(workDayPayload);
         alert("Offline – facings u ruajtën për t'u dërguar më vonë.");
       } else {
-        await podravkaFacingsService.batchCreatePodravkaFacings(facingData);
+        await podravkaFacingsService.batchCreatePodravkaFacings(workDayPayload);
         alert("Facings u ngarkuan me sukses!");
       }
       setFacings({});
