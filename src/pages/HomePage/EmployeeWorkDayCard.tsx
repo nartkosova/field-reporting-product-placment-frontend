@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AxiosError } from "axios";
 import workDayService from "../../services/workDayService";
 import {
@@ -251,6 +251,10 @@ export const EmployeeWorkDayCard = () => {
   const hasWorkDayStarterData = Boolean(
     isWorkDay && form.plan.trim() && form.start_kilometers.trim()
   );
+  const hasUnsavedChanges = useMemo(() => {
+    if (!selectedDay) return false;
+    return JSON.stringify(form) !== JSON.stringify(mapDayToStarterForm(selectedDay));
+  }, [form, selectedDay]);
   const shouldExposeTodayActions = selectedDate === todayDate;
 
   useEffect(() => {
@@ -370,7 +374,7 @@ export const EmployeeWorkDayCard = () => {
   // input to correct it would re-run this effect and immediately write the old
   // value back, making the field impossible to edit.
   useEffect(() => {
-    if (!selectedDate || selectedDay) {
+    if (!selectedDate || selectedDay || !userId) {
       return;
     }
 
@@ -425,7 +429,7 @@ export const EmployeeWorkDayCard = () => {
     return () => {
       ignore = true;
     };
-  }, [selectedDate, selectedDay]);
+  }, [selectedDate, selectedDay, userId]);
 
   const saveStarterData = async (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -567,6 +571,10 @@ export const EmployeeWorkDayCard = () => {
                   placeholder="Plani i ditës"
                   className={`w-full ${inputClass} min-h-24`}
                 />
+                <p className="text-sm text-neutral-400">
+                  Shkruaj planin e ditës. Bashkë me kilometrazhin fillestar,
+                  kjo hap qytetet, aktivitetet, kostot dhe përmbledhjen.
+                </p>
               </div>
 
               <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
@@ -590,6 +598,35 @@ export const EmployeeWorkDayCard = () => {
                   </p>
                 )}
               </div>
+
+              {!hasWorkDayStarterData && (
+                <div className="rounded-xl border border-amber-800/70 bg-amber-950/30 px-4 py-3 text-sm text-amber-100">
+                  <p className="font-semibold">Plotëso hapat fillestarë</p>
+                  <p className="mt-1 text-amber-200/80">
+                    Plotëso planin dhe kilometrazhin fillestar për të vazhduar
+                    me të dhënat e detajuara të ditës.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                    <span
+                      className={
+                        form.plan.trim() ? "text-green-300" : "text-amber-200"
+                      }
+                    >
+                      {form.plan.trim() ? "✓" : "○"} Plani
+                    </span>
+                    <span
+                      className={
+                        form.start_kilometers.trim()
+                          ? "text-green-300"
+                          : "text-amber-200"
+                      }
+                    >
+                      {form.start_kilometers.trim() ? "✓" : "○"} Kilometrazhi
+                      fillestar
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {hasWorkDayStarterData && (
                 <>
@@ -924,16 +961,24 @@ export const EmployeeWorkDayCard = () => {
             </div>
           )}
 
-          <div className="text-left font-semibold text-gray-200">
-            {selectedDay
-              ? "Dita ekziston dhe është aktive."
-              : "Ruani ditën për të vazhduar me aktivitetet."}
+          <div
+            className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+              selectedDay && !hasUnsavedChanges
+                ? "border-green-800 bg-green-950/40 text-green-200"
+                : "border-amber-800 bg-amber-950/40 text-amber-100"
+            }`}
+          >
+            {selectedDay && !hasUnsavedChanges
+              ? "✓ Dita është ruajtur dhe aktive."
+              : selectedDay
+              ? "Ke ndryshime të paruajtura. Kliko “Ruaj ndryshimet”."
+              : "Dita nuk është ruajtur ende. Ruaje për të vazhduar me aktivitetet."}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <SubmitButton
               loading={isSaving}
-              label={selectedDay ? "Përditëso Ditën" : "Dërgo Ditën"}
+              label={selectedDay ? "Ruaj ndryshimet" : "Ruaj Ditën"}
               loadingLabel="Duke dërguar..."
               className="h-[46px]"
             />

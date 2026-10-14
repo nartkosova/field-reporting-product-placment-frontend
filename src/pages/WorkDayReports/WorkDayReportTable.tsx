@@ -5,6 +5,20 @@ import { DetailedWorkDayReportRow } from "../../types/workDayReportInterface";
 
 const columnHelper = createColumnHelper<DetailedWorkDayReportRow>();
 
+// `work_date` is a date-only field. Parse it as a local calendar date so it
+// cannot shift to the previous day for users west of UTC.
+const formatWorkDate = (workDate: string) => {
+  const [year, month, day] = workDate.slice(0, 10).split("-").map(Number);
+
+  if (!year || !month || !day) return workDate;
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(year, month - 1, day));
+};
+
 const getStatusLabel = (status: DetailedWorkDayReportRow["status"]) => {
   switch (status) {
     case "planned_work":
@@ -35,7 +49,10 @@ const WorkDayReportTable = ({ data }: { data: DetailedWorkDayReportRow[] }) => {
   const columns = useMemo(
     () => [
       columnHelper.accessor("user", { header: "Perdoruesi" }),
-      columnHelper.accessor("work_date", { header: "Data" }),
+      columnHelper.accessor("work_date", {
+        header: "Data",
+        cell: (info) => formatWorkDate(info.getValue()),
+      }),
       columnHelper.accessor("status", {
         header: "Statusi",
         cell: (info) => getStatusLabel(info.getValue()),

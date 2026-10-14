@@ -33,6 +33,7 @@ type GenericReportHeaderProps<T> = {
     filters: Record<string, string | string[]>
   ) => React.ReactNode;
   exportExcel?: (data: T[]) => void;
+  exportCsv?: (data: T[]) => void;
   dateNeeded?: boolean;
   user?: { user?: string; user_id?: number } | null;
   userRole?: string | null;
@@ -51,6 +52,7 @@ export default function GenericReportHeader<T>({
   fetchData,
   renderTable,
   exportExcel,
+  exportCsv,
   dateNeeded = true,
   user,
   userRole,
@@ -66,6 +68,7 @@ export default function GenericReportHeader<T>({
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
 
   const normalizeSelected = (
     selected: FilterOption | readonly FilterOption[] | null
@@ -139,6 +142,28 @@ export default function GenericReportHeader<T>({
     filtersConfig.forEach((filter) => {
       filter.onChange?.([], setFilters);
     });
+  };
+
+  const exportAllCsvRows = async () => {
+    if (!exportCsv || isExportingCsv) return;
+
+    const query: Record<
+      string,
+      string | number | boolean | string[] | number[] | boolean[]
+    > = {
+      ...debouncedFilters,
+      ...(startDate ? { start_date: toDateInputValue(startDate) } : {}),
+      ...(endDate ? { end_date: toDateInputValue(endDate) } : {}),
+    };
+
+    setIsExportingCsv(true);
+    try {
+      // Export every row matching the active filters, not merely the current page.
+      const result = await fetchData(Math.max(total, 1), 0, query);
+      exportCsv(result.data);
+    } finally {
+      setIsExportingCsv(false);
+    }
   };
 
   return (
@@ -333,6 +358,17 @@ export default function GenericReportHeader<T>({
             </ActionButton>
           </div>
         )}
+      {exportCsv && userRole === "admin" && (
+        <div className="pt-6 flex gap-2">
+          <ActionButton
+            onClick={exportAllCsvRows}
+            disabled={isExportingCsv || total === 0}
+            variant="primary"
+          >
+            {isExportingCsv ? "Duke eksportuar..." : "Eksporto CSV"}
+          </ActionButton>
+        </div>
+      )}
     </div>
   );
 }

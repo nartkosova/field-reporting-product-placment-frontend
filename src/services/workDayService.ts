@@ -26,7 +26,6 @@ const listWorkDays = async (
 };
 
 const getLatestKilometers = async (params: {
-  user_id?: number;
   up_to_date?: string;
 } = {}): Promise<LatestWorkDayKilometers | null> => {
   const response = await axios.get(`${baseUrl}/api/work-days/latest-kilometers`, {

@@ -12,10 +12,17 @@ import { useActiveWorkDay } from "../../hooks/useActiveWorkDay";
 const HomePage: React.FC = () => {
   const { user, userRole } = useUser();
   const isAdmin = userRole === "admin";
+  // Florina keeps her admin role, but also needs the field-work workspace.
+  const canUseEmployeeWorkspace =
+    !isAdmin || user?.user.trim().toLocaleLowerCase() === "florina";
   const selectedStore = useSelectedStore();
   const activeWorkDay = useActiveWorkDay();
   const hasActiveWorkingDay =
     activeWorkDay?.work_date && activeWorkDay.status === "planned_work";
+  const adminNavigationItems = adminNavItems.filter(
+    (item) =>
+      !(canUseEmployeeWorkspace && hasActiveWorkingDay && item.to === "/reports")
+  );
 
   useEffect(() => {
     fetchAndCacheCompetitorCategories();
@@ -52,7 +59,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {!isAdmin && (
+        {canUseEmployeeWorkspace && (
           <>
             <div className="w-full max-w-4xl mb-10">
               <EmployeeWorkDayCard />
@@ -88,7 +95,7 @@ const HomePage: React.FC = () => {
 
         {isAdmin && (
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {adminNavItems.map((item) => (
+            {adminNavigationItems.map((item) => (
               <NavButton key={item.to} to={item.to} variant="card">
                 {item.label}
               </NavButton>
