@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearQueryCache } from "../lib/queryClient";
 
 // The session token lives in an httpOnly cookie that page scripts cannot
 // read. The browser only keeps the non-secret profile, to render the UI and
@@ -26,6 +27,8 @@ export const setSession = (session: StoredSession | null) => {
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   } else {
     localStorage.removeItem(SESSION_KEY);
+    // The next user on this device must not see the previous user's reports.
+    clearQueryCache();
   }
 
   window.dispatchEvent(new Event(SESSION_EVENT));

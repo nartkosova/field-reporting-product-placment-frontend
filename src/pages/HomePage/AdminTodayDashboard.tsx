@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { REPORT_STALE_TIME } from "../../lib/queryClient";
 import { Link } from "react-router-dom";
 import {
   Bar,
@@ -20,11 +22,12 @@ import {
 } from "../../components/Analytics/chartTheme";
 import StatCard, { ShelfSplit } from "../../components/Analytics/StatCard";
 import workDayService from "../../services/workDayService";
-import { DayOverview, LiveState } from "../../types/attendanceInterface";
+import { LiveState } from "../../types/attendanceInterface";
 import { formatTime } from "../../utils/attendance";
 import { getLocalDateIso } from "../../utils/utils";
 
-const REFRESH_MS = 60_000;
+// Today's view refreshes itself every 10 minutes while it is open.
+const REFRESH_MS = 10 * 60 * 1000;
 
 const STATE_LABELS: Record<LiveState, { label: string; className: string }> = {
   in_store: {
@@ -65,36 +68,20 @@ const STATE_ORDER: LiveState[] = [
 
 const AdminTodayDashboard = () => {
   const [date, setDate] = useState(getLocalDateIso());
-  const [data, setData] = useState<DayOverview | null>(null);
-  const [error, setError] = useState(false);
+  const isToday = date === getLocalDateIso();
 
-  useEffect(() => {
-    let ignore = false;
-
-    const load = () =>
-      workDayService
-        .getDayOverview(date)
-        .then((overview) => {
-          if (ignore) return;
-          setData(overview);
-          setError(false);
-        })
-        .catch(() => {
-          if (!ignore) setError(true);
-        });
-
-    load();
-    // Only today's view changes while it is open.
-    const timer =
-      date === getLocalDateIso()
-        ? window.setInterval(load, REFRESH_MS)
-        : undefined;
-
-    return () => {
-      ignore = true;
-      window.clearInterval(timer);
-    };
-  }, [date]);
+  // Today's numbers move while people work, so they refresh every 10 minutes.
+  // Other days stay fresh for an hour and survive a page reload.
+  const overviewQuery = useQuery({
+    queryKey: ["day-overview", date],
+    queryFn: () => workDayService.getDayOverview(date),
+    staleTime: isToday ? REFRESH_MS : REPORT_STALE_TIME,
+    refetchInterval: isToday ? REFRESH_MS : false,
+    placeholderData: keepPreviousData,
+    meta: { persist: true },
+  });
+  const data = overviewQuery.data ?? null;
+  const error = overviewQuery.isError && !data;
 
   const previous = data?.previous_business;
   const business = data?.business;

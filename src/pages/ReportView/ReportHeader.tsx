@@ -21,6 +21,7 @@ import {
 } from "../../types/pplReportInterface";
 import GenericReportHeader from "../../components/BaseTableHeader/BaseTableHeader";
 import { toast } from "../../components/Toast/toast";
+import { REPORT_STALE_TIME, queryClient } from "../../lib/queryClient";
 import { useProductCategories } from "../../hooks/useProductCategories";
 import { useUser } from "../../hooks/useUser";
 
@@ -177,13 +178,15 @@ const ReportHeader = () => {
     ] as FilterConfig[];
   }, [userOptions, filteredStores, filteredCategories, businessUnits]);
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const fetchData = useCallback(
     async (pageSize: number, offset: number, filters: Filters) => {
       const query = toQuery(filters);
       lastQuery.current = query;
       setIsLoading(true);
       try {
-        const res = await podravkaFacingsService.getPplReport({
+        const params = {
           ...query,
           group_by: groupBy,
           ...(sort.field
@@ -191,6 +194,15 @@ const ReportHeader = () => {
             : {}),
           limit: pageSize,
           offset,
+        };
+        // Served from cache while fresh; after a PPL is posted the cache is
+        // invalidated, so this waits for fresh data instead of showing old.
+        const res = await queryClient.fetchQuery({
+          queryKey: ["ppl-report", params],
+          queryFn: () => podravkaFacingsService.getPplReport(params),
+          staleTime: REPORT_STALE_TIME,
+          // Kept in memory only: report pages are large and saving every
+          // filter combination would fill localStorage.
         });
         setReport(res);
         return { data: res.data, total: res.total };
@@ -198,8 +210,15 @@ const ReportHeader = () => {
         setIsLoading(false);
       }
     },
-    [groupBy, sort],
+    // refreshKey is only here to give the header a new fetchData to reload with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [groupBy, sort, refreshKey],
   );
+
+  const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["ppl-report"] });
+    setRefreshKey((key) => key + 1);
+  };
 
   const updateVisibleColumns = (next: string[]) => {
     setVisibleColumns(next);
@@ -319,6 +338,14 @@ const ReportHeader = () => {
                 ))}
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={refresh}
+                  disabled={isLoading}
+                  className="rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-sm text-neutral-200 hover:bg-neutral-800 disabled:opacity-50"
+                >
+                  {isLoading ? "Duke ngarkuar..." : "Rifresko"}
+                </button>
                 {userRole === "admin" && (
                   <button
                     type="button"

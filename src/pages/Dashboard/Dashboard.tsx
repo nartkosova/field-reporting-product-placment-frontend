@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { REPORT_STALE_TIME } from "../../lib/queryClient";
 import {
   Bar,
   BarChart,
@@ -42,17 +44,13 @@ import { getCurrentQuarter } from "../../types/photoInterface";
 import { exportAnalyticsWorkbook } from "./exportAnalytics";
 
 type PresetKey =
-  | "this_month"
-  | "last_month"
-  | "this_quarter"
-  | "last_quarter"
-  | "ytd";
+  "this_month" | "last_month" | "this_quarter" | "last_quarter" | "ytd";
 
 const startOfQuarter = (year: number, quarter: number) =>
   new Date(year, (quarter - 1) * 3, 1);
 
 const buildPreset = (
-  key: PresetKey
+  key: PresetKey,
 ): { start: string; end: string; granularity: Granularity } => {
   const now = new Date();
   const { year, quarter } = getCurrentQuarter(now);
@@ -121,6 +119,11 @@ const GRANULARITY_OPTIONS: { value: Granularity; label: string }[] = [
 const sectionClass =
   "w-full bg-neutral-900 p-5 border border-neutral-800 rounded-2xl shadow-lg space-y-4";
 
+// Stable empty fallbacks, so memoized values don't recompute every render.
+const NO_TIMESERIES: TimeseriesPoint[] = [];
+const NO_EMPLOYEES: EmployeeBreakdownRow[] = [];
+const NO_CATEGORIES: BreakdownRow[] = [];
+
 const Dashboard = () => {
   const { userRole } = useUser();
   const isAdmin = userRole === "admin";
@@ -128,15 +131,6 @@ const Dashboard = () => {
   const [preset, setPreset] = useState<PresetKey>("this_quarter");
   const [granularity, setGranularity] = useState<Granularity>("week");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-
-  const [overview, setOverview] = useState<AnalyticsOverview | null>(null);
-  const [timeseries, setTimeseries] = useState<TimeseriesPoint[]>([]);
-  const [byEmployee, setByEmployee] = useState<EmployeeBreakdownRow[]>([]);
-  const [categories, setCategories] = useState<BreakdownRow[]>([]);
-  const [coverage, setCoverage] = useState<StoreCoverage | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const range = useMemo(() => buildPreset(preset), [preset]);
 
@@ -147,7 +141,7 @@ const Dashboard = () => {
       granularity,
       ...(selectedUsers.length ? { user_ids: selectedUsers } : {}),
     }),
-    [range.start, range.end, granularity, selectedUsers]
+    [range.start, range.end, granularity, selectedUsers],
   );
 
   // The preset carries a sensible bucket size; changing it explicitly afterwards
@@ -156,50 +150,50 @@ const Dashboard = () => {
     setGranularity(buildPreset(preset).granularity);
   }, [preset]);
 
-  useEffect(() => {
-    if (!isAdmin) return;
+  const usersQuery = useQuery({
+    queryKey: ["users", "all"],
+    queryFn: (): Promise<User[]> => userService.getAllUsers(),
+    enabled: isAdmin,
+    staleTime: 60 * 60 * 1000,
+  });
+  const users = usersQuery.data ?? [];
 
-    userService
-      .getAllUsers()
-      .then(setUsers)
-      .catch(() => setUsers([]));
-  }, [isAdmin]);
+  // All five panels load together and are cached per filter combination, so
+  // switching back to a period already seen is instant.
+  const analyticsQuery = useQuery({
+    queryKey: ["analytics", filters],
+    queryFn: async () => {
+      const [overview, timeseries, byEmployee, categories, coverage] =
+        await Promise.all([
+          analyticsService.getOverview(filters),
+          analyticsService.getTimeseries(filters),
+          analyticsService.getByEmployee(filters),
+          analyticsService.getPhotoCategories(filters),
+          analyticsService.getStoreCoverage(filters),
+        ]);
+      return { overview, timeseries, byEmployee, categories, coverage };
+    },
+    staleTime: REPORT_STALE_TIME,
+    placeholderData: keepPreviousData,
+    meta: { persist: true },
+  });
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const [
-        overviewRes,
-        timeseriesRes,
-        employeeRes,
-        categoryRes,
-        coverageRes,
-      ] = await Promise.all([
-        analyticsService.getOverview(filters),
-        analyticsService.getTimeseries(filters),
-        analyticsService.getByEmployee(filters),
-        analyticsService.getPhotoCategories(filters),
-        analyticsService.getStoreCoverage(filters),
-      ]);
-
-      setOverview(overviewRes);
-      setTimeseries(timeseriesRes);
-      setByEmployee(employeeRes);
-      setCategories(categoryRes);
-      setCoverage(coverageRes);
-    } catch (err) {
-      console.error("Error loading analytics:", err);
-      setError("Nuk u ngarkuan të dhënat analitike. Provo përsëri.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filters]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const overview: AnalyticsOverview | null =
+    analyticsQuery.data?.overview ?? null;
+  const timeseries = analyticsQuery.data?.timeseries ?? NO_TIMESERIES;
+  const byEmployee = analyticsQuery.data?.byEmployee ?? NO_EMPLOYEES;
+  const categories = analyticsQuery.data?.categories ?? NO_CATEGORIES;
+  const coverage: StoreCoverage | null = analyticsQuery.data?.coverage ?? null;
+  const isLoading = analyticsQuery.isPending;
+  const error = analyticsQuery.isError
+    ? "Nuk u ngarkuan të dhënat analitike. Provo përsëri."
+    : null;
+  const updatedAt = analyticsQuery.dataUpdatedAt
+    ? new Date(analyticsQuery.dataUpdatedAt).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
 
   const topCategories = useMemo(() => categories.slice(0, 12), [categories]);
 
@@ -208,7 +202,7 @@ const Dashboard = () => {
       byEmployee
         .slice(0, 12)
         .map((row) => ({ name: row.user, photos: row.photos })),
-    [byEmployee]
+    [byEmployee],
   );
 
   const handleExport = () =>
@@ -231,11 +225,29 @@ const Dashboard = () => {
               <h1 className="text-2xl font-bold text-white">Paneli Analitik</h1>
               <p className="text-sm text-neutral-400">
                 {range.start} - {range.end}
+                {updatedAt && (
+                  <span className="text-neutral-500">
+                    {" · "}
+                    {analyticsQuery.isFetching
+                      ? "Duke përditësuar..."
+                      : `Përditësuar ${updatedAt}`}
+                  </span>
+                )}
               </p>
             </div>
-            <ActionButton onClick={handleExport} className="h-[42px]">
-              Eksporto Excel
-            </ActionButton>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => analyticsQuery.refetch()}
+                disabled={analyticsQuery.isFetching}
+                className="h-[42px] rounded-xl border border-neutral-700 bg-neutral-900 px-4 text-sm text-neutral-200 hover:bg-neutral-800 disabled:opacity-50"
+              >
+                Rifresko
+              </button>
+              <ActionButton onClick={handleExport} className="h-[42px]">
+                Eksporto Excel
+              </ActionButton>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -280,7 +292,7 @@ const Dashboard = () => {
                   }))}
                   onChange={(selected) =>
                     setSelectedUsers(
-                      (selected || []).map((option) => option.value)
+                      (selected || []).map((option) => option.value),
                     )
                   }
                   placeholder="Të gjithë"
@@ -292,11 +304,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {error && (
-          <div className="notice-error w-full">
-            {error}
-          </div>
-        )}
+        {error && <div className="notice-error w-full">{error}</div>}
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <KpiTile
@@ -330,9 +338,7 @@ const Dashboard = () => {
           <KpiTile
             label="Ditë pune"
             value={formatNumber(overview?.workDays)}
-            hint={
-              overview ? `${overview.absenceDays} ditë mungesë` : undefined
-            }
+            hint={overview ? `${overview.absenceDays} ditë mungesë` : undefined}
             isLoading={isLoading}
           />
           <KpiTile
@@ -344,7 +350,9 @@ const Dashboard = () => {
             label="Kosto karburanti"
             value={formatNumber(overview?.fuelCost)}
             hint={
-              overview ? `${formatNumber(overview.fuelLiters)} litra` : undefined
+              overview
+                ? `${formatNumber(overview.fuelLiters)} litra`
+                : undefined
             }
             isLoading={isLoading}
           />
@@ -368,7 +376,10 @@ const Dashboard = () => {
           </h2>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeseries} margin={{ left: 4, right: 12, top: 8 }}>
+              <LineChart
+                data={timeseries}
+                margin={{ left: 4, right: 12, top: 8 }}
+              >
                 <CartesianGrid stroke={CHART_INK.grid} vertical={false} />
                 <XAxis dataKey="bucket" {...axisProps} />
                 <YAxis {...axisProps} width={56} />
@@ -400,10 +411,15 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className={sectionClass}>
             {/* Single series: the title names it, so no legend box. */}
-            <h2 className="text-lg font-semibold text-white">Foto të ngarkuara</h2>
+            <h2 className="text-lg font-semibold text-white">
+              Foto të ngarkuara
+            </h2>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={timeseries} margin={{ left: 4, right: 12, top: 8 }}>
+                <BarChart
+                  data={timeseries}
+                  margin={{ left: 4, right: 12, top: 8 }}
+                >
                   <CartesianGrid stroke={CHART_INK.grid} vertical={false} />
                   <XAxis dataKey="bucket" {...axisProps} />
                   <YAxis {...axisProps} width={48} />
@@ -505,7 +521,7 @@ const Dashboard = () => {
                 {(coverage?.stores || [])
                   .filter(
                     (store) =>
-                      store.photo_count === 0 && store.facing_count === 0
+                      store.photo_count === 0 && store.facing_count === 0,
                   )
                   .slice(0, 25)
                   .map((store) => (
