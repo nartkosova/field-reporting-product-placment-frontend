@@ -3,3 +3,22 @@
 :root {
   --transparent-black: rgba(0, 0, 0, 0.6);
 }
+
+/* Shared surfaces, so every page uses the same card and notice styles. */
+@layer components {
+  .card {
+    @apply rounded-2xl border border-neutral-800 bg-neutral-900 p-6 shadow-lg;
+  }
+  .card-inset {
+    @apply rounded-xl border border-neutral-800 bg-black p-4;
+  }
+  .notice-error {
+    @apply rounded-xl border px-4 py-3 text-sm border-red-800 bg-red-950/40 text-red-200;
+  }
+  .notice-success {
+    @apply rounded-xl border px-4 py-3 text-sm border-green-800 bg-green-950/40 text-green-200;
+  }
+  .notice-warning {
+    @apply rounded-xl border px-4 py-3 text-sm border-amber-800 bg-amber-950/30 text-amber-100;
+  }
+}

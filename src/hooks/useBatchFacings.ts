@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import { toast } from "../components/Toast/toast";
 
 export interface BatchFacingsConfig<TMeta, TInput> {
   fetchBatch: (batchId: string) => Promise<TMeta[]>;
@@ -45,7 +46,7 @@ export const useBatchFacings = <
         const msg =
           (err as AxiosError<{ error: string }>)?.response?.data?.error ??
           "Gabim gjatë ngarkimit.";
-        alert(msg);
+        toast.error(msg);
       } finally {
         setLoading(false);
       }
@@ -67,13 +68,13 @@ export const useBatchFacings = <
         config.makePayload(item, counts[config.makeKey(item)] ?? 0)
       );
       await config.submitBatch(batchId, payload);
-      alert("Përditësimi u krye me sukses.");
+      toast.success("Përditësimi u krye me sukses.");
       navigate(-1);
     } catch (err) {
       const msg =
         (err as AxiosError<{ error: string }>)?.response?.data?.error ??
         "Gabim gjatë përditësimit.";
-      alert(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

@@ -1,12 +1,13 @@
 import { useCallback } from "react";
 import { AxiosError } from "axios";
 import { ApiResponse } from "../types/common";
+import { toast } from "../components/Toast/toast";
 
 export const useErrorHandler = () => {
   const handleError = useCallback((error: unknown, fallbackMessage?: string) => {
     console.error("Error occurred:", error);
     
-    let message = fallbackMessage || "An error occurred. Please try again.";
+    let message = fallbackMessage || "Ndodhi një gabim. Provo përsëri.";
     
     if (error instanceof AxiosError) {
       const apiResponse = error.response?.data as ApiResponse;
@@ -17,8 +18,7 @@ export const useErrorHandler = () => {
       message = error;
     }
     
-    // For now, use alert but this can be replaced with a toast notification system
-    alert(message);
+    toast.error(message);
   }, []);
 
   const handleAsyncError = useCallback(async <T>(

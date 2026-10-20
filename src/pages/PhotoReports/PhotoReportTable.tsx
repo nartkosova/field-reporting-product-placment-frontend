@@ -4,6 +4,7 @@ import { BaseTable } from "../../components/BaseTable/BaseTable";
 import { PhotoSchema, PHOTO_TYPE_LABELS } from "../../types/photoInterface";
 import photoService from "../../services/photoService";
 import ActionButton from "../../components/Buttons/ActionButtons";
+import { toast } from "../../components/Toast/toast";
 
 const columnHelper = createColumnHelper<PhotoSchema>();
 
@@ -149,7 +150,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
 
               const photoUrls = Array.from(selectedPhotos);
               await photoService.bulkDeletePhotos(photoUrls);
-              alert("Fotot u fshinë me sukses.");
+              toast.success("Fotot u fshinë me sukses.");
               setTableData((prev) =>
                 prev.filter((photo) => !selectedPhotos.has(photo.photo_url))
               );

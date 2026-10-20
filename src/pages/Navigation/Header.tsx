@@ -5,7 +5,8 @@ import { useUser } from "../../hooks/useUser";
 import { useState } from "react";
 import { syncAllIfNeeded } from "../../db/db";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
-import { setToken } from "../../services/authService";
+import { logout } from "../../services/authService";
+import { toast } from "../../components/Toast/toast";
 
 const Header: React.FC = () => {
   const { user } = useUser();
@@ -17,20 +18,20 @@ const Header: React.FC = () => {
     try {
       const synced = await syncAllIfNeeded();
       if (synced) {
-        alert("Të gjitha të dhënat u sinkronizuan me sukses.");
+        toast.success("Të gjitha të dhënat u sinkronizuan me sukses.");
       } else {
-        alert("Nuk ka të dhëna për të sinkronizuar.");
+        toast.info("Nuk ka të dhëna për të sinkronizuar.");
       }
     } catch (err) {
       console.error("Sync error:", err);
-      alert("Ndodhi një gabim gjatë sinkronizimit.");
+      toast.error("Ndodhi një gabim gjatë sinkronizimit.");
     } finally {
       setSyncing(false);
     }
   };
 
   const handleLogout = () => {
-    setToken(null);
+    logout();
     localStorage.removeItem("selectedStore");
     localStorage.removeItem("selectedCategory");
     navigate("/login");

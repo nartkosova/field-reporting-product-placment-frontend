@@ -6,6 +6,7 @@ import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
 
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+import { toast } from "../../../components/Toast/toast";
 
 const UpdatePodravkaProduct = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ const UpdatePodravkaProduct = () => {
         );
 
         if (!product) {
-          alert("Produkti nuk u gjet.");
+          toast.error("Produkti nuk u gjet.");
           return;
         }
 
@@ -44,7 +45,7 @@ const UpdatePodravkaProduct = () => {
       } catch (err) {
         console.error("Gabim gjatë ngarkimit", err);
         const axiosError = err as AxiosError<{ error: string }>;
-        alert(
+        toast.error(
           axiosError.response?.data?.error ||
             "Gabim gjatë ngarkimit të të dhënave."
         );

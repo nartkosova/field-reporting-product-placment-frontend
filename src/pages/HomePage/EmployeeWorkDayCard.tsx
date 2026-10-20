@@ -66,6 +66,8 @@ const createDefaultForm = (): StarterFormState => ({
   ],
 });
 
+const LAST_KILOMETERS_KEY = "lastKnownKilometers";
+
 const emptyCity = () => ({ city_name: "", visit_order: "", note: "" });
 
 const emptyActivity = () => ({
@@ -369,54 +371,65 @@ export const EmployeeWorkDayCard = () => {
     userId,
   ]);
 
-  // Carrying the previous odometer reading over is a one-time convenience per
-  // date. It must not depend on the kilometer fields themselves: clearing the
-  // input to correct it would re-run this effect and immediately write the old
-  // value back, making the field impossible to edit.
+  // Carry the previous day's odometer reading into an empty start field, for
+  // new days and for saved days that are missing it. It waits for the day to
+  // finish loading (loading resets the form and would wipe the value) and runs
+  // once per day, so clearing the field to correct it does not refill it.
+  const kilometerPrefillKey = selectedDate
+    ? `${selectedDate}:${selectedDay?.work_log_day_id ?? "new"}`
+    : null;
+  const needsKilometerPrefill =
+    isWorkDay && !form.start_kilometers.trim() && !form.end_kilometers.trim();
+
   useEffect(() => {
-    if (!selectedDate || selectedDay || !userId) {
+    if (!kilometerPrefillKey || !userId || isLoading || !needsKilometerPrefill) {
       return;
     }
 
-    if (prefilledKilometersDateRef.current === selectedDate) {
+    if (prefilledKilometersDateRef.current === kilometerPrefillKey) {
       return;
     }
 
     let ignore = false;
 
+    const applyKilometers = (value: string) =>
+      setForm((prev) =>
+        prev.start_kilometers.trim() || prev.end_kilometers.trim()
+          ? prev
+          : { ...prev, start_kilometers: value }
+      );
+
     const loadLatestKilometers = async () => {
       setIsLoadingKilometers(true);
 
       try {
+        // Only earlier days count: today's own row is what is being filled.
+        const previousDay = new Date(`${selectedDate}T00:00:00`);
+        previousDay.setDate(previousDay.getDate() - 1);
         const latest = await workDayService.getLatestKilometers({
-          up_to_date: selectedDate,
+          up_to_date: getLocalDateIso(previousDay),
         });
 
         if (ignore) return;
-        prefilledKilometersDateRef.current = selectedDate;
-        if (!latest) return;
+        prefilledKilometersDateRef.current = kilometerPrefillKey;
 
         const kilometerValue =
-          latest.end_kilometers !== null
+          latest?.end_kilometers != null
             ? String(latest.end_kilometers)
-            : latest.start_kilometers !== null
+            : latest?.start_kilometers != null
             ? String(latest.start_kilometers)
             : "";
 
         if (!kilometerValue) return;
 
-        setForm((prev) => {
-          if (prev.start_kilometers.trim() || prev.end_kilometers.trim()) {
-            return prev;
-          }
-
-          return {
-            ...prev,
-            start_kilometers: kilometerValue,
-          };
-        });
+        localStorage.setItem(LAST_KILOMETERS_KEY, kilometerValue);
+        applyKilometers(kilometerValue);
       } catch {
-        // Keep the form usable even if kilometer prefill fails.
+        // Offline: fall back to the last reading this device saw.
+        if (ignore) return;
+        prefilledKilometersDateRef.current = kilometerPrefillKey;
+        const cached = localStorage.getItem(LAST_KILOMETERS_KEY);
+        if (cached) applyKilometers(cached);
       } finally {
         if (!ignore) {
           setIsLoadingKilometers(false);
@@ -429,7 +442,7 @@ export const EmployeeWorkDayCard = () => {
     return () => {
       ignore = true;
     };
-  }, [selectedDate, selectedDay, userId]);
+  }, [kilometerPrefillKey, selectedDate, userId, isLoading, needsKilometerPrefill]);
 
   const saveStarterData = async (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -445,6 +458,10 @@ export const EmployeeWorkDayCard = () => {
 
     try {
       const payload = buildPayload(selectedDate, form);
+      const latestReading = payload.end_kilometers ?? payload.start_kilometers;
+      if (latestReading != null) {
+        localStorage.setItem(LAST_KILOMETERS_KEY, String(latestReading));
+      }
       if (!isOnline()) {
         await queueWorkDay(payload);
         const offlineDay = mapQueuedWorkDayToDay(
@@ -492,7 +509,7 @@ export const EmployeeWorkDayCard = () => {
   };
 
   return (
-    <div className="w-full bg-neutral-900 p-6 border border-neutral-800 rounded-2xl shadow-lg space-y-4">
+    <div className="card w-full space-y-4">
       <h2 className="text-2xl font-bold text-white">Dita e Punës</h2>
       <p className="text-gray-300">
         Zgjidhni datën dhe llojin e ditës. Për ditë pune, plotësoni planin dhe
@@ -523,20 +540,20 @@ export const EmployeeWorkDayCard = () => {
       )}
 
       {screenError && (
-        <div className="rounded-xl border border-red-800 bg-red-950/40 px-4 py-3 text-red-200">
+        <div className="notice-error">
           {screenError}
         </div>
       )}
 
       {successMessage && (
-        <div className="rounded-xl border border-green-800 bg-green-950/40 px-4 py-3 text-green-200">
+        <div className="notice-success">
           {successMessage}
         </div>
       )}
 
       {!isLoading && selectedDate && (
         <form onSubmit={saveStarterData} className="space-y-4">
-          <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+          <div className="card-inset relative space-y-2">
             <label className="block mb-2 font-medium text-gray-200">Eventi</label>
             <Select
               options={statusSelectOptions}
@@ -559,7 +576,7 @@ export const EmployeeWorkDayCard = () => {
 
           {isWorkDay ? (
             <>
-              <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+              <div className="card-inset relative space-y-2">
                 <label className="block mb-2 font-medium text-gray-200">
                   Plani
                 </label>
@@ -577,7 +594,7 @@ export const EmployeeWorkDayCard = () => {
                 </p>
               </div>
 
-              <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+              <div className="card-inset relative space-y-2">
                 <label className="block mb-2 font-medium text-gray-200">
                   Kilometrazhi fillestar
                 </label>
@@ -631,7 +648,7 @@ export const EmployeeWorkDayCard = () => {
               {hasWorkDayStarterData && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+                    <div className="card-inset relative space-y-2">
                       <label className="block mb-2 font-medium text-gray-200">
                         Kilometrazhi përfundimtar
                       </label>
@@ -648,7 +665,7 @@ export const EmployeeWorkDayCard = () => {
                       />
                     </div>
 
-                    <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+                    <div className="card-inset relative space-y-2">
                       <label className="block mb-2 font-medium text-gray-200">
                         Kosto karburanti
                       </label>
@@ -665,7 +682,7 @@ export const EmployeeWorkDayCard = () => {
                       />
                     </div>
 
-                    <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+                    <div className="card-inset relative space-y-2">
                       <label className="block mb-2 font-medium text-gray-200">
                         Litrat e karburantit
                       </label>
@@ -682,7 +699,7 @@ export const EmployeeWorkDayCard = () => {
                       />
                     </div>
 
-                    <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+                    <div className="card-inset relative space-y-2">
                       <label className="block mb-2 font-medium text-gray-200">
                         Kosto tjetër udhëtimi
                       </label>
@@ -700,7 +717,7 @@ export const EmployeeWorkDayCard = () => {
                     </div>
                   </div>
 
-                  <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+                  <div className="card-inset relative space-y-2">
                     <label className="block mb-2 font-medium text-gray-200">
                       Përmbledhja
                     </label>
@@ -714,7 +731,7 @@ export const EmployeeWorkDayCard = () => {
                     />
                   </div>
 
-                  <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-4">
+                  <div className="card-inset relative space-y-4">
                     <div className="flex items-center justify-between gap-3">
                       <label className="block font-medium text-gray-200">
                         Qytetet
@@ -809,7 +826,7 @@ export const EmployeeWorkDayCard = () => {
                     </div>
                   </div>
 
-                  <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-4">
+                  <div className="card-inset relative space-y-4">
                     <div className="flex items-center justify-between gap-3">
                       <label className="block font-medium text-gray-200">
                         Aktivitetet
@@ -943,7 +960,7 @@ export const EmployeeWorkDayCard = () => {
               )}
             </>
           ) : (
-            <div className="relative p-4 border border-neutral-800 rounded-xl bg-black space-y-2">
+            <div className="card-inset relative space-y-2">
               <label className="block mb-2 font-medium text-gray-200">
                 Arsyeja
               </label>
@@ -983,7 +1000,7 @@ export const EmployeeWorkDayCard = () => {
               className="h-[46px]"
             />
 
-            <div className="border border-neutral-800 bg-black rounded-xl p-4 text-sm text-neutral-300">
+            <div className="card-inset text-sm text-neutral-300">
               {selectedDay
                 ? "Tani PPL, fotot dhe facings do lidhen me këtë ditë."
                 : "Pasi ta dërgoni ditën, vazhdoni me aktivitetet e zakonshme."}

@@ -7,6 +7,7 @@ import { competitorFields } from "./CompetitorFields";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+import { toast } from "../../../components/Toast/toast";
 
 const UpdateCompetitorBrand = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ const UpdateCompetitorBrand = () => {
         const backendMessage =
           axiosError.response?.data?.error ||
           "Gabim gjatë ngarkimit të dhenave.";
-        alert(backendMessage);
+        toast.error(backendMessage);
       } finally {
         setLoading(false);
       }

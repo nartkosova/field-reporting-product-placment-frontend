@@ -32,7 +32,7 @@ const FacingsForm = ({
   const total = entries.reduce((sum, entry) => sum + entry.value, 0);
 
   return (
-    <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-4">
+    <div className="card w-full space-y-4">
       <h2 className="text-2xl font-bold text-white">{title}</h2>
 
       <p className="text-gray-300">
@@ -52,7 +52,7 @@ const FacingsForm = ({
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="relative p-4 border border-neutral-800 rounded-xl bg-black"
+              className="card-inset relative"
             >
               {onRemoveProduct && (
                 <button

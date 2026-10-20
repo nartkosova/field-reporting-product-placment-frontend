@@ -13,6 +13,7 @@ import {
 import FacingsForm from "../../../components/FacingsForm/FacingsForm";
 import { CompetitorBrand } from "../../../types/competitorBrandsInterface";
 import { useActiveWorkDay } from "../../../hooks/useActiveWorkDay";
+import { toast } from "../../../components/Toast/toast";
 
 interface CompetitorEntry {
   id?: number;
@@ -106,7 +107,7 @@ const PPLCompetitor = () => {
     setIsSubmitting(true);
 
     if (!userId) {
-      alert("User not authenticated");
+      toast.error("Sesioni ka skaduar. Hyni përsëri.");
       setIsSubmitting(false);
       return;
     }
@@ -138,10 +139,10 @@ const PPLCompetitor = () => {
 
       if (!isOnline()) {
         await queueCompetitorFacings(workDayPayload);
-        alert("Jeni offline – të dhënat janë ruajtur dhe do dërgohen më vonë.");
+        toast.info("Jeni offline – të dhënat janë ruajtur dhe do dërgohen më vonë.");
       } else {
         await competitorFacingsService.batchCreateCompetitorFacings(workDayPayload);
-        alert("Facings te konkurencës janë dërguar me sukses.");
+        toast.success("Facings te konkurencës janë dërguar me sukses.");
       }
 
       setCompetitors([{ name: "", facings: 0 }]);
@@ -150,7 +151,7 @@ const PPLCompetitor = () => {
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Error, provo persëri.";
-      alert(backendMessage);
+      toast.error(backendMessage);
     } finally {
       setIsSubmitting(false);
     }

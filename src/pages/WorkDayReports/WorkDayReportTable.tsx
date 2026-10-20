@@ -2,6 +2,14 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { BaseTable } from "../../components/BaseTable/BaseTable";
 import { DetailedWorkDayReportRow } from "../../types/workDayReportInterface";
+import PhotoGallery from "../../components/PhotoGallery/PhotoGallery";
+import {
+  CRITICAL_FLAGS,
+  FLAG_LABELS,
+  STATUS_STYLES,
+  formatMinutes,
+  formatTime,
+} from "../../utils/attendance";
 
 const columnHelper = createColumnHelper<DetailedWorkDayReportRow>();
 
@@ -56,6 +64,95 @@ const WorkDayReportTable = ({ data }: { data: DetailedWorkDayReportRow[] }) => {
       columnHelper.accessor("status", {
         header: "Statusi",
         cell: (info) => getStatusLabel(info.getValue()),
+      }),
+      columnHelper.display({
+        id: "verification",
+        header: "Verifikimi",
+        cell: ({ row }) => {
+          const v = row.original.verification;
+          if (!v) return "-";
+          return (
+            <div className="space-y-1">
+              <span
+                className={`inline-block rounded-full border px-2 py-0.5 text-xs ${
+                  STATUS_STYLES[v.verification_status].className
+                }`}
+              >
+                {STATUS_STYLES[v.verification_status].label}
+              </span>
+              <div className="flex flex-wrap gap-1 max-w-xs">
+                {v.flags.map((flag) => (
+                  <span
+                    key={flag}
+                    className={`text-xs ${
+                      CRITICAL_FLAGS.includes(flag) ? "text-red-300" : "text-amber-200"
+                    }`}
+                  >
+                    {FLAG_LABELS[flag]};
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        },
+      }),
+      columnHelper.display({
+        id: "gallery",
+        header: "Fotot",
+        cell: ({ row }) => (
+          <PhotoGallery
+            photos={row.original.verification?.gallery || []}
+            title={`${row.original.user} · ${formatWorkDate(row.original.work_date)}`}
+          />
+        ),
+      }),
+      columnHelper.display({
+        id: "hours",
+        header: "Orari",
+        cell: ({ row }) => {
+          const v = row.original.verification;
+          if (!v || !v.check_in_at) return "-";
+          return `${formatTime(v.check_in_at)} – ${formatTime(v.check_out_at)} (${formatMinutes(
+            v.worked_minutes
+          )})`;
+        },
+      }),
+      columnHelper.display({
+        id: "visits",
+        header: "Vizitat në markete",
+        cell: ({ row }) => {
+          const visits = row.original.verification?.visits || [];
+          if (!visits.length) return "-";
+          return (
+            <ul className="space-y-0.5 text-xs">
+              {visits.map((visit) => (
+                <li key={visit.store_visit_id}>
+                  {formatTime(visit.check_in_at)}–{formatTime(visit.check_out_at)}{" "}
+                  {visit.store_name}
+                  {visit.duration_minutes !== null && (
+                    <span className="text-neutral-400">
+                      {" "}({formatMinutes(visit.duration_minutes)})
+                    </span>
+                  )}
+                  {!visit.photos.length && (
+                    <span className="text-amber-300"> pa foto</span>
+                  )}
+                  {visit.photos.map((photo) => (
+                    <a
+                      key={photo.store_visit_photo_id}
+                      href={photo.photo_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-1 text-sky-400 hover:underline"
+                    >
+                      📷
+                    </a>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          );
+        },
       }),
       columnHelper.accessor("start_kilometers", {
         header: "KM Fillestar",

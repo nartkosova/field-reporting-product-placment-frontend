@@ -1,3 +1,4 @@
+import { DayVerification } from "./attendanceInterface";
 import { WorkActivityType, WorkLogStatus } from "./workDayInterface";
 
 export interface DetailedWorkDayReportRow {
@@ -32,4 +33,5 @@ export interface DetailedWorkDayReportRow {
     completed: boolean;
     note: string | null;
   }>;
+  verification: DayVerification | null;
 }

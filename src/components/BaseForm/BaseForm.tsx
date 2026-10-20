@@ -28,7 +28,7 @@ const BaseForm: React.FC<BaseFormProps> = ({
   submitButtonLabel,
 }) => {
   return (
-    <div className="flex flex-col p-6 space-y-4 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg mt-8">
+    <div className="card flex flex-col space-y-4 mt-8">
       <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
         {title}
       </h2>
@@ -36,7 +36,7 @@ const BaseForm: React.FC<BaseFormProps> = ({
         {entries.map((entry, index) => (
           <div
             key={index}
-            className="flex flex-col space-y-2 border border-neutral-800 bg-black rounded-xl p-4"
+            className="card-inset flex flex-col space-y-2"
           >
             {fields.map((field) =>
               field.type === "select" ? (

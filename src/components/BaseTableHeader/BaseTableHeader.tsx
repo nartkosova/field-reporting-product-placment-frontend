@@ -234,7 +234,7 @@ export default function GenericReportHeader<T>({
           )
         )}
         {dateNeeded && (
-          <div className="min-w-[280px] flex-1 rounded-xl border border-neutral-800 bg-black p-3">
+          <div className="card-inset min-w-[280px] flex-1">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
               Data
             </p>

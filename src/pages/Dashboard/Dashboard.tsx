@@ -293,7 +293,7 @@ const Dashboard = () => {
         </div>
 
         {error && (
-          <div className="w-full rounded-xl border border-red-800 bg-red-950/40 px-4 py-3 text-red-200">
+          <div className="notice-error w-full">
             {error}
           </div>
         )}

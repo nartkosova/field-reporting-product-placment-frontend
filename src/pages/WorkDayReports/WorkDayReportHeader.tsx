@@ -6,6 +6,7 @@ import workDayService from "../../services/workDayService";
 import { DetailedWorkDayReportRow } from "../../types/workDayReportInterface";
 import { WORK_LOG_STATUS_OPTIONS } from "../../types/workDayInterface";
 import WorkDayReportTable from "./WorkDayReportTable";
+import { FLAG_LABELS, STATUS_STYLES, formatMinutes, formatTime } from "../../utils/attendance";
 
 const getStatusLabel = (status: (typeof WORK_LOG_STATUS_OPTIONS)[number]["value"]) => {
   switch (status) {
@@ -38,6 +39,15 @@ const exportCsv = (rows: DetailedWorkDayReportRow[]) => {
     "Perdoruesi",
     "Data",
     "Statusi",
+    "Verifikimi",
+    "Check-in",
+    "Check-out",
+    "Ore pune",
+    "Ne market",
+    "Vizita",
+    "Vizita me foto",
+    "Paralajmerime",
+    "Detajet e vizitave",
     "KM Fillestar",
     "KM Perfundimtar",
     "KM te Pershkuara",
@@ -58,6 +68,22 @@ const exportCsv = (rows: DetailedWorkDayReportRow[]) => {
     row.user,
     row.work_date,
     getStatusLabel(row.status),
+    row.verification ? STATUS_STYLES[row.verification.verification_status].label : "",
+    formatTime(row.verification?.check_in_at),
+    formatTime(row.verification?.check_out_at),
+    formatMinutes(row.verification?.worked_minutes),
+    row.verification ? formatMinutes(row.verification.in_store_minutes) : "",
+    row.verification?.visit_count ?? "",
+    row.verification?.photo_visit_count ?? "",
+    (row.verification?.flags || []).map((flag) => FLAG_LABELS[flag]).join(", "),
+    (row.verification?.visits || [])
+      .map(
+        (visit) =>
+          `${formatTime(visit.check_in_at)}-${formatTime(visit.check_out_at)} ${visit.store_name} (foto: ${
+            visit.photos.map((photo) => photo.photo_url).join(" ") || "-"
+          })`
+      )
+      .join(" | "),
     row.start_kilometers,
     row.end_kilometers,
     row.kilometers_driven,

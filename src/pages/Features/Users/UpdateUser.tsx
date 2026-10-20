@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import { updateUserFields } from "./userFields";
 
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+import { toast } from "../../../components/Toast/toast";
 
 const UpdateUser = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +30,7 @@ const UpdateUser = () => {
         const backendMessage =
           axiosError.response?.data?.error ||
           "Gabim gjatë ngarkimit të të dhënave.";
-        alert(backendMessage);
+        toast.error(backendMessage);
       } finally {
         setLoading(false);
       }

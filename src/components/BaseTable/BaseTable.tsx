@@ -11,6 +11,9 @@ import { useState } from "react";
 
 interface Props<T> {
   data: T[];
+  // Columns carry different value types; TanStack's own docs type a mixed
+  // column array this way, and `unknown` rejects the typed accessor columns.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<T, any>[];
   customFooter?: (rows: T[]) => React.ReactNode;
   rowClassName?: string;

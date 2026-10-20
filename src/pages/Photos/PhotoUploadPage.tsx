@@ -22,6 +22,7 @@ import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { useUser } from "../../hooks/useUser";
 import { v4 as uuidv4 } from "uuid";
 import { useActiveWorkDay } from "../../hooks/useActiveWorkDay";
+import { toast } from "../../components/Toast/toast";
 
 interface Props {
   photoType: PhotoInput["photo_type"];
@@ -66,7 +67,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
   const handleSubmit = async () => {
     if (isLoading) return;
     if (!file || !storeId || !userId) {
-      alert("Ju lutem plotësoni të gjitha fushat.");
+      toast.error("Ju lutem plotësoni të gjitha fushat.");
       return;
     }
     setIsLoading(true);
@@ -98,15 +99,15 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     try {
       if (isOnline()) {
         await photoService.createPhoto(formData);
-        alert("Fotoja u ngarkua me sukses");
+        toast.success("Fotoja u ngarkua me sukses");
       } else {
         await queuePhoto(formData);
-        alert("Nuk ka internet. Fotoja u ruajt për ngarkim më vonë.");
+        toast.info("Nuk ka internet. Fotoja u ruajt për ngarkim më vonë.");
       }
       navigate(-1);
       clearState();
     } catch (e) {
-      alert("Fotoja nuk u ngarkua, provo perseri.");
+      toast.error("Fotoja nuk u ngarkua, provo perseri.");
       console.error("Error uploading photo:", e);
     } finally {
       setIsLoading(false);
@@ -120,7 +121,7 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
 
   return (
     <div className="w-full flex items-center justify-center bg-black p-2 sm:p-0 overflow-auto">
-      <div className="p-4 sm:p-6 space-y-6 max-w-xl w-full bg-neutral-900 rounded-2xl shadow-md border border-neutral-800 max-h-[90vh] overflow-y-auto">
+      <div className="card sm:p-6 space-y-6 max-w-xl w-full max-h-[90vh] overflow-y-auto">
         {category && (
           <div className="text-lg font-medium pb-2 text-white">
             Kategoria: <span className="text-blue-400">{category}</span>

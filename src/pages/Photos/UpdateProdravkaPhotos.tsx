@@ -9,6 +9,7 @@ import { AxiosError } from "axios";
 import { Store } from "../../types/storeInterface";
 import SubmitButton from "../../components/Buttons/SubmitButton";
 import darkSelectStyles from "../../utils/darkSelectStyles";
+import { toast } from "../../components/Toast/toast";
 
 const UpdatePhotoPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,7 +52,7 @@ const UpdatePhotoPage = () => {
         );
       } catch (err) {
         const axiosError = err as AxiosError<{ error: string }>;
-        alert(axiosError.response?.data?.error || "Gabim gjatë ngarkimit.");
+        toast.error(axiosError.response?.data?.error || "Gabim gjatë ngarkimit.");
       }
     };
 
@@ -81,11 +82,11 @@ const UpdatePhotoPage = () => {
       if (file) data.append("photo", file);
 
       await photoService.updateReportPhoto(id!, data);
-      alert("Foto u përditësua me sukses!");
+      toast.success("Foto u përditësua me sukses!");
       navigate("/photos/edit");
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
-      alert(axiosError.response?.data?.error || "Gabim gjatë përditësimit.");
+      toast.error(axiosError.response?.data?.error || "Gabim gjatë përditësimit.");
     } finally {
       setIsSubmitting(false);
     }
@@ -134,7 +135,7 @@ const UpdatePhotoPage = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-2xl flex flex-col items-center justify-center flex-1 py-8">
-        <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-4">
+        <div className="card w-full space-y-4">
           <h2 className="text-2xl font-bold text-white">
             Përditëso foton e raportit
           </h2>
@@ -143,7 +144,7 @@ const UpdatePhotoPage = () => {
             {fields.map(({ name, label, type, options }) => (
               <div
                 key={name}
-                className="p-4 border border-neutral-800 rounded-xl bg-black"
+                className="card-inset"
               >
                 <label className="block mb-2 font-medium text-gray-200">
                   {label}
@@ -177,7 +178,7 @@ const UpdatePhotoPage = () => {
               </div>
             ))}
 
-            <div className="p-4 border border-neutral-800 rounded-xl bg-black">
+            <div className="card-inset">
               <label className="block mb-2 font-medium text-gray-200">
                 Zëvendëso foton (opsionale)
               </label>

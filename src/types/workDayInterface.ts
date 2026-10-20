@@ -85,8 +85,7 @@ export interface WorkLogDay {
   cities: WorkLogDayCity[];
 }
 
-export interface WorkLogDayListItem
-  extends Omit<WorkLogDay, "activities" | "cities"> {}
+export type WorkLogDayListItem = Omit<WorkLogDay, "activities" | "cities">;
 
 export interface WorkDayListParams {
   user_id?: number;

@@ -9,6 +9,7 @@ import { UserInput } from "../../../types/userInterface";
 
 import { AxiosError } from "axios";
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+import { toast } from "../../../components/Toast/toast";
 
 const UpdateStore = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,7 +53,7 @@ const UpdateStore = () => {
         });
       } catch (err) {
         console.error("Error fetching store:", err);
-        alert("Nuk mund të ngarkohet dyqani.");
+        toast.error("Nuk mund të ngarkohet dyqani.");
       } finally {
         setLoading(false);
       }

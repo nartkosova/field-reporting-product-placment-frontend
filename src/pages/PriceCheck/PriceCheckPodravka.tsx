@@ -11,6 +11,7 @@ import productServices from "../../services/productServices";
 import SubmitButton from "../../components/Buttons/SubmitButton";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { useUser } from "../../hooks/useUser";
+import { toast } from "../../components/Toast/toast";
 
 const PriceCheckPodravka = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -62,7 +63,7 @@ const PriceCheckPodravka = () => {
     e.preventDefault();
     setLoading(true);
     if (!userId) {
-      alert("User not authenticated");
+      toast.error("Sesioni ka skaduar. Hyni përsëri.");
       setLoading(false);
       return;
     }
@@ -84,13 +85,13 @@ const PriceCheckPodravka = () => {
 
       await priceCheckServices.batchCreatePriceCheck(payload);
 
-      alert("Qmimet u ngarkuan me sukses!");
+      toast.success("Qmimet u ngarkuan me sukses!");
       setPrices({});
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Gabim gjatë ngarkimit të qmimit.";
-      alert(backendMessage);
+      toast.error(backendMessage);
       console.error("Submit error:", err);
     } finally {
       setLoading(false);

@@ -543,19 +543,19 @@ const WorkDayPage = () => {
 
           {selectedDay && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="border border-neutral-800 bg-black rounded-xl p-4">
+              <div className="card-inset">
                 <p className="text-sm text-neutral-400">Data</p>
                 <p className="text-white font-semibold mt-1">
                   {selectedDay.work_date}
                 </p>
               </div>
-              <div className="border border-neutral-800 bg-black rounded-xl p-4">
+              <div className="card-inset">
                 <p className="text-sm text-neutral-400">Statusi aktual</p>
                 <p className="text-white font-semibold mt-1">
                   {getStatusLabel(form.status)}
                 </p>
               </div>
-              <div className="border border-neutral-800 bg-black rounded-xl p-4">
+              <div className="card-inset">
                 <p className="text-sm text-neutral-400">Marketi i zgjedhur</p>
                 <p className="text-white font-semibold mt-1">
                   {selectedStore?.store_name || "Nuk ka market të zgjedhur"}
@@ -566,13 +566,13 @@ const WorkDayPage = () => {
         </div>
 
         {screenError && (
-          <div className="w-full rounded-xl border border-red-800 bg-red-950/40 px-4 py-3 text-red-200">
+          <div className="notice-error w-full">
             {screenError}
           </div>
         )}
 
         {successMessage && (
-          <div className="w-full rounded-xl border border-green-800 bg-green-950/40 px-4 py-3 text-green-200">
+          <div className="notice-success w-full">
             {successMessage}
           </div>
         )}
@@ -755,7 +755,7 @@ const WorkDayPage = () => {
                     {form.cities.map((city, index) => (
                       <div
                         key={`city-${index}`}
-                        className="flex flex-col gap-4 border border-neutral-800 bg-black rounded-xl p-4"
+                        className="card-inset flex flex-col gap-4"
                       >
                         <div className="flex items-center justify-between">
                           <p className="text-white font-medium">
@@ -852,7 +852,7 @@ const WorkDayPage = () => {
                     {form.activities.map((activity, index) => (
                       <div
                         key={`activity-${index}`}
-                        className="flex flex-col gap-4 border border-neutral-800 bg-black rounded-xl p-4"
+                        className="card-inset flex flex-col gap-4"
                       >
                         <div className="flex items-center justify-between">
                           <p className="text-white font-medium">
@@ -1002,7 +1002,7 @@ const WorkDayPage = () => {
                 {evidence.map((item) => (
                   <div
                     key={item.label}
-                    className="border border-neutral-800 bg-black rounded-xl p-4"
+                    className="card-inset"
                   >
                     <p className="text-neutral-400 text-sm">{item.label}</p>
                     <p className="text-2xl font-bold text-white mt-2">
@@ -1038,7 +1038,7 @@ const WorkDayPage = () => {
               </div>
             </div>
 
-            <div className="w-full bg-neutral-900 p-4 border border-neutral-800 rounded-2xl shadow-lg">
+            <div className="card w-full">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ActionButton
                   onClick={() => saveDay(false)}

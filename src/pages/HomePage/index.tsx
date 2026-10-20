@@ -3,11 +3,15 @@ import { userNavItems, adminNavItems } from "./HomePageFields";
 import { useSelectedStore } from "../../hooks/useSelectStore";
 import { NavButton } from "../../components/NavButton/NavButton";
 import { getInitials } from "../../utils/utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchAndCacheCompetitorCategories } from "../../db/db";
 import { useUser } from "../../hooks/useUser";
 import { EmployeeWorkDayCard } from "./EmployeeWorkDayCard";
 import { useActiveWorkDay } from "../../hooks/useActiveWorkDay";
+import { FieldAttendancePanel } from "./FieldAttendancePanel";
+import AdminTodayDashboard from "./AdminTodayDashboard";
+import { getLocalDateIso } from "../../utils/utils";
+import { isOnline } from "../../utils/cacheManager";
 
 const HomePage: React.FC = () => {
   const { user, userRole } = useUser();
@@ -19,6 +23,21 @@ const HomePage: React.FC = () => {
   const activeWorkDay = useActiveWorkDay();
   const hasActiveWorkingDay =
     activeWorkDay?.work_date && activeWorkDay.status === "planned_work";
+  // Check-ins only apply to today's saved day; offline days fall back to
+  // the old flow and are flagged in the admin report instead.
+  const attendanceDayId =
+    hasActiveWorkingDay &&
+    activeWorkDay?.work_log_day_id &&
+    activeWorkDay.work_date === getLocalDateIso()
+      ? activeWorkDay.work_log_day_id
+      : null;
+  const [openVisitStoreId, setOpenVisitStoreId] = useState<number | null>(null);
+  const [attendanceAvailable, setAttendanceAvailable] = useState(false);
+  const requiresStoreCheckIn =
+    Boolean(attendanceDayId) && isOnline() && attendanceAvailable;
+  const isInSelectedStore =
+    !requiresStoreCheckIn ||
+    (selectedStore !== null && openVisitStoreId === selectedStore.store_id);
   const adminNavigationItems = adminNavItems.filter(
     (item) =>
       !(canUseEmployeeWorkspace && hasActiveWorkingDay && item.to === "/reports")
@@ -67,16 +86,40 @@ const HomePage: React.FC = () => {
 
             {hasActiveWorkingDay ? (
               <>
-                <div className="w-full max-w-4xl mb-10">
-                  <StoreDropdown />
-                </div>
+                {attendanceDayId ? (
+                  <div className="w-full max-w-4xl mb-10">
+                    <FieldAttendancePanel
+                      workLogDayId={attendanceDayId}
+                      selectedStore={selectedStore}
+                      storePicker={<StoreDropdown />}
+                      onOpenVisitChange={setOpenVisitStoreId}
+                      onAvailabilityChange={setAttendanceAvailable}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full max-w-4xl mb-10">
+                    <StoreDropdown />
+                  </div>
+                )}
+
+                {!isInSelectedStore && (
+                  <div className="notice-warning w-full max-w-4xl mb-6">
+                    🔒 PPL dhe Krijo Foto hapen pasi të bësh{" "}
+                    <b>“Hyr në market”</b>
+                    {selectedStore ? ` në ${selectedStore.store_name}` : ""} më
+                    sipër.
+                  </div>
+                )}
 
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 pb-12">
                   {userNavItems(selectedStore).map((item) => (
                     <NavButton
                       key={item.to}
                       to={item.to}
-                      disabled={item.disabled}
+                      disabled={
+                        item.disabled ||
+                        (item.requiresStoreVisit && !isInSelectedStore)
+                      }
                       variant="card"
                     >
                       {item.label}
@@ -85,13 +128,15 @@ const HomePage: React.FC = () => {
                 </div>
               </>
             ) : (
-              <div className="w-full max-w-4xl border border-neutral-800 bg-neutral-900 rounded-2xl p-6 text-center text-neutral-300">
+              <div className="card w-full max-w-4xl text-center text-neutral-300">
                 Pasi dita të jetë vendosur si ditë pune, këtu do shfaqen marketi
                 dhe aktivitetet si PPL, foto dhe raportet e tjera.
               </div>
             )}
           </>
         )}
+
+        {isAdmin && <AdminTodayDashboard />}
 
         {isAdmin && (
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">

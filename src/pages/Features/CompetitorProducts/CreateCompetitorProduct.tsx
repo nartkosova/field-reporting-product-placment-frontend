@@ -4,6 +4,7 @@ import competitorServices from "../../../services/competitorServices";
 import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
 import { useUser } from "../../../hooks/useUser";
+import { toast } from "../../../components/Toast/toast";
 
 const CreateCompetitorProductPage = () => {
   const { user: userInfo } = useUser();
@@ -29,7 +30,7 @@ const CreateCompetitorProductPage = () => {
     data: Record<string, string | number | (string | number)[]>
   ) => {
     if (!userInfo?.user_id) {
-      alert("User not authenticated");
+      toast.error("Sesioni ka skaduar. Hyni përsëri.");
       return;
     }
     const payload = {

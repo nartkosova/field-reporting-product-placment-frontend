@@ -1,60 +1,86 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 
-let token: string | null = null;
+// The session token lives in an httpOnly cookie that page scripts cannot
+// read. The browser only keeps the non-secret profile, to render the UI and
+// to know when the session has run out.
+export interface SessionUser {
+  user_id: number;
+  user: string;
+  role: string;
+}
 
-export const setToken = (newToken: string | null) => {
-  token = newToken ? `${newToken}` : null;
+interface StoredSession extends SessionUser {
+  expires_at: string;
+}
 
-  if (newToken) {
-    localStorage.setItem("authToken", newToken);
-  } else {
-    localStorage.removeItem("authToken");
-  }
-
-  window.dispatchEvent(new Event("authTokenChanged"));
-};
-
-export const getToken = () => token || localStorage.getItem("authToken");
-
+const SESSION_KEY = "authSession";
+const SESSION_EVENT = "authTokenChanged";
 const LOGIN_PATH = "/login";
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
-/**
- * Tokens now carry an expiry. A decoded-but-expired token must not count as a
- * session, otherwise the guard lets the user in and every request 401s.
- */
-export const isTokenExpired = (value: string | null): boolean => {
-  if (!value) return true;
+// Tokens used to be kept in localStorage; drop any left behind.
+localStorage.removeItem("authToken");
 
+export const setSession = (session: StoredSession | null) => {
+  if (session) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } else {
+    localStorage.removeItem(SESSION_KEY);
+  }
+
+  window.dispatchEvent(new Event(SESSION_EVENT));
+};
+
+export const getSessionUser = (): SessionUser | null => {
   try {
-    const { exp } = jwtDecode<{ exp?: number }>(value);
-    // A token with no exp claim never expires client-side.
-    if (typeof exp !== "number") return false;
-    return exp * 1000 <= Date.now();
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null") as StoredSession | null;
+    if (!session || new Date(session.expires_at).getTime() <= Date.now()) return null;
+    return { user_id: session.user_id, user: session.user, role: session.role };
   } catch {
-    return true;
+    return null;
   }
 };
 
-export const hasValidSession = () => !isTokenExpired(getToken());
+export const hasValidSession = () => getSessionUser() !== null;
+
+// Kept for the services that still build an Authorization header; the cookie
+// authenticates instead and the interceptor below drops the header.
+export const getToken = (): string | null => null;
 
 const redirectToLogin = () => {
   if (window.location.pathname === LOGIN_PATH) return;
   window.location.assign(LOGIN_PATH);
 };
 
+export const logout = async () => {
+  setSession(null);
+  try {
+    await axios.post(`${baseUrl}/api/users/logout`);
+  } catch {
+    // The local session is gone either way; the cookie expires on its own.
+  }
+};
+
 /** Drops the session and sends the user back to the login screen. */
 export const endSession = () => {
-  setToken(null);
+  setSession(null);
   redirectToLogin();
 };
 
 /**
- * Sends the user to the login page whenever the API rejects their token.
- * Skips the login request itself (a wrong password is a form error, not an
- * expired session) and skips offline failures, which the queue handles.
+ * Sends cookies with every API call, and sends the user to the login page
+ * whenever the API rejects their session. Skips the login request itself (a
+ * wrong password is a form error, not an expired session) and skips offline
+ * failures, which the queue handles.
  */
 export const setupAuthInterceptor = () => {
+  axios.defaults.withCredentials = true;
+
+  axios.interceptors.request.use((config) => {
+    config.headers?.delete?.("Authorization");
+    return config;
+  });
+
   axios.interceptors.response.use(
     (response) => response,
     (error) => {

@@ -4,6 +4,7 @@ import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import SubmitButton from "../Buttons/SubmitButton";
 import darkSelectStyles from "../../utils/darkSelectStyles";
+import { toast } from "../Toast/toast";
 
 interface Field {
   name: string;
@@ -61,7 +62,7 @@ export function CreateUpdateForm({
       if (!initialValues || Object.keys(initialValues).length === 0) {
         setFormState({});
       }
-      alert("Veprimi u krye me sukses!");
+      toast.success("Veprimi u krye me sukses!");
       navigate(-1);
     } catch (err: unknown) {
       console.error("Submit error:", err);
@@ -78,11 +79,11 @@ export function CreateUpdateForm({
           axiosErr.response?.data?.message ||
           axiosErr.response?.statusText ||
           "Gabim nga serveri";
-        alert(message);
+        toast.error(message);
       } else if (err instanceof Error) {
-        alert(err.message);
+        toast.error(err.message);
       } else {
-        alert("Gabim i panjohur. Provo përsëri.");
+        toast.error("Gabim i panjohur. Provo përsëri.");
       }
     } finally {
       setIsSubmitting(false);
@@ -90,7 +91,7 @@ export function CreateUpdateForm({
   };
 
   return (
-    <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-6">
+    <div className="card w-full space-y-6">
       <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
         {title}
       </h2>

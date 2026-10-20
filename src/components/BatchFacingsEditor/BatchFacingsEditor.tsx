@@ -20,7 +20,7 @@ export const BatchFacingsEditor = ({ title, hook }: Props) => {
   const { meta, counts, loading, submitting, total, change, submit } = hook;
 
   return (
-    <div className="w-full bg-neutral-900 p-8 border border-neutral-800 rounded-2xl shadow-lg space-y-4">
+    <div className="card w-full space-y-4">
       <h2 className="text-2xl font-bold text-white">{title}</h2>
 
       {loading ? (
@@ -39,7 +39,7 @@ export const BatchFacingsEditor = ({ title, hook }: Props) => {
             return (
               <div
                 key={key}
-                className="p-4 border border-neutral-800 rounded-xl bg-black"
+                className="card-inset"
               >
                 <label className="block mb-2 font-medium text-gray-200">
                   {m.label}

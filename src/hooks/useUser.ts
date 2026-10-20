@@ -1,46 +1,11 @@
 import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { isTokenExpired } from "../services/authService";
-
-interface UserInfo {
-  user_id: number;
-  user: string;
-  role: string;
-}
-
-interface DecodedToken {
-  user_id: number;
-  user: string;
-  role: string;
-}
-
-function getUserFromToken(token: string | null): UserInfo | null {
-  // An expired token is not a session: without this the route guard admits the
-  // user and every subsequent request fails with a 401.
-  if (!token || isTokenExpired(token)) return null;
-  try {
-    const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
-    return {
-      user_id: decoded.user_id,
-      user: decoded.user,
-      role: decoded.role,
-    };
-  } catch {
-    return null;
-  }
-}
+import { getSessionUser, SessionUser } from "../services/authService";
 
 export const useUser = () => {
-  const [user, setUser] = useState<UserInfo | null>(() => {
-    const token = localStorage.getItem("authToken");
-    return getUserFromToken(token);
-  });
+  const [user, setUser] = useState<SessionUser | null>(getSessionUser);
 
   useEffect(() => {
-    const refreshUserFromToken = () => {
-      const token = localStorage.getItem("authToken");
-      setUser(getUserFromToken(token));
-    };
+    const refreshUserFromToken = () => setUser(getSessionUser());
 
     window.addEventListener("storage", refreshUserFromToken);
     window.addEventListener("authTokenChanged", refreshUserFromToken);

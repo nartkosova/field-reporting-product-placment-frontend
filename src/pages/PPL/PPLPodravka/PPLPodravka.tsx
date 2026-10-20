@@ -12,6 +12,7 @@ import Select from "react-select";
 import darkSelectStyles from "../../../utils/darkSelectStyles";
 import storeServices from "../../../services/storeServices";
 import { useActiveWorkDay } from "../../../hooks/useActiveWorkDay";
+import { toast } from "../../../components/Toast/toast";
 
 const PodravkaFacingsFormPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -136,7 +137,7 @@ const PodravkaFacingsFormPage = () => {
     setLoading(true);
 
     if (!userId) {
-      alert("User not authenticated");
+      toast.error("Sesioni ka skaduar. Hyni përsëri.");
       setLoading(false);
       return;
     }
@@ -178,16 +179,16 @@ const PodravkaFacingsFormPage = () => {
     try {
       if (!isOnline()) {
         await queueFacings(workDayPayload);
-        alert("Offline – facings u ruajtën për t'u dërguar më vonë.");
+        toast.info("Offline – facings u ruajtën për t'u dërguar më vonë.");
       } else {
         await podravkaFacingsService.batchCreatePodravkaFacings(workDayPayload);
-        alert("Facings u ngarkuan me sukses!");
+        toast.success("Facings u ngarkuan me sukses!");
       }
       setFacings({});
       navigate(-1);
     } catch (err) {
       console.error("Gabim gjatë submit:", err);
-      alert("Gabim gjatë ngarkimit të facings.");
+      toast.error("Gabim gjatë ngarkimit të facings.");
     } finally {
       setLoading(false);
     }

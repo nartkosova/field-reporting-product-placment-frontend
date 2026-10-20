@@ -1,28 +1,13 @@
 import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { ActiveWorkDaySelection } from "../types/workDayInterface";
-import { getToken } from "../services/authService";
+import { getSessionUser } from "../services/authService";
 
 const STORAGE_KEY = "activeWorkDay";
 const EVENT_NAME = "activeWorkDayChanged";
 
-type DecodedToken = {
-  user_id?: number;
-};
-
 const normalizeDateOnly = (value: string) => value.slice(0, 10);
 
-const getCurrentUserId = () => {
-  const token = getToken();
-  if (!token) return null;
-
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    return typeof decoded.user_id === "number" ? decoded.user_id : null;
-  } catch {
-    return null;
-  }
-};
+const getCurrentUserId = () => getSessionUser()?.user_id ?? null;
 
 const readActiveWorkDay = (): ActiveWorkDaySelection | null => {
   const item = localStorage.getItem(STORAGE_KEY);

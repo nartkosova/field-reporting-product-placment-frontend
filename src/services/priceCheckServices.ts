@@ -1,7 +1,7 @@
 import axios from "axios";
 import { PriceCheckInput } from "../types/priceCheckInterface";
 const baseUrl = import.meta.env.VITE_BASE_URL;
-const getToken = () => localStorage.getItem("authToken");
+import { getToken } from "./authService";
 
 const batchCreatePriceCheck = async (priceDataArray: PriceCheckInput[]) => {
   const token = getToken();

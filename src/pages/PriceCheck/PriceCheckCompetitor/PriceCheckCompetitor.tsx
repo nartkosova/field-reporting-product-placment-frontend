@@ -10,6 +10,7 @@ import { AxiosError } from "axios";
 import productServices from "../../../services/productServices";
 import SubmitButton from "../../../components/Buttons/SubmitButton";
 import { useUser } from "../../../hooks/useUser";
+import { toast } from "../../../components/Toast/toast";
 
 const PriceCheckCompetitor = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +56,7 @@ const PriceCheckCompetitor = () => {
 
   const handleSubmit = async () => {
     if (!userId) {
-      alert("User not authenticated");
+      toast.error("Sesioni ka skaduar. Hyni përsëri.");
       return;
     }
     setLoading(true);
@@ -72,13 +73,13 @@ const PriceCheckCompetitor = () => {
           prices[p.competitor_product_id]?.discount_description,
       }));
       await priceCheckServices.batchCreatePriceCheck(payload);
-      alert("Qmimet u ngarkuan me sukses!");
+      toast.success("Qmimet u ngarkuan me sukses!");
       setPrices({});
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
       const backendMessage =
         axiosError.response?.data?.error || "Gabim gjatë ngarkimit të qmimit.";
-      alert(backendMessage);
+      toast.error(backendMessage);
       console.error(err);
     } finally {
       setLoading(false);

@@ -11,7 +11,7 @@ interface KpiTileProps {
  * chart would only dilute.
  */
 const KpiTile = ({ label, value, hint, accent, isLoading }: KpiTileProps) => (
-  <div className="border border-neutral-800 bg-black rounded-xl p-4 flex flex-col gap-1">
+  <div className="card-inset flex flex-col gap-1">
     <div className="flex items-center gap-2">
       {accent && (
         <span

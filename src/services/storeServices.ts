@@ -34,7 +34,7 @@ const getStoreById = async (store_id: number) => {
 
 const getAllStores = async (channel?: string) => {
   const token = getToken();
-  const url = new URL(`${baseUrl}/api/stores`);
+  const url = new URL(`${baseUrl}/api/stores`, window.location.origin);
   if (channel) url.searchParams.append("channel", channel);
 
   const response = await axios.get(url.toString(), {

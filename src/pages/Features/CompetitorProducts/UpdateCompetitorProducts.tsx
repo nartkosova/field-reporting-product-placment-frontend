@@ -8,6 +8,7 @@ import { useProductCategories } from "../../../hooks/useProductCategories";
 import productServices from "../../../services/productServices";
 
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+import { toast } from "../../../components/Toast/toast";
 
 const UpdateCompetitorProduct = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,7 +39,7 @@ const UpdateCompetitorProduct = () => {
         );
 
         if (!product) {
-          alert("Produkti nuk u gjet.");
+          toast.error("Produkti nuk u gjet.");
           return;
         }
 
@@ -54,7 +55,7 @@ const UpdateCompetitorProduct = () => {
         const backendMessage =
           axiosError.response?.data?.error ||
           "Gabim gjatë ngarkimit të të dhënave.";
-        alert(backendMessage);
+        toast.error(backendMessage);
       } finally {
         setLoading(false);
       }

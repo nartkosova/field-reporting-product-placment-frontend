@@ -1,8 +1,9 @@
+import { PplReportResponse } from "../types/pplReportInterface";
 import axios from "axios";
 import { PodravkaFacingInput } from "../types/podravkaFacingInterface";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
-const getToken = () => localStorage.getItem("authToken");
+import { getToken } from "./authService";
 
 type PodravkaBatchCreatePayload =
   | PodravkaFacingInput[]
@@ -17,6 +18,13 @@ const getPodravkaFacings = async () => {
   const response = await axios.get(`${baseUrl}/api/facings/podravka-facing`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  return response.data;
+};
+
+const getPplReport = async (
+  params: Record<string, string | number | string[]>
+): Promise<PplReportResponse> => {
+  const response = await axios.get(`${baseUrl}/api/facings/ppl-report`, { params });
   return response.data;
 };
 
@@ -187,6 +195,7 @@ const deletePodravkaFacingBatch = async (batchId: number | string) => {
 export default {
   getPodravkaFacings,
   getPodravkaFacingsWithCompetitors,
+  getPplReport,
   getPodravkaFacingsByBatchId,
   getPodravkaPresenceByBatchId,
   getUserPPLBatches,

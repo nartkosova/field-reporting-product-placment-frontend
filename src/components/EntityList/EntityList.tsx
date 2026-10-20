@@ -6,6 +6,7 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 import { useErrorHandler } from "../../hooks/useErrorHandler";
 import { BaseEntity } from "../../types/common";
+import { toast } from "../Toast/toast";
 
 export interface Entity extends BaseEntity {
   role?: string;
@@ -120,7 +121,7 @@ export const EntityList = <T extends Entity>({
       try {
         await onDelete(id);
         setItems((prev) => prev.filter((item) => item.id !== id));
-        alert(
+        toast.success(
           `${itemLabel[0].toUpperCase() + itemLabel.slice(1)} u fshi me sukses.`
         );
       } catch (err) {
@@ -136,7 +137,7 @@ export const EntityList = <T extends Entity>({
   );
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6 w-full">
+    <div className="card w-full">
       <h2 className="text-2xl font-bold text-white mb-6">{title}</h2>
       {loading ? (
         <LoadingSpinner />
