@@ -6,7 +6,7 @@ import workDayService from "../../services/workDayService";
 import { DetailedWorkDayReportRow } from "../../types/workDayReportInterface";
 import { WORK_LOG_STATUS_OPTIONS } from "../../types/workDayInterface";
 import WorkDayReportTable from "./WorkDayReportTable";
-import { FLAG_LABELS, STATUS_STYLES, formatMinutes, formatTime } from "../../utils/attendance";
+import { withDerivedStoreVisits, FLAG_LABELS, STATUS_STYLES, formatMinutes, formatTime } from "../../utils/attendance";
 
 const getStatusLabel = (status: (typeof WORK_LOG_STATUS_OPTIONS)[number]["value"]) => {
   switch (status) {
@@ -98,7 +98,7 @@ const exportCsv = (rows: DetailedWorkDayReportRow[]) => {
           }`
       )
       .join(", "),
-    row.activities
+    withDerivedStoreVisits(row.activities, row.verification?.visits ?? [])
       .map((activity) => {
         const flags = [
           activity.planned ? "plan" : null,
@@ -109,7 +109,9 @@ const exportCsv = (rows: DetailedWorkDayReportRow[]) => {
 
         return `${getActivityLabel(activity.activity_type)}${
           flags ? ` [${flags}]` : ""
-        }${activity.note ? ` - ${activity.note}` : ""}`;
+        }${activity.note ? ` - ${activity.note}` : ""}${
+          activity.derived_visits ? ` (${activity.derived_visits})` : ""
+        }`;
       })
       .join(" | "),
     row.report_photo_count,

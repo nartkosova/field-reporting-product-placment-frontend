@@ -4,6 +4,7 @@ import { BaseTable } from "../../components/BaseTable/BaseTable";
 import { DetailedWorkDayReportRow } from "../../types/workDayReportInterface";
 import PhotoGallery from "../../components/PhotoGallery/PhotoGallery";
 import {
+  withDerivedStoreVisits,
   CRITICAL_FLAGS,
   FLAG_LABELS,
   STATUS_STYLES,
@@ -191,9 +192,13 @@ const WorkDayReportTable = ({ data }: { data: DetailedWorkDayReportRow[] }) => {
       columnHelper.display({
         id: "activities",
         header: "Aktivitetet",
-        cell: ({ row }) =>
-          row.original.activities.length
-            ? row.original.activities
+        cell: ({ row }) => {
+          const activities = withDerivedStoreVisits(
+            row.original.activities,
+            row.original.verification?.visits ?? []
+          );
+          return activities.length
+            ? activities
                 .map((activity) => {
                   const flags = [
                     activity.planned ? "plan" : null,
@@ -204,10 +209,13 @@ const WorkDayReportTable = ({ data }: { data: DetailedWorkDayReportRow[] }) => {
 
                   return `${getActivityLabel(activity.activity_type)}${
                     flags ? ` [${flags}]` : ""
-                  }${activity.note ? ` - ${activity.note}` : ""}`;
+                  }${activity.note ? ` - ${activity.note}` : ""}${
+                    activity.derived_visits ? ` (${activity.derived_visits})` : ""
+                  }`;
                 })
                 .join(" | ")
-            : "-",
+            : "-";
+        },
       }),
       columnHelper.accessor("report_photo_count", { header: "Foto" }),
       columnHelper.accessor("podravka_facing_count", { header: "PPL Podravka" }),

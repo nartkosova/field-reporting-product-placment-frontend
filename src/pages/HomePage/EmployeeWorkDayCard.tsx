@@ -9,8 +9,13 @@ import {
   WorkLogDay,
   WorkLogDayInput,
   WorkLogStatus,
+  WorkDayStoreVisit,
 } from "../../types/workDayInterface";
-import { setActiveWorkDay, useActiveWorkDay } from "../../hooks/useActiveWorkDay";
+import { formatTime } from "../../utils/attendance";
+import {
+  setActiveWorkDay,
+  useActiveWorkDay,
+} from "../../hooks/useActiveWorkDay";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import SubmitButton from "../../components/Buttons/SubmitButton";
 import Select from "react-select";
@@ -67,6 +72,23 @@ const createDefaultForm = (): StarterFormState => ({
 });
 
 const LAST_KILOMETERS_KEY = "lastKnownKilometers";
+
+const StoreVisitList = ({ visits }: { visits: WorkDayStoreVisit[] }) => (
+  <ul className="space-y-1 text-sm">
+    {visits.map((visit) => (
+      <li
+        key={visit.store_visit_id}
+        className="flex justify-between gap-3 text-neutral-300"
+      >
+        <span>{visit.store_name}</span>
+        <span className="tabular-nums text-neutral-400">
+          {formatTime(visit.check_in_at)} –{" "}
+          {visit.check_out_at ? formatTime(visit.check_out_at) : "në market"}
+        </span>
+      </li>
+    ))}
+  </ul>
+);
 
 const emptyCity = () => ({ city_name: "", visit_order: "", note: "" });
 
@@ -128,18 +150,18 @@ const mapDayToStarterForm = (day: WorkLogDay): StarterFormState => ({
     : [emptyCity()],
   activities: day.activities.length
     ? day.activities.map((activity) => ({
-      activity_type: activity.activity_type,
-      planned: Boolean(activity.planned),
-      completed: Boolean(activity.completed),
-      note: activity.note || "",
-    }))
+        activity_type: activity.activity_type,
+        planned: Boolean(activity.planned),
+        completed: Boolean(activity.completed),
+        note: activity.note || "",
+      }))
     : [emptyActivity()],
 });
 
 const mapQueuedWorkDayToDay = (
   queuedDay: WorkLogDayInput,
   userId: number,
-  workLogDayId: number | null
+  workLogDayId: number | null,
 ): WorkLogDay => ({
   work_log_day_id: workLogDayId ?? 0,
   user_id: userId,
@@ -180,7 +202,7 @@ const mapQueuedWorkDayToDay = (
 
 const buildPayload = (
   selectedDate: string,
-  form: StarterFormState
+  form: StarterFormState,
 ): WorkLogDayInput => {
   const isWorkDay = form.status === "planned_work";
   const startKm = parseNumber(form.start_kilometers);
@@ -206,7 +228,7 @@ const buildPayload = (
           (activity) =>
             activity.activity_type === "store_visit" ||
             activity.activity_type === "ppl" ||
-            activity.activity_type === "photo_report"
+            activity.activity_type === "photo_report",
         )
         .map((activity) => ({
           activity_type: activity.activity_type,
@@ -238,7 +260,7 @@ export const EmployeeWorkDayCard = () => {
   const activeWorkDay = useActiveWorkDay();
   const todayDate = getLocalDateIso();
   const [selectedDate, setSelectedDate] = useState(
-    () => activeWorkDay?.work_date || ""
+    () => activeWorkDay?.work_date || "",
   );
   const [selectedDay, setSelectedDay] = useState<WorkLogDay | null>(null);
   const [form, setForm] = useState<StarterFormState>(createDefaultForm);
@@ -250,12 +272,20 @@ export const EmployeeWorkDayCard = () => {
   const prefilledKilometersDateRef = useRef<string | null>(null);
 
   const isWorkDay = form.status === "planned_work";
+  // Store check-ins prove the market visits, so they mark "Vizite ne Market"
+  // as done instead of a checkbox the employee ticks by hand.
+  const storeVisits = selectedDay?.store_visits ?? [];
+  const hasPlannedStoreVisit = form.activities.some(
+    (activity) => activity.activity_type === "store_visit",
+  );
   const hasWorkDayStarterData = Boolean(
-    isWorkDay && form.plan.trim() && form.start_kilometers.trim()
+    isWorkDay && form.plan.trim() && form.start_kilometers.trim(),
   );
   const hasUnsavedChanges = useMemo(() => {
     if (!selectedDay) return false;
-    return JSON.stringify(form) !== JSON.stringify(mapDayToStarterForm(selectedDay));
+    return (
+      JSON.stringify(form) !== JSON.stringify(mapDayToStarterForm(selectedDay))
+    );
   }, [form, selectedDay]);
   const shouldExposeTodayActions = selectedDate === todayDate;
 
@@ -292,7 +322,7 @@ export const EmployeeWorkDayCard = () => {
           const offlineDay = mapQueuedWorkDayToDay(
             queuedDay,
             userId ?? 0,
-            activeWorkDay?.work_log_day_id ?? null
+            activeWorkDay?.work_log_day_id ?? null,
           );
           setSelectedDay(offlineDay);
           setForm(mapDayToStarterForm(offlineDay));
@@ -306,7 +336,7 @@ export const EmployeeWorkDayCard = () => {
                     status: offlineDay.status,
                     selected_at: new Date().toISOString(),
                   }
-                : null
+                : null,
             );
           }
           setSuccessMessage("Dita offline u ngarkua nga pajisja.");
@@ -321,7 +351,9 @@ export const EmployeeWorkDayCard = () => {
         if (ignore) return;
 
         if (days[0]) {
-          const detail = await workDayService.getWorkDayById(days[0].work_log_day_id);
+          const detail = await workDayService.getWorkDayById(
+            days[0].work_log_day_id,
+          );
           if (ignore) return;
 
           setSelectedDay(detail);
@@ -336,7 +368,7 @@ export const EmployeeWorkDayCard = () => {
                     status: detail.status,
                     selected_at: new Date().toISOString(),
                   }
-                : null
+                : null,
             );
           }
           setSuccessMessage("Dita ekziston. Mund ta vazhdosh.");
@@ -382,7 +414,12 @@ export const EmployeeWorkDayCard = () => {
     isWorkDay && !form.start_kilometers.trim() && !form.end_kilometers.trim();
 
   useEffect(() => {
-    if (!kilometerPrefillKey || !userId || isLoading || !needsKilometerPrefill) {
+    if (
+      !kilometerPrefillKey ||
+      !userId ||
+      isLoading ||
+      !needsKilometerPrefill
+    ) {
       return;
     }
 
@@ -396,7 +433,7 @@ export const EmployeeWorkDayCard = () => {
       setForm((prev) =>
         prev.start_kilometers.trim() || prev.end_kilometers.trim()
           ? prev
-          : { ...prev, start_kilometers: value }
+          : { ...prev, start_kilometers: value },
       );
 
     const loadLatestKilometers = async () => {
@@ -417,8 +454,8 @@ export const EmployeeWorkDayCard = () => {
           latest?.end_kilometers != null
             ? String(latest.end_kilometers)
             : latest?.start_kilometers != null
-            ? String(latest.start_kilometers)
-            : "";
+              ? String(latest.start_kilometers)
+              : "";
 
         if (!kilometerValue) return;
 
@@ -442,7 +479,13 @@ export const EmployeeWorkDayCard = () => {
     return () => {
       ignore = true;
     };
-  }, [kilometerPrefillKey, selectedDate, userId, isLoading, needsKilometerPrefill]);
+  }, [
+    kilometerPrefillKey,
+    selectedDate,
+    userId,
+    isLoading,
+    needsKilometerPrefill,
+  ]);
 
   const saveStarterData = async (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -467,7 +510,7 @@ export const EmployeeWorkDayCard = () => {
         const offlineDay = mapQueuedWorkDayToDay(
           payload,
           userId,
-          activeWorkDay?.work_log_day_id ?? null
+          activeWorkDay?.work_log_day_id ?? null,
         );
         setSelectedDay(offlineDay);
         setForm(mapDayToStarterForm(offlineDay));
@@ -484,7 +527,10 @@ export const EmployeeWorkDayCard = () => {
 
       const response =
         selectedDay && selectedDay.work_log_day_id
-          ? await workDayService.updateWorkDay(selectedDay.work_log_day_id, payload)
+          ? await workDayService.updateWorkDay(
+              selectedDay.work_log_day_id,
+              payload,
+            )
           : await workDayService.createWorkDay(payload);
 
       setSelectedDay(response);
@@ -499,7 +545,7 @@ export const EmployeeWorkDayCard = () => {
       setSuccessMessage(
         selectedDay
           ? "Dita u përditësua me sukses."
-          : "Dita u krijua me sukses. Tani vazhdo me PPL ose foto."
+          : "Dita u krijua me sukses. Tani vazhdo me PPL ose foto.",
       );
     } catch (error) {
       setScreenError(getErrorMessage(error));
@@ -539,27 +585,22 @@ export const EmployeeWorkDayCard = () => {
         </div>
       )}
 
-      {screenError && (
-        <div className="notice-error">
-          {screenError}
-        </div>
-      )}
+      {screenError && <div className="notice-error">{screenError}</div>}
 
-      {successMessage && (
-        <div className="notice-success">
-          {successMessage}
-        </div>
-      )}
+      {successMessage && <div className="notice-success">{successMessage}</div>}
 
       {!isLoading && selectedDate && (
         <form onSubmit={saveStarterData} className="space-y-4">
           <div className="card-inset relative space-y-2">
-            <label className="block mb-2 font-medium text-gray-200">Eventi</label>
+            <label className="block mb-2 font-medium text-gray-200">
+              Eventi
+            </label>
             <Select
               options={statusSelectOptions}
               value={
-                statusSelectOptions.find((option) => option.value === form.status) ||
-                null
+                statusSelectOptions.find(
+                  (option) => option.value === form.status,
+                ) || null
               }
               onChange={(selected) =>
                 setForm((prev) => ({
@@ -589,8 +630,8 @@ export const EmployeeWorkDayCard = () => {
                   className={`w-full ${inputClass} min-h-24`}
                 />
                 <p className="text-sm text-neutral-400">
-                  Shkruaj planin e ditës. Bashkë me kilometrazhin fillestar,
-                  kjo hap qytetet, aktivitetet, kostot dhe përmbledhjen.
+                  Shkruaj planin e ditës. Bashkë me kilometrazhin fillestar, kjo
+                  hap qytetet, aktivitetet, kostot dhe përmbledhjen.
                 </p>
               </div>
 
@@ -724,7 +765,10 @@ export const EmployeeWorkDayCard = () => {
                     <textarea
                       value={form.summary}
                       onChange={(event) =>
-                        setForm((prev) => ({ ...prev, summary: event.target.value }))
+                        setForm((prev) => ({
+                          ...prev,
+                          summary: event.target.value,
+                        }))
                       }
                       placeholder="Si shkoi dita?"
                       className={`w-full ${inputClass} min-h-24`}
@@ -765,8 +809,11 @@ export const EmployeeWorkDayCard = () => {
                                   ...prev,
                                   cities: prev.cities.map((item, itemIndex) =>
                                     itemIndex === index
-                                      ? { ...item, city_name: event.target.value }
-                                      : item
+                                      ? {
+                                          ...item,
+                                          city_name: event.target.value,
+                                        }
+                                      : item,
                                   ),
                                 }))
                               }
@@ -780,8 +827,11 @@ export const EmployeeWorkDayCard = () => {
                                   ...prev,
                                   cities: prev.cities.map((item, itemIndex) =>
                                     itemIndex === index
-                                      ? { ...item, visit_order: event.target.value }
-                                      : item
+                                      ? {
+                                          ...item,
+                                          visit_order: event.target.value,
+                                        }
+                                      : item,
                                   ),
                                 }))
                               }
@@ -797,7 +847,7 @@ export const EmployeeWorkDayCard = () => {
                                 cities: prev.cities.map((item, itemIndex) =>
                                   itemIndex === index
                                     ? { ...item, note: event.target.value }
-                                    : item
+                                    : item,
                                 ),
                               }))
                             }
@@ -810,7 +860,7 @@ export const EmployeeWorkDayCard = () => {
                                 setForm((prev) => ({
                                   ...prev,
                                   cities: prev.cities.filter(
-                                    (_, itemIndex) => itemIndex !== index
+                                    (_, itemIndex) => itemIndex !== index,
                                   ),
                                 }))
                               }
@@ -847,35 +897,50 @@ export const EmployeeWorkDayCard = () => {
                     </div>
 
                     <div className="space-y-3">
+                      {!hasPlannedStoreVisit && storeVisits.length > 0 && (
+                        <div className="border border-neutral-800 rounded-xl p-3 space-y-2">
+                          <p className="text-sm text-gray-200">
+                            Vizite ne Market{" "}
+                            <span className="text-green-300">
+                              ✓ I përfunduar (nga check-in)
+                            </span>
+                          </p>
+                          <StoreVisitList visits={storeVisits} />
+                        </div>
+                      )}
                       {form.activities.map((activity, index) => (
                         <div
                           key={`activity-${index}`}
                           className="border border-neutral-800 rounded-xl p-3 space-y-3"
                         >
                           <Select
-                            options={WORK_ACTIVITY_TYPE_OPTIONS.map((option) => ({
-                              value: option.value,
-                              label: option.label,
-                            }))}
+                            options={WORK_ACTIVITY_TYPE_OPTIONS.map(
+                              (option) => ({
+                                value: option.value,
+                                label: option.label,
+                              }),
+                            )}
                             value={{
                               value: activity.activity_type,
                               label:
                                 WORK_ACTIVITY_TYPE_OPTIONS.find(
-                                  (option) => option.value === activity.activity_type
+                                  (option) =>
+                                    option.value === activity.activity_type,
                                 )?.label || activity.activity_type,
                             }}
                             onChange={(selected) =>
                               setForm((prev) => ({
                                 ...prev,
-                                activities: prev.activities.map((item, itemIndex) =>
-                                  itemIndex === index
-                                    ? {
-                                        ...item,
-                                        activity_type:
-                                          (selected?.value as WorkActivityType) ||
-                                          "store_visit",
-                                      }
-                                    : item
+                                activities: prev.activities.map(
+                                  (item, itemIndex) =>
+                                    itemIndex === index
+                                      ? {
+                                          ...item,
+                                          activity_type:
+                                            (selected?.value as WorkActivityType) ||
+                                            "store_visit",
+                                        }
+                                      : item,
                                 ),
                               }))
                             }
@@ -889,10 +954,11 @@ export const EmployeeWorkDayCard = () => {
                             onChange={(event) =>
                               setForm((prev) => ({
                                 ...prev,
-                                activities: prev.activities.map((item, itemIndex) =>
-                                  itemIndex === index
-                                    ? { ...item, note: event.target.value }
-                                    : item
+                                activities: prev.activities.map(
+                                  (item, itemIndex) =>
+                                    itemIndex === index
+                                      ? { ...item, note: event.target.value }
+                                      : item,
                                 ),
                               }))
                             }
@@ -907,41 +973,60 @@ export const EmployeeWorkDayCard = () => {
                                 onChange={(event) =>
                                   setForm((prev) => ({
                                     ...prev,
-                                    activities: prev.activities.map((item, itemIndex) =>
-                                      itemIndex === index
-                                        ? { ...item, planned: event.target.checked }
-                                        : item
+                                    activities: prev.activities.map(
+                                      (item, itemIndex) =>
+                                        itemIndex === index
+                                          ? {
+                                              ...item,
+                                              planned: event.target.checked,
+                                            }
+                                          : item,
                                     ),
                                   }))
                                 }
                               />
                               I planifikuar
                             </label>
-                            <label className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                checked={activity.completed}
-                                onChange={(event) =>
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    activities: prev.activities.map((item, itemIndex) =>
-                                      itemIndex === index
-                                        ? { ...item, completed: event.target.checked }
-                                        : item
-                                    ),
-                                  }))
-                                }
-                              />
-                              I përfunduar
-                            </label>
+                            {activity.activity_type === "store_visit" &&
+                            storeVisits.length > 0 ? (
+                              <span className="text-green-300">
+                                ✓ I përfunduar (nga check-in)
+                              </span>
+                            ) : (
+                              <label className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={activity.completed}
+                                  onChange={(event) =>
+                                    setForm((prev) => ({
+                                      ...prev,
+                                      activities: prev.activities.map(
+                                        (item, itemIndex) =>
+                                          itemIndex === index
+                                            ? {
+                                                ...item,
+                                                completed: event.target.checked,
+                                              }
+                                            : item,
+                                      ),
+                                    }))
+                                  }
+                                />
+                                I përfunduar
+                              </label>
+                            )}
                           </div>
+                          {activity.activity_type === "store_visit" &&
+                            storeVisits.length > 0 && (
+                              <StoreVisitList visits={storeVisits} />
+                            )}
                           {form.activities.length > 1 && (
                             <ActionButton
                               onClick={() =>
                                 setForm((prev) => ({
                                   ...prev,
                                   activities: prev.activities.filter(
-                                    (_, itemIndex) => itemIndex !== index
+                                    (_, itemIndex) => itemIndex !== index,
                                   ),
                                 }))
                               }
@@ -988,8 +1073,8 @@ export const EmployeeWorkDayCard = () => {
             {selectedDay && !hasUnsavedChanges
               ? "✓ Dita është ruajtur dhe aktive."
               : selectedDay
-              ? "Ke ndryshime të paruajtura. Kliko “Ruaj ndryshimet”."
-              : "Dita nuk është ruajtur ende. Ruaje për të vazhduar me aktivitetet."}
+                ? "Ke ndryshime të paruajtura. Kliko “Ruaj ndryshimet”."
+                : "Dita nuk është ruajtur ende. Ruaje për të vazhduar me aktivitetet."}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1006,7 +1091,6 @@ export const EmployeeWorkDayCard = () => {
                 : "Pasi ta dërgoni ditën, vazhdoni me aktivitetet e zakonshme."}
             </div>
           </div>
-
         </form>
       )}
     </div>

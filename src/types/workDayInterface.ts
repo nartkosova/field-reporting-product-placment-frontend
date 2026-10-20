@@ -58,6 +58,14 @@ export interface WorkLogDayCity extends WorkLogDayCityInput {
   created_at: string;
 }
 
+export interface WorkDayStoreVisit {
+  store_visit_id: number;
+  store_id: number;
+  store_name: string;
+  check_in_at: string;
+  check_out_at: string | null;
+}
+
 export interface WorkLogDay {
   work_log_day_id: number;
   user_id: number;
@@ -83,6 +91,8 @@ export interface WorkLogDay {
   city_count?: number;
   activities: WorkLogActivity[];
   cities: WorkLogDayCity[];
+  // Missing on days loaded from the offline queue.
+  store_visits?: WorkDayStoreVisit[];
 }
 
 export type WorkLogDayListItem = Omit<WorkLogDay, "activities" | "cities">;
