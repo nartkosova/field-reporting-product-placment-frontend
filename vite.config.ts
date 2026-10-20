@@ -6,16 +6,19 @@ import { VitePWA } from "vite-plugin-pwa";
 const LOCAL_BACKEND = "http://localhost:3000";
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  // The app always calls the API on its own origin ("/api/..."), so the
-  // httpOnly session cookie is first-party and works in every browser. In dev
-  // Vite proxies /api to the backend; on Cloudflare, functions/api/[[path]].ts
-  // proxies it to Railway. Nothing from .env is baked into the build.
-  const devBackend = loadEnv(mode, process.cwd(), "VITE_").VITE_BASE_URL || LOCAL_BACKEND;
+export default defineConfig(({ command, mode }) => {
+  // Dev calls the local backend directly (VITE_BASE_URL from .env). Builds
+  // call "/api" on their own origin, which functions/api/[[path]].ts proxies
+  // to Railway, so the session cookie stays first-party. Nothing from .env is
+  // baked into a build.
+  const baseUrl =
+    command === "build"
+      ? ""
+      : loadEnv(mode, process.cwd(), "VITE_").VITE_BASE_URL || LOCAL_BACKEND;
 
   return {
     define: {
-      "import.meta.env.VITE_BASE_URL": JSON.stringify(""),
+      "import.meta.env.VITE_BASE_URL": JSON.stringify(baseUrl),
     },
     plugins: [
       react(),
@@ -65,9 +68,6 @@ export default defineConfig(({ mode }) => {
         protocol: "ws",
         host: "localhost",
         port: 5173,
-      },
-      proxy: {
-        "/api": { target: devBackend, changeOrigin: true },
       },
     },
   };
