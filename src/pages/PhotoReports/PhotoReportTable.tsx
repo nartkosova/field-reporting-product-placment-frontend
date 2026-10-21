@@ -1,7 +1,12 @@
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { BaseTable } from "../../components/BaseTable/BaseTable";
-import { PhotoSchema, PHOTO_TYPE_LABELS } from "../../types/photoInterface";
+import {
+  PhotoSchema,
+  PHOTO_TYPE_LABELS,
+  formatQuarter,
+  photoQuarter,
+} from "../../types/photoInterface";
 import photoService from "../../services/photoService";
 import ActionButton from "../../components/Buttons/ActionButtons";
 import { toast } from "../../components/Toast/toast";
@@ -62,7 +67,19 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         header: "Shifra e bleresit",
         cell: (info) => info.getValue() ?? "-",
       }),
-      columnHelper.accessor("category", { header: "Kategoria" }),
+      columnHelper.accessor("category", {
+        header: "Kategoria",
+        // Quarterly photos uploaded before categories were recorded for them.
+        cell: (info) =>
+          info.getValue() || (
+            <span className="text-neutral-500">pa kategori</span>
+          ),
+      }),
+      columnHelper.display({
+        id: "quarter",
+        header: "Kvartali",
+        cell: ({ row }) => formatQuarter(photoQuarter(row.original)),
+      }),
       columnHelper.accessor("photo_type", {
         header: "Lloji i Fotos",
         cell: (info) =>
@@ -103,7 +120,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
         ),
       }),
     ],
-    [tableData, selectedPhotos, toggleAllPhotos, togglePhoto]
+    [tableData, selectedPhotos, toggleAllPhotos, togglePhoto],
   );
 
   return (
@@ -124,7 +141,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
                   const filename =
                     url.split("/").pop()?.split("?")[0] || `photo_${idx}.jpg`;
                   zip.file(filename, blob);
-                })
+                }),
               );
 
               const blob = await zip.generateAsync({ type: "blob" });
@@ -143,7 +160,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
             onClick={async () => {
               if (
                 !window.confirm(
-                  "A je i sigurt që dëshiron të fshish këto foto?"
+                  "A je i sigurt që dëshiron të fshish këto foto?",
                 )
               )
                 return;
@@ -152,7 +169,7 @@ const PhotoTable = ({ data }: { data: PhotoSchema[] }) => {
               await photoService.bulkDeletePhotos(photoUrls);
               toast.success("Fotot u fshinë me sukses.");
               setTableData((prev) =>
-                prev.filter((photo) => !selectedPhotos.has(photo.photo_url))
+                prev.filter((photo) => !selectedPhotos.has(photo.photo_url)),
               );
               setSelectedPhotos(new Set());
             }}

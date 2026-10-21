@@ -51,11 +51,9 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     return getQuarterValue(year, quarter);
   });
 
-  // Quarterly photos carry the reporting quarter in place of a product
-  // category, which the route does not supply for this type.
-  const resolvedCategory = isQuarterPhoto
-    ? selectedQuarter
-    : category || photoType;
+  // Quarterly photos keep the product category picked before this page and
+  // send the reporting quarter alongside it.
+  const resolvedCategory = category || photoType;
 
   useEffect(() => {
     if (!storeId) return;
@@ -72,8 +70,8 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     }
     setIsLoading(true);
     const safeName = sanitizeFilename(String(storeName));
-    const customName = `${safeName}-${
-      resolvedCategory
+    const customName = `${safeName}-${resolvedCategory}${
+      isQuarterPhoto ? `-${selectedQuarter}` : ""
     }-${company}-${uuidv4()}`.toLowerCase();
 
     const compressedFile = await imageCompression(file, {
@@ -86,6 +84,9 @@ const PhotoUploadPage: React.FC<Props> = ({ photoType }) => {
     formData.append("photo", compressedFile, customName);
     formData.append("photo_type", photoType);
     formData.append("category", resolvedCategory);
+    if (isQuarterPhoto) {
+      formData.append("quarter", selectedQuarter);
+    }
     formData.append("company", company || "podravka");
     formData.append("user_id", String(userId));
     formData.append("store_id", storeId.toString());

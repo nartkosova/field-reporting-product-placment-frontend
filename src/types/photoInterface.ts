@@ -21,12 +21,29 @@ export const PHOTO_TYPE_LABELS: Record<PhotoType, string> =
       acc[option.value] = option.label;
       return acc;
     },
-    {} as Record<PhotoType, string>
+    {} as Record<PhotoType, string>,
   );
 
-// Photo types whose "category" carries the reporting quarter instead of a
-// product category.
+// Photo types that record a reporting quarter next to their product category.
 export const QUARTER_PHOTO_TYPES: PhotoType[] = ["secondary_position_quarter"];
+
+// "Q4-2026" -> "Kvartali 4 - 2026"
+export const formatQuarter = (value: string | null | undefined) => {
+  const match = value?.match(/^Q([1-4])-(\d{4})$/);
+  return match ? `Kvartali ${match[1]} - ${match[2]}` : "-";
+};
+
+// The quarter of a photo in either form: the quarter column (current) or,
+// for older quarterly photos, the category column that held it.
+export const photoQuarter = (photo: {
+  photo_type: PhotoType;
+  category: string;
+  quarter?: string | null;
+}) =>
+  photo.quarter ??
+  (isQuarterPhotoType(photo.photo_type) && /^Q[1-4]-\d{4}$/.test(photo.category)
+    ? photo.category
+    : null);
 
 export const isQuarterPhotoType = (photoType: PhotoType) =>
   QUARTER_PHOTO_TYPES.includes(photoType);
@@ -84,6 +101,8 @@ export interface PhotoSchema {
   store_code?: number;
   created_at: string;
   photo_description?: string;
+  // "Q4-2026" on quarterly photos, null on every other type.
+  quarter?: string | null;
 }
 
 export interface PaginatedPhotoResponse {

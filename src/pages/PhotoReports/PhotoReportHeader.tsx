@@ -8,6 +8,8 @@ import {
   PHOTO_TYPE_OPTIONS,
   PHOTO_TYPE_LABELS,
   getQuarterOptions,
+  formatQuarter,
+  photoQuarter,
 } from "../../types/photoInterface";
 import { User, Store } from "../../types/reportInterface";
 import PhotoTable from "./PhotoReportTable";
@@ -49,7 +51,7 @@ const PhotoReportHeader = () => {
     }
 
     return stores.filter((store) =>
-      selectedUsers.includes(String(store.user_id))
+      selectedUsers.includes(String(store.user_id)),
     );
   }, [stores, selectedUsers]);
 
@@ -58,16 +60,18 @@ const PhotoReportHeader = () => {
     label: s.store_name,
   }));
 
-  // Quarterly photos store their reporting quarter in the category column, so
-  // the quarters have to be selectable here alongside the product categories —
-  // otherwise those photos are unreachable through this filter.
+  // Older quarterly photos store their quarter in the category column, so the
+  // quarters stay selectable here next to the product categories.
   const categoryOptions = useMemo(
     () => [
       ...categories.map((c) => ({ value: c, label: c })),
       ...getQuarterOptions(),
     ],
-    [categories]
+    [categories],
   );
+  // Quarterly photos record their quarter separately, so it combines with
+  // the category and photo type filters.
+  const quarterOptions = useMemo(() => getQuarterOptions(), []);
 
   const photoTypeOptions = [...PHOTO_TYPE_OPTIONS];
 
@@ -102,6 +106,11 @@ const PhotoReportHeader = () => {
       placeholder: "Zgjidh kategorinë",
     },
     {
+      key: "quarters",
+      options: quarterOptions,
+      placeholder: "Zgjidh kvartalin",
+    },
+    {
       key: "company",
       options: companyOptions,
       placeholder: "Zgjedh kompanin",
@@ -114,7 +123,7 @@ const PhotoReportHeader = () => {
       const res = await photoService.getAllReportPhotos(
         pageSize,
         offset,
-        filters
+        filters,
       );
       setPhotoReport(res.data);
       return {
@@ -122,7 +131,7 @@ const PhotoReportHeader = () => {
         total: res.total,
       };
     },
-    []
+    [],
   );
 
   const getImageBuffer = async (url: string): Promise<ArrayBuffer> => {
@@ -140,6 +149,7 @@ const PhotoReportHeader = () => {
       { header: "Shifra e bleresit", key: "store_code" },
       { header: "Lloji i fotos", key: "photo_type" },
       { header: "Category", key: "category" },
+      { header: "Kvartali", key: "quarter" },
       { header: "Description", key: "photo_description" },
       { header: "Company", key: "company" },
       { header: "Date", key: "created_at" },
@@ -153,7 +163,8 @@ const PhotoReportHeader = () => {
         store_name: row.store_name,
         store_code: row.store_code ?? "-",
         photo_type: PHOTO_TYPE_LABELS[row.photo_type] ?? row.photo_type,
-        category: row.category,
+        category: row.category || "pa kategori",
+        quarter: photoQuarter(row) ? formatQuarter(photoQuarter(row)) : "",
         photo_description: row.photo_description,
         company: row.company,
         created_at: new Date(row.created_at).toLocaleDateString(),
@@ -170,7 +181,7 @@ const PhotoReportHeader = () => {
         // Keep the image anchored to the "Photo" column: adding a column to the
         // list above shifts this index.
         const photoColumnIndex = worksheet.columns.findIndex(
-          (column) => column.key === "photo"
+          (column) => column.key === "photo",
         );
 
         worksheet.getRow(excelRow.number).height = 120;

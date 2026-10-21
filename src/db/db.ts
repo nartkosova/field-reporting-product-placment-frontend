@@ -250,6 +250,7 @@ export const queuePhoto = async (formData: FormData) => {
     photo_name: file.name,
     photo_type: formData.get("photo_type"),
     category: formData.get("category"),
+    quarter: formData.get("quarter"),
     company: formData.get("company"),
     user_id: formData.get("user_id"),
     store_id: formData.get("store_id"),
@@ -267,6 +268,8 @@ interface QueuedPhoto {
   photo_name: string;
   photo_type: string;
   category: string;
+  // Only on quarterly photos queued by the current app version.
+  quarter?: string | null;
   company: string;
   user_id: string;
   store_id: string;
@@ -282,6 +285,7 @@ export const syncQueuedPhotos = () =>
     formData.append("photo", new Blob([item.photo]), item.photo_name);
     formData.append("photo_type", item.photo_type);
     formData.append("category", item.category);
+    if (item.quarter) formData.append("quarter", String(item.quarter));
     formData.append("company", item.company);
     formData.append("user_id", item.user_id);
     formData.append("store_id", item.store_id);
