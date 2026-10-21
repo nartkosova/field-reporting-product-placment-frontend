@@ -40,6 +40,8 @@ export interface DayVerification {
   worked_minutes: number | null;
   in_store_minutes: number;
   longest_gap_minutes: number | null;
+  // Past day with no check-out: last recorded activity, shown as an estimate.
+  estimated_check_out_at: string | null;
   visit_count: number;
   photo_visit_count: number;
   activities_outside_visit: number;
@@ -61,7 +63,8 @@ export type LiveState =
   | "not_started"
   | "in_store"
   | "on_road"
-  | "done";
+  | "done"
+  | "not_closed";
 
 export interface BusinessTotals {
   ppl_batches: number;

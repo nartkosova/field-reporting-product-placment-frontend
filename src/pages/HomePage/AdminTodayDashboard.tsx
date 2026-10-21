@@ -46,6 +46,10 @@ const STATE_LABELS: Record<LiveState, { label: string; className: string }> = {
     label: "Pa filluar",
     className: "bg-amber-950 text-amber-300 border-amber-800",
   },
+  not_closed: {
+    label: "Pa mbyllur",
+    className: "bg-amber-950 text-amber-300 border-amber-800",
+  },
   missing: {
     label: "Pa ditë",
     className: "bg-red-950 text-red-300 border-red-800",
@@ -60,6 +64,7 @@ const STATE_LABELS: Record<LiveState, { label: string; className: string }> = {
 const STATE_ORDER: LiveState[] = [
   "missing",
   "not_started",
+  "not_closed",
   "in_store",
   "on_road",
   "done",

@@ -113,6 +113,16 @@ const WorkDayReportTable = ({ data }: { data: DetailedWorkDayReportRow[] }) => {
         cell: ({ row }) => {
           const v = row.original.verification;
           if (!v || !v.check_in_at) return "-";
+          if (!v.check_out_at && v.estimated_check_out_at) {
+            return (
+              <span>
+                {formatTime(v.check_in_at)} –{" "}
+                <span className="text-amber-300" title="Pa check-out: aktiviteti i fundit i regjistruar">
+                  ~{formatTime(v.estimated_check_out_at)} (pa check-out)
+                </span>
+              </span>
+            );
+          }
           return `${formatTime(v.check_in_at)} – ${formatTime(v.check_out_at)} (${formatMinutes(
             v.worked_minutes
           )})`;

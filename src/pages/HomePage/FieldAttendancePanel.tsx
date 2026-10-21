@@ -212,7 +212,25 @@ export const FieldAttendancePanel = ({
           </p>
         )}
         {checkedOut && (
-          <p className="text-sm text-green-300">✓ Dita është mbyllur.</p>
+          <div className="space-y-2">
+            <p className="text-sm text-green-300">✓ Dita është mbyllur.</p>
+            {/* For an accidental or early check-out: reopens the day so the
+                employee can keep visiting stores and close it again later. */}
+            <button
+              type="button"
+              disabled={busyAction !== null}
+              onClick={() =>
+                runAction(
+                  "reopen",
+                  () => workDayService.reopenDay(workLogDayId),
+                  () => "Dita u rihap. Mbylle përsëri kur të përfundosh."
+                )
+              }
+              className={`${buttonClass} bg-neutral-800 hover:bg-neutral-700 text-white`}
+            >
+              {busyAction === "reopen" ? "Duke rihapur..." : "↺ Rifillo ditën"}
+            </button>
+          </div>
         )}
       </div>
 

@@ -119,6 +119,15 @@ const checkOut = async (workLogDayId: number): Promise<DayAttendance> => {
   return response.data;
 };
 
+const reopenDay = async (workLogDayId: number): Promise<DayAttendance> => {
+  const response = await axios.post(
+    `${baseUrl}/api/work-days/${workLogDayId}/reopen`,
+    {},
+    authHeaders()
+  );
+  return response.data;
+};
+
 const startStoreVisit = async (
   workLogDayId: number,
   storeId: number
@@ -180,6 +189,7 @@ export default {
   getAttendance,
   checkIn,
   checkOut,
+  reopenDay,
   startStoreVisit,
   endStoreVisit,
   uploadStoreVisitPhoto,

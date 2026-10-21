@@ -70,7 +70,11 @@ const exportCsv = (rows: DetailedWorkDayReportRow[]) => {
     getStatusLabel(row.status),
     row.verification ? STATUS_STYLES[row.verification.verification_status].label : "",
     formatTime(row.verification?.check_in_at),
-    formatTime(row.verification?.check_out_at),
+    row.verification?.check_out_at
+      ? formatTime(row.verification.check_out_at)
+      : row.verification?.estimated_check_out_at
+      ? `~${formatTime(row.verification.estimated_check_out_at)} (pa check-out)`
+      : "-",
     formatMinutes(row.verification?.worked_minutes),
     row.verification ? formatMinutes(row.verification.in_store_minutes) : "",
     row.verification?.visit_count ?? "",
